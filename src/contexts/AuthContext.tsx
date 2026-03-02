@@ -22,6 +22,11 @@ interface AuthState {
   // Chain
   activeChainId: number;
   setActiveChain: (chainId: number) => void;
+  walletChainId: number | undefined;
+  isChainMismatch: boolean;
+  switchWalletToActiveChain: () => void;
+  chainSwitchError: string | null;
+  clearChainSwitchError: () => void;
   // Hydration — true once localStorage has been read
   isHydrated: boolean;
   // PIN
@@ -102,6 +107,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const isChainMismatch = isConnected
+    && walletChainId !== undefined
+    && isChainSupported(walletChainId)
+    && walletChainId !== activeChainId;
+
+  const [chainSwitchError, setChainSwitchError] = useState<string | null>(null);
+
+  // Auto-clear error when mismatch resolves
+  useEffect(() => {
+    if (!isChainMismatch) setChainSwitchError(null);
+  }, [isChainMismatch]);
+
+  const switchWalletToActiveChain = useCallback(() => {
+    if (!switchChain) return;
+    try {
+      switchChain(
+        { chainId: activeChainId },
+        { onError: (err) => setChainSwitchError(err.message || 'Failed to switch chain') },
+      );
+    } catch (err) {
+      setChainSwitchError(err instanceof Error ? err.message : 'Failed to switch chain');
+    }
+  }, [switchChain, activeChainId]);
+
+  const clearChainSwitchError = useCallback(() => setChainSwitchError(null), []);
+
   // Migrate legacy onboarded key once when address changes
   useEffect(() => {
     if (!address || typeof window === 'undefined') return;
@@ -130,6 +161,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     address,
     activeChainId,
     setActiveChain,
+    walletChainId,
+    isChainMismatch,
+    switchWalletToActiveChain,
+    chainSwitchError,
+    clearChainSwitchError,
     isHydrated: stealthAddr.isHydrated,
     hasPin: pinHook.hasPin,
     isPinVerified: pinHook.isPinVerified,

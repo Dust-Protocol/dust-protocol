@@ -4,11 +4,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useCallback, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "./Navbar";
+import { ChainMismatchBanner } from "./ChainMismatchBanner";
+import { Toast } from "@/components/ui/Toast";
 import { PinGate } from "@/components/auth/PinGate";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { isConnected, isOnboarded, isNamesSettled, isHydrated, address, hasPin,
-          stealthKeys, autoRestoreFailed } = useAuth();
+          stealthKeys, autoRestoreFailed, chainSwitchError, clearChainSwitchError } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [pinUnlocked, setPinUnlocked] = useState(false);
@@ -44,9 +46,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-[#06080F] text-white">
         <Navbar />
+        <ChainMismatchBanner />
         <main className="pt-14">
           {children}
         </main>
+        {chainSwitchError && <Toast message={chainSwitchError} variant="error" onDismiss={clearChainSwitchError} />}
       </div>
     );
   }
@@ -67,6 +71,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#06080F] text-white">
       <Navbar />
+      <ChainMismatchBanner />
       <main className="pt-14">
         {isAutoRestoring ? (
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -79,6 +84,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <PinGate onUnlocked={handlePinUnlocked} />
         ) : children}
       </main>
+      {chainSwitchError && <Toast message={chainSwitchError} variant="error" onDismiss={clearChainSwitchError} />}
     </div>
   );
 }

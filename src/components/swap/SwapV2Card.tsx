@@ -8,6 +8,7 @@ import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
 import { DEFAULT_CHAIN_ID } from "@/config/chains";
 import { useSwitchChain } from "wagmi";
 import { useAuth } from "@/contexts/AuthContext";
+import { UnsupportedChainNotice } from "@/components/ui/UnsupportedChainNotice";
 import { useV2Keys, useV2Balance } from "@/hooks/dustpool/v2";
 import { useV2Swap, type SwapStatus } from "@/hooks/swap/v2/useV2Swap";
 import { useV2DenomSwap, type DenomSwapStatus } from "@/hooks/swap/v2/useV2DenomSwap";
@@ -503,25 +504,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
           {/* Unsupported Chain Banner */}
           {!swapSupported && isConnected && (
-            <div className="mb-4 p-3 rounded-sm bg-[rgba(255,176,0,0.06)] border border-[rgba(255,176,0,0.2)]">
-              <div className="flex items-start gap-2 mb-3">
-                <AlertCircleIcon size={14} color="#FFB000" />
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#FFB000] font-mono">
-                    CHAIN_UNSUPPORTED
-                  </span>
-                  <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
-                    V2 Swap is not deployed on this chain.
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => switchChain?.({ chainId: DEFAULT_CHAIN_ID })}
-                className="w-full py-2 rounded-sm text-xs font-bold font-mono text-[#FFB000] bg-[rgba(255,176,0,0.08)] border border-[rgba(255,176,0,0.25)] hover:bg-[rgba(255,176,0,0.14)] hover:border-[#FFB000] transition-all tracking-wider"
-              >
-                SWITCH TO SUPPORTED CHAIN
-              </button>
-            </div>
+            <UnsupportedChainNotice feature="V2 Swap" />
           )}
 
           {/* Keys status + inline PIN unlock */}

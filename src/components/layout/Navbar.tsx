@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { DustLogo } from "@/components/DustLogo";
 import { getSupportedChains } from "@/config/chains";
 import { ChainIcon as ChainTokenIcon } from "@/components/stealth/icons";
+import { FeatureMatrix } from "@/components/ui/FeatureMatrix";
 import { MenuIcon, XIcon, ChevronDownIcon, CopyIcon, LogOutIcon, CheckIcon } from "lucide-react";
 import { isPrivyEnabled } from "@/config/privy";
 import { useLogin, usePrivy, useLogout } from "@privy-io/react-auth";
@@ -35,6 +36,10 @@ function useLogoutSafe() {
 }
 
 const chains = getSupportedChains();
+
+function shortChainName(name: string): string {
+  return name.replace(/\s*Sepolia\s*/i, '').trim() || name;
+}
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -63,8 +68,10 @@ export function Navbar() {
   const { activeChainId, setActiveChain } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
+  const [chainDropdownOpen, setChainDropdownOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const walletRef = useRef<HTMLDivElement>(null);
+  const chainBadgeRef = useRef<HTMLDivElement>(null);
 
   const activeChain = chains.find(c => c.id === activeChainId) || chains[0];
 
@@ -83,11 +90,14 @@ export function Navbar() {
     }
   };
 
-  // Close wallet dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handle(e: MouseEvent) {
       if (walletRef.current && !walletRef.current.contains(e.target as Node)) {
         setWalletOpen(false);
+      }
+      if (chainBadgeRef.current && !chainBadgeRef.current.contains(e.target as Node)) {
+        setChainDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handle);
@@ -99,6 +109,12 @@ export function Navbar() {
     navigator.clipboard.writeText(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  function selectChain(chainId: number) {
+    setActiveChain(chainId);
+    setChainDropdownOpen(false);
+    setMobileOpen(false);
   }
 
   return (
@@ -138,16 +154,71 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Right — wallet button + hamburger */}
-        <div className="flex-1 flex items-center justify-end gap-3 min-w-0">
+        {/* Right — chain badge + wallet button + hamburger */}
+        <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3 min-w-0">
+
+          {/* Chain badge */}
+          {isConnected && (
+            <div className="relative shrink-0" ref={chainBadgeRef}>
+              <button
+                onClick={() => setChainDropdownOpen(v => !v)}
+                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-sm border border-white/10 bg-[#0a0d14] hover:bg-[#0a0d14]/80 hover:border-[#00FF41]/40 transition-all duration-300 group shadow-sm"
+              >
+                <ChainTokenIcon size={16} chainId={activeChain.id} />
+                <span className="hidden sm:inline text-[11px] font-mono text-white/70 group-hover:text-[#00FF41] transition-colors tracking-wide">
+                  {shortChainName(activeChain.name).toUpperCase()}
+                </span>
+                <ChevronDownIcon
+                  className="w-3 h-3 text-white/30 group-hover:text-[#00FF41]/70 transition-all duration-300"
+                  style={{ transform: chainDropdownOpen ? "rotate(180deg)" : "none" }}
+                />
+              </button>
+
+              {chainDropdownOpen && (
+                <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0d14] border border-[#00FF41]/20 rounded-sm min-w-[220px] z-50 overflow-hidden shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="px-4 pt-3 pb-2 border-b border-white/[0.04]">
+                    <span className="text-[10px] font-mono text-[#00FF41]/50 tracking-[0.2em] uppercase">Network</span>
+                  </div>
+                  <div className="py-1">
+                    {chains.map(chain => {
+                      const isActive = chain.id === activeChainId;
+                      return (
+                        <button
+                          key={chain.id}
+                          onClick={() => selectChain(chain.id)}
+                          className={`w-full text-left px-4 py-2.5 text-xs font-mono transition-all flex items-center gap-3 relative group ${isActive
+                              ? 'text-[#00FF41] bg-[#00FF41]/[0.08]'
+                              : 'text-white/60 hover:bg-white/[0.04] hover:text-white'
+                            }`}
+                        >
+                          {isActive && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#00FF41] shadow-[0_0_8px_rgba(0,255,65,1)]" />}
+                          <ChainTokenIcon size={16} chainId={chain.id} />
+                          <span className="flex-1 tracking-wide">{chain.name}</span>
+                          {isActive && <span className="w-1.5 h-1.5 bg-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.8)] rounded-sm"></span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {/* Feature availability for selected chain */}
+                  <div className="border-t border-white/[0.04]">
+                    <div className="px-4 pt-2.5 pb-1">
+                      <span className="text-[10px] font-mono text-white/25 tracking-[0.2em] uppercase">Features</span>
+                    </div>
+                    <FeatureMatrix chainId={activeChainId} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Wallet button */}
           <div className="relative shrink-0" ref={walletRef}>
             {displayName ? (
               <>
                 <button
                   onClick={() => setWalletOpen(v => !v)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-sm border border-white/10 bg-[#0a0d14] hover:bg-[#0a0d14]/80 hover:border-[#00FF41]/40 transition-all duration-300 group shadow-sm"
+                  className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-sm border border-white/10 bg-[#0a0d14] hover:bg-[#0a0d14]/80 hover:border-[#00FF41]/40 transition-all duration-300 group shadow-sm"
                 >
-                  <ChainTokenIcon size={16} chainId={activeChain.id} />
                   <div className="w-1.5 h-1.5 bg-[#00FF41] animate-pulse shrink-0 rounded-sm" />
                   <span className="hidden sm:inline text-xs font-mono text-white/90 group-hover:text-[#00FF41] transition-colors">{displayName}</span>
                   <ChevronDownIcon
@@ -157,31 +228,7 @@ export function Navbar() {
                 </button>
 
                 {walletOpen && (
-                  <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0d14] border border-[#00FF41]/20 rounded-sm min-w-[240px] z-50 overflow-hidden shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="px-4 pt-3 pb-2 border-b border-white/[0.04]">
-                      <span className="text-[10px] font-mono text-[#00FF41]/50 tracking-[0.2em] uppercase">Network</span>
-                    </div>
-                    <div className="py-1">
-                      {chains.map(chain => {
-                        const isActive = chain.id === activeChainId;
-                        return (
-                          <button
-                            key={chain.id}
-                            onClick={() => { setActiveChain(chain.id); setWalletOpen(false); }}
-                            className={`w-full text-left px-4 py-2.5 text-xs font-mono transition-all flex items-center gap-3 relative group ${isActive
-                                ? 'text-[#00FF41] bg-[#00FF41]/[0.08]'
-                                : 'text-white/60 hover:bg-white/[0.04] hover:text-white'
-                              }`}
-                          >
-                            {isActive && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#00FF41] shadow-[0_0_8px_rgba(0,255,65,1)]" />}
-                            <ChainTokenIcon size={16} chainId={chain.id} />
-                            <span className="flex-1 tracking-wide">{chain.name}</span>
-                            {isActive && <span className="w-1.5 h-1.5 bg-[#00FF41] shadow-[0_0_6px_rgba(0,255,65,0.8)] rounded-sm"></span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="border-t border-white/[0.04]" />
+                  <div className="absolute top-[calc(100%+8px)] right-0 bg-[#0a0d14] border border-[#00FF41]/20 rounded-sm min-w-[220px] z-50 overflow-hidden shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-1 duration-200">
                     <div className="py-1">
                       <button
                         onClick={copyAddress}
@@ -225,6 +272,31 @@ export function Navbar() {
       {/* Mobile nav drawer */}
       {mobileOpen && (
         <div className="fixed top-16 left-0 right-0 z-40 bg-[#0a0d14]/95 backdrop-blur-xl border-b border-[#00FF41]/20 flex flex-col py-3 shadow-[0_8px_32px_rgba(0,0,0,0.8)] animate-in slide-in-from-top-2 duration-200">
+          {/* Mobile chain switcher */}
+          {isConnected && (
+            <div className="px-3 mb-2 pb-2 border-b border-white/[0.04]">
+              <span className="block px-4 pb-2 text-[10px] font-mono text-[#00FF41]/50 tracking-[0.2em] uppercase">Network</span>
+              <div className="flex flex-col gap-0.5">
+                {chains.map(chain => {
+                  const isActive = chain.id === activeChainId;
+                  return (
+                    <button
+                      key={chain.id}
+                      onClick={() => selectChain(chain.id)}
+                      className={`flex items-center gap-3 px-4 py-2.5 text-xs font-mono tracking-widest transition-all rounded-sm relative ${isActive
+                          ? 'text-[#00FF41] bg-[#00FF41]/[0.08] border-l-2 border-[#00FF41]'
+                          : 'text-white/50 hover:text-white hover:bg-white/[0.04] border-l-2 border-transparent'
+                        }`}
+                    >
+                      <ChainTokenIcon size={16} chainId={chain.id} />
+                      <span>{chain.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-0.5 px-3">
             {isConnected ? navItems.map(item => {
               const isActive = isNavActive(item.href, pathname);
