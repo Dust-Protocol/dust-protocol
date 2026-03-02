@@ -718,7 +718,40 @@ export const TokenIcon = ({ symbol, size = 24 }: { symbol: string; size?: number
   );
 };
 
+export const ArbitrumIcon = ({ size = 24 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+    <rect width="40" height="40" rx="20" fill="#213147" />
+    <path d="M21.87 19.47l3.48 5.69-4.37 2.53-.09-1.57-2.67-6.43 3.65-.22z" fill="#28A0F0" />
+    <path d="M28.27 23.36l1.63-0.95-3.37-9.58-.1-.29-2.08 1.21-.46.26 4.38 9.35z" fill="#28A0F0" />
+    <path d="M14.53 25.5l3.36 1.94 2.98-1.72.09-1.6-3.82-9.26-2.6 1.51-3.53 5.78 3.52 3.35z" fill="white" />
+    <path d="M26.43 12.54l-5.4-3.12a1.88 1.88 0 0 0-1.86 0l-5.4 3.12a1.88 1.88 0 0 0-.94 1.63v6.24L16.35 17l3.23-5.28a.66.66 0 0 1 1.15 0l4.7 7.7 3.53-2.04v-3.21c0-.67-.35-1.3-.94-1.63h.41z" fill="white" />
+    <path d="M20.06 30.56l8.22-4.75.72-.42-1.63.95-4.37 2.53-3.39 1.96-.33.19.78-.46z" fill="#96BEDC" />
+    <path d="M11.82 25.81l2.71 1.57.33-.19-3.52-3.35v1.97h.48z" fill="#96BEDC" />
+  </svg>
+);
+
+export const OptimismIcon = ({ size = 24 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+    <rect width="40" height="40" rx="20" fill="#FF0420" />
+    <path d="M14.56 24.48c-1.22 0-2.18-.33-2.87-1-.68-.67-1.03-1.62-1.03-2.84 0-1.76.46-3.18 1.38-4.26.92-1.09 2.15-1.63 3.69-1.63 1.2 0 2.14.33 2.83.98.69.65 1.03 1.56 1.03 2.72 0 1.8-.46 3.24-1.39 4.33-.92 1.1-2.15 1.7-3.64 1.7zm.27-2.1c.62 0 1.14-.34 1.56-1.02.42-.68.63-1.56.63-2.64 0-.7-.13-1.24-.39-1.62-.26-.38-.64-.57-1.14-.57-.63 0-1.15.34-1.57 1.03-.41.68-.62 1.56-.62 2.62 0 .71.13 1.25.4 1.63.27.38.65.57 1.13.57z" fill="white" />
+    <path d="M20.38 24.32V14.91h3.15c1.04 0 1.84.26 2.4.78.56.52.84 1.25.84 2.2 0 1.16-.37 2.1-1.1 2.8-.73.7-1.7 1.05-2.89 1.05h-1.13l-.44 2.58h-2.83zm3.06-4.62c.42 0 .77-.14 1.04-.43.28-.29.42-.66.42-1.1 0-.3-.09-.54-.27-.72-.18-.17-.44-.26-.78-.26h-.74l-.35 2.51h.68z" fill="white" />
+  </svg>
+);
+
+export const BaseIcon = ({ size = 24 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+    <rect width="40" height="40" rx="20" fill="#0052FF" />
+    <path d="M20 33c7.18 0 13-5.82 13-13S27.18 7 20 7C13.36 7 7.74 12 7.08 18.4h16.56v3.2H7.08C7.74 28 13.36 33 20 33z" fill="white" />
+  </svg>
+);
+
 export const ChainIcon = ({ size = 24, chainId }: IconProps & { chainId?: number }) => {
-  if (chainId === 11155111) return <ETHIcon size={size} />;
-  return <TONIcon size={size} />;
+  switch (chainId) {
+    case 11155111: return <ETHIcon size={size} />;
+    case 111551119090: return <TONIcon size={size} />;
+    case 421614: case 42161: return <ArbitrumIcon size={size} />;
+    case 11155420: case 10: return <OptimismIcon size={size} />;
+    case 84532: case 8453: return <BaseIcon size={size} />;
+    default: return <ETHIcon size={size} />;
+  }
 };

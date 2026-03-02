@@ -2,6 +2,7 @@
 // Each supported chain has its contract addresses, creation codes, and metadata
 
 import { defineChain, type Chain } from 'viem';
+import { arbitrumSepolia, optimismSepolia, baseSepolia } from 'viem/chains';
 
 export interface ChainContracts {
   announcer: string;
@@ -195,11 +196,176 @@ const ETHEREUM_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
 };
 
+// ─── Arbitrum Sepolia ──────────────────────────────────────────────────────────
+
+const ARBITRUM_SEPOLIA_RPC_URLS = [
+  process.env.NEXT_PUBLIC_ALCHEMY_ARBITRUM_SEPOLIA_RPC,
+  'https://sepolia-rollup.arbitrum.io/rpc',
+  'https://arbitrum-sepolia.drpc.org',
+].filter(Boolean) as string[];
+
+const ARBITRUM_SEPOLIA_CONFIG: ChainConfig = {
+  id: 421614,
+  name: 'Arbitrum Sepolia',
+  rpcUrl: ARBITRUM_SEPOLIA_RPC_URLS[0],
+  rpcUrls: ARBITRUM_SEPOLIA_RPC_URLS,
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  blockExplorerUrl: 'https://sepolia.arbiscan.io',
+  viemChain: arbitrumSepolia,
+  contracts: {
+    announcer: '',
+    registry: '',
+    nameRegistry: '',
+    walletFactory: '',
+    legacyWalletFactory: '',
+    accountFactory: '',
+    legacyAccountFactory: '',
+    entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+    paymaster: '',
+    dustPool: null,
+    dustPoolVerifier: null,
+    subAccount7702: null,
+    nameRegistryMerkle: null,
+    nameVerifier: null,
+    uniswapV4PoolManager: null,
+    uniswapV4StateView: null,
+    uniswapV4Quoter: null,
+    dustPoolV2: null,
+    dustPoolV2Verifier: null,
+    dustPoolV2SplitVerifier: null,
+    dustPoolV2ComplianceVerifier: null,
+    dustSwapAdapterV2: null,
+    dustSwapVanillaPoolKey: null,
+  },
+  creationCodes: {
+    wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
+    legacyWallet: '',
+    account: THANOS_SEPOLIA_CONFIG.creationCodes.account,
+    legacyAccount: '',
+  },
+  deploymentBlock: 0,
+  dustPoolDeploymentBlock: null,
+  supportsEIP7702: false,
+  canonicalForNaming: false,
+  testnet: true,
+};
+
+// ─── OP Sepolia ────────────────────────────────────────────────────────────────
+
+const OP_SEPOLIA_RPC_URLS = [
+  process.env.NEXT_PUBLIC_ALCHEMY_OP_SEPOLIA_RPC,
+  'https://sepolia.optimism.io',
+  'https://optimism-sepolia.drpc.org',
+].filter(Boolean) as string[];
+
+const OP_SEPOLIA_CONFIG: ChainConfig = {
+  id: 11155420,
+  name: 'OP Sepolia',
+  rpcUrl: OP_SEPOLIA_RPC_URLS[0],
+  rpcUrls: OP_SEPOLIA_RPC_URLS,
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  blockExplorerUrl: 'https://sepolia-optimism.etherscan.io',
+  viemChain: optimismSepolia,
+  contracts: {
+    announcer: '',
+    registry: '',
+    nameRegistry: '',
+    walletFactory: '',
+    legacyWalletFactory: '',
+    accountFactory: '',
+    legacyAccountFactory: '',
+    entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+    paymaster: '',
+    dustPool: null,
+    dustPoolVerifier: null,
+    subAccount7702: null,
+    nameRegistryMerkle: null,
+    nameVerifier: null,
+    uniswapV4PoolManager: null,
+    uniswapV4StateView: null,
+    uniswapV4Quoter: null,
+    dustPoolV2: null,
+    dustPoolV2Verifier: null,
+    dustPoolV2SplitVerifier: null,
+    dustPoolV2ComplianceVerifier: null,
+    dustSwapAdapterV2: null,
+    dustSwapVanillaPoolKey: null,
+  },
+  creationCodes: {
+    wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
+    legacyWallet: '',
+    account: THANOS_SEPOLIA_CONFIG.creationCodes.account,
+    legacyAccount: '',
+  },
+  deploymentBlock: 0,
+  dustPoolDeploymentBlock: null,
+  supportsEIP7702: false,
+  canonicalForNaming: false,
+  testnet: true,
+};
+
+// ─── Base Sepolia ──────────────────────────────────────────────────────────────
+
+const BASE_SEPOLIA_RPC_URLS = [
+  process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC,
+  'https://sepolia.base.org',
+  'https://base-sepolia.drpc.org',
+].filter(Boolean) as string[];
+
+const BASE_SEPOLIA_CONFIG: ChainConfig = {
+  id: 84532,
+  name: 'Base Sepolia',
+  rpcUrl: BASE_SEPOLIA_RPC_URLS[0],
+  rpcUrls: BASE_SEPOLIA_RPC_URLS,
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  blockExplorerUrl: 'https://sepolia.basescan.org',
+  viemChain: baseSepolia,
+  contracts: {
+    announcer: '',
+    registry: '',
+    nameRegistry: '',
+    walletFactory: '',
+    legacyWalletFactory: '',
+    accountFactory: '',
+    legacyAccountFactory: '',
+    entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+    paymaster: '',
+    dustPool: null,
+    dustPoolVerifier: null,
+    subAccount7702: null,
+    nameRegistryMerkle: null,
+    nameVerifier: null,
+    uniswapV4PoolManager: null,
+    uniswapV4StateView: null,
+    uniswapV4Quoter: null,
+    dustPoolV2: null,
+    dustPoolV2Verifier: null,
+    dustPoolV2SplitVerifier: null,
+    dustPoolV2ComplianceVerifier: null,
+    dustSwapAdapterV2: null,
+    dustSwapVanillaPoolKey: null,
+  },
+  creationCodes: {
+    wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
+    legacyWallet: '',
+    account: THANOS_SEPOLIA_CONFIG.creationCodes.account,
+    legacyAccount: '',
+  },
+  deploymentBlock: 0,
+  dustPoolDeploymentBlock: null,
+  supportsEIP7702: false,
+  canonicalForNaming: false,
+  testnet: true,
+};
+
 // ─── Registry ──────────────────────────────────────────────────────────────────
 
 const CHAIN_CONFIGS: Record<number, ChainConfig> = {
   [THANOS_SEPOLIA_CONFIG.id]: THANOS_SEPOLIA_CONFIG,
   [ETHEREUM_SEPOLIA_CONFIG.id]: ETHEREUM_SEPOLIA_CONFIG,
+  [ARBITRUM_SEPOLIA_CONFIG.id]: ARBITRUM_SEPOLIA_CONFIG,
+  [OP_SEPOLIA_CONFIG.id]: OP_SEPOLIA_CONFIG,
+  [BASE_SEPOLIA_CONFIG.id]: BASE_SEPOLIA_CONFIG,
 };
 
 export const DEFAULT_CHAIN_ID = 11155111;
@@ -237,4 +403,4 @@ export function getCanonicalNamingChain(): ChainConfig {
 export const MIN_CLAIMABLE_BALANCE = 0.0001;
 
 // Re-export viem chain definitions for providers.tsx
-export { thanosSepolia, ethereumSepolia };
+export { thanosSepolia, ethereumSepolia, arbitrumSepolia, optimismSepolia, baseSepolia };

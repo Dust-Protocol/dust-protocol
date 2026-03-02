@@ -25,6 +25,7 @@ import { errorToUserMessage } from "@/lib/dustpool/v2/errors";
 import { getTokenBySymbol } from "@/config/tokens";
 import { ERC20_ABI } from "@/lib/swap/contracts";
 import { getDustPoolV2Config } from "@/lib/dustpool/v2/contracts";
+import { getChainConfig } from "@/config/chains";
 
 type DepositMode = "self" | "external";
 type SelectedToken = "native" | "USDC";
@@ -83,7 +84,8 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
   const usdcConfig = useMemo(() => getTokenBySymbol(chainId ?? 0, 'USDC'), [chainId]);
   const usdcAddr = usdcConfig?.address as Address | undefined;
   const isUSDC = selectedToken === 'USDC' && !!usdcAddr;
-  const tokenSymbol = isUSDC ? 'USDC' : 'ETH';
+  const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
+  const tokenSymbol = isUSDC ? 'USDC' : nativeSymbol;
 
   // Fetch USDC balance when modal opens
   useEffect(() => {
@@ -219,14 +221,17 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
       return;
     }
     if (!walletBalance) return;
-    const reserved = parseEther("0.005");
+    // L2s need ~10x less gas reserve than L1
+    const isL2 = [421614, 42161, 11155420, 10, 84532, 8453].includes(chainId ?? 0);
+    const reserveAmount = isL2 ? "0.0005" : "0.005";
+    const reserved = parseEther(reserveAmount);
     const max = walletBalance.value > reserved ? walletBalance.value - reserved : 0n;
     if (max > 0n) {
       setAmount(formatEther(max));
       setMaxWarning("");
     } else {
       setAmount("0");
-      setMaxWarning("Wallet balance too low (gas reserve: 0.005 ETH)");
+      setMaxWarning(`Wallet balance too low (gas reserve: ${reserveAmount} ${nativeSymbol})`);
     }
   };
 

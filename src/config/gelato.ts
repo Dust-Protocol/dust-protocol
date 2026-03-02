@@ -7,12 +7,9 @@ export const GELATO_API_KEY = process.env.GELATO_API_KEY || '';
 // Thanos Sepolia is NOT supported by Gelato — uses sponsor wallet fallback
 const GELATO_SUPPORTED_CHAIN_IDS = new Set<number>([
   11155111,   // Ethereum Sepolia
-  // Add mainnet chains here as we expand:
-  // 1,       // Ethereum Mainnet
-  // 10,      // Optimism
-  // 137,     // Polygon
-  // 42161,   // Arbitrum One
-  // 8453,    // Base
+  421614,     // Arbitrum Sepolia
+  11155420,   // OP Sepolia
+  84532,      // Base Sepolia
 ]);
 
 export function isGelatoSupported(chainId: number): boolean {

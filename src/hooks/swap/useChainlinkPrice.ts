@@ -29,8 +29,12 @@ const AGGREGATOR_ABI = [
 ] as const
 
 // Chainlink ETH/USD feed addresses per chain
+// Testnet feed addresses — verify at deploy time, mainnet addresses in Report 10
 const CHAINLINK_ETH_USD: Record<number, Address> = {
   11155111: '0x694AA1769357215DE4FAC081bf1f309aDC325306', // Eth Sepolia
+  421614: '0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165',  // Arbitrum Sepolia
+  11155420: '0x61Ec26aA57019C486B10502285c5A3D4A4750AD7', // OP Sepolia
+  84532: '0x4aDC67D02Aff5D8E9a64202d8B30C0CE5412eCFe',   // Base Sepolia
 }
 
 const POLL_INTERVAL_MS = 30_000

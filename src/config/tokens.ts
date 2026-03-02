@@ -64,9 +64,60 @@ const THANOS_SEPOLIA_TOKENS: TokenConfig[] = [
   },
 ];
 
+// Arbitrum Sepolia testnet tokens
+const ARBITRUM_SEPOLIA_TOKENS: TokenConfig[] = [
+  {
+    address: '0xf3C3351D6bd0098EEb33ca8f830FAf2a141Ea2e1',
+    symbol: 'USDC',
+    decimals: 6,
+    name: 'USD Coin',
+  },
+  {
+    address: '0x980B62Da83eFf3D4576C647993b0c1D7faf17c73',
+    symbol: 'WETH',
+    decimals: 18,
+    name: 'Wrapped Ether',
+  },
+];
+
+// OP Sepolia testnet tokens
+const OP_SEPOLIA_TOKENS: TokenConfig[] = [
+  {
+    address: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
+    symbol: 'USDC',
+    decimals: 6,
+    name: 'USD Coin',
+  },
+  {
+    address: '0x4200000000000000000000000000000000000006',
+    symbol: 'WETH',
+    decimals: 18,
+    name: 'Wrapped Ether',
+  },
+];
+
+// Base Sepolia testnet tokens
+const BASE_SEPOLIA_TOKENS: TokenConfig[] = [
+  {
+    address: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    symbol: 'USDC',
+    decimals: 6,
+    name: 'USD Coin',
+  },
+  {
+    address: '0x4200000000000000000000000000000000000006',
+    symbol: 'WETH',
+    decimals: 18,
+    name: 'Wrapped Ether',
+  },
+];
+
 const TOKEN_REGISTRY: Record<number, TokenConfig[]> = {
   [11155111]: ETHEREUM_SEPOLIA_TOKENS,
   [111551119090]: THANOS_SEPOLIA_TOKENS,
+  [421614]: ARBITRUM_SEPOLIA_TOKENS,
+  [11155420]: OP_SEPOLIA_TOKENS,
+  [84532]: BASE_SEPOLIA_TOKENS,
 };
 
 export function getTokensForChain(chainId: number): TokenConfig[] {

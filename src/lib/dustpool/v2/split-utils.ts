@@ -1,16 +1,14 @@
 import { zeroAddress, type Address } from 'viem'
 import type { SplitOutputNote } from './proof-inputs'
 import type { NoteCommitmentV2 } from './types'
-
-// Per-chain USDC addresses for token symbol resolution
-const USDC_ADDRESSES: Record<number, string> = {
-  11155111: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-}
+import { getUSDCAddress } from '@/lib/swap/constants'
 
 export function resolveTokenSymbol(asset: Address, chainId: number): string {
   if (asset === zeroAddress) return 'ETH'
-  const usdcAddr = USDC_ADDRESSES[chainId]
-  if (usdcAddr && usdcAddr.toLowerCase() === asset.toLowerCase()) return 'USDC'
+  try {
+    const usdcAddr = getUSDCAddress(chainId)
+    if (usdcAddr.toLowerCase() === asset.toLowerCase()) return 'USDC'
+  } catch { /* USDC not configured for this chain */ }
   throw new Error(`Unknown token ${asset} on chain ${chainId}. Supported: ETH, USDC`)
 }
 
