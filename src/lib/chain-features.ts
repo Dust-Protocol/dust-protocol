@@ -17,7 +17,7 @@ export function getChainFeatures(chainId: number): ChainFeatures {
     dustPoolV2: !!c.dustPoolV2,
     dustSwap: isSwapSupported(chainId),
     compliance: !!c.dustPoolV2ComplianceVerifier,
-    names: !!c.nameRegistry,
+    names: !!c.nameRegistry || !!c.nameVerifier,
     eip7702: config.supportsEIP7702,
   };
 }
