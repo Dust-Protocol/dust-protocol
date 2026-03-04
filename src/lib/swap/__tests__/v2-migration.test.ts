@@ -8,12 +8,12 @@ describe('V1→V2 migration: isSwapSupported', () => {
     expect(isSwapSupported(11155111)).toBe(true)
   })
 
-  it('returns true for Arbitrum Sepolia (has V2 config)', () => {
-    expect(isSwapSupported(421614)).toBe(true)
+  it('returns false for Arbitrum Sepolia (pool not initialized)', () => {
+    expect(isSwapSupported(421614)).toBe(false)
   })
 
-  it('returns true for Base Sepolia (has V2 config)', () => {
-    expect(isSwapSupported(84532)).toBe(true)
+  it('returns false for Base Sepolia (pool not initialized)', () => {
+    expect(isSwapSupported(84532)).toBe(false)
   })
 
   it('returns false for Thanos Sepolia (no swap support)', () => {
