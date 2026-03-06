@@ -25,7 +25,7 @@ export function SendForm() {
   const chainConfig = getChainConfig(activeChainId);
   const symbol = chainConfig.nativeCurrency.symbol;
   const tokens = getTokensForChain(activeChainId);
-  const { generateAddressFor, sendEthToStealth, sendTokenToStealth, lastGeneratedAddress, isLoading, error: sendError } = useStealthSend();
+  const { generateAddressFor, sendEthToStealth, sendTokenToStealth, lastGeneratedAddress, isLoading, error: sendError } = useStealthSend(activeChainId);
   const { resolveName, isConfigured: nameRegistryConfigured } = useStealthName();
 
   const [recipient, setRecipient] = useState("");
@@ -217,8 +217,13 @@ export function SendForm() {
                 placeholder="0.0"
                 type="number"
                 step="0.001"
+                min="0"
                 value={amount}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
+                onKeyDown={(e) => { if (['-', 'e', 'E', '+'].includes(e.key)) e.preventDefault(); }}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const v = e.target.value;
+                  if (v === '' || parseFloat(v) >= 0) setAmount(v);
+                }}
               />
               <span className="text-[11px] text-[rgba(255,255,255,0.4)] mt-1.5 block">{displaySymbol} on {chainConfig.name}</span>
             </div>

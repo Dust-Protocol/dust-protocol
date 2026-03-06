@@ -79,8 +79,8 @@ export const PrivateWallet = () => {
     selectClaimAddress,
   } = useStealthAddress();
 
-  const { payments, scan, isScanning, claimPayment, error: scanError } = useStealthScanner(stealthKeys);
-  const { generateAddressFor, sendEthToStealth, lastGeneratedAddress, isLoading: isSendLoading, error: sendError } = useStealthSend();
+  const { payments, scan, isScanning, claimPayment, error: scanError } = useStealthScanner(stealthKeys, { chainId: activeChainId });
+  const { generateAddressFor, sendEthToStealth, lastGeneratedAddress, isLoading: isSendLoading, error: sendError } = useStealthSend(activeChainId);
   const { ownedNames: _hookNames, registerName, checkAvailability, resolveName, validateName, formatName, isConfigured: nameRegistryConfigured, isLoading: isNameLoading } = useStealthName();
   const { login: privyLogin } = useLogin();
   const { connect } = useConnect();
@@ -750,8 +750,13 @@ const SendView = ({ colors, radius, sendStep, recipient, setRecipient, amount, s
               placeholder="0.0"
               type="number"
               step="0.001"
+              min="0"
               value={amount}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
+              onKeyDown={(e) => { if (['-', 'e', 'E', '+'].includes(e.key)) e.preventDefault(); }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const v = e.target.value;
+                if (v === '' || parseFloat(v) >= 0) setAmount(v);
+              }}
             />
             <span className="text-[11px] mt-1.5 block" style={{ color: colors.text.muted }}>{symbol} on {chainConfig.name}</span>
           </div>

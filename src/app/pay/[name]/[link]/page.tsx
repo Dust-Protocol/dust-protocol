@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, ChangeEvent } from "react";
-import { useAccount, useConnect } from "wagmi";
+import React, { useState, useEffect, useCallback, useRef, ChangeEvent } from "react";
+import { useAccount, useConnect, useChainId } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { colors, radius, shadows, glass, buttonVariants, transitions, typography, getExplorerBase } from "@/lib/design/tokens";
 import { useStealthSend, useStealthName } from "@/hooks/stealth";
 import { NAME_SUFFIX } from "@/lib/stealth";
-import { getChainConfig, DEFAULT_CHAIN_ID } from "@/config/chains";
+import { getChainConfig } from "@/config/chains";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { NoOptInPayment } from "@/components/pay/NoOptInPayment";
 import {
@@ -43,32 +44,48 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
   const { name, link } = params;
   const { isConnected } = useAccount();
   const { connect } = useConnect();
+  const walletChainId = useChainId();
   const { resolveName, formatName, isConfigured } = useStealthName();
-  const chainId = DEFAULT_CHAIN_ID;
+  const { activeChainId } = useAuth();
+  const chainId = activeChainId;
+  const chainMismatch = isConnected && walletChainId !== chainId;
   const chainConfig = getChainConfig(chainId);
   const { generateAddressFor, sendEthToStealth, isLoading, error: sendError } = useStealthSend(chainId);
 
   const [activeTab, setActiveTab] = useState<"wallet" | "qr">("wallet");
   const [resolvedMeta, setResolvedMeta] = useState<string | null>(null);
   const [metaResolving, setMetaResolving] = useState(false);
+  const resolvingRef = useRef(false);
   const [amount, setAmount] = useState("");
   const [sendStep, setSendStep] = useState<"input" | "confirm" | "success">("input");
   const [sendTxHash, setSendTxHash] = useState<string | null>(null);
 
   const dustName = `${link}.${name}.dust`;
 
+  const [resolveError, setResolveError] = useState(false);
+
   const doResolve = useCallback(async () => {
-    if (resolvedMeta || metaResolving || !isConfigured) return;
+    if (resolvedMeta || resolvingRef.current || !isConfigured) return;
+    resolvingRef.current = true;
     setMetaResolving(true);
-    const resolved = await resolveName(name + NAME_SUFFIX);
-    if (resolved) {
-      setResolvedMeta(`st:eth:${resolved}`);
-    } else {
-      const resolved2 = await resolveName(name);
-      if (resolved2) setResolvedMeta(`st:thanos:${resolved2}`);
+    setResolveError(false);
+    try {
+      const resolved = await resolveName(name + NAME_SUFFIX);
+      if (resolved) {
+        setResolvedMeta(`st:eth:${resolved}`);
+      } else {
+        const resolved2 = await resolveName(name);
+        if (resolved2) setResolvedMeta(`st:thanos:${resolved2}`);
+        else setResolveError(true);
+      }
+    } catch (e) {
+      console.error('[pay] Name resolution failed:', e);
+      setResolveError(true);
+    } finally {
+      resolvingRef.current = false;
+      setMetaResolving(false);
     }
-    setMetaResolving(false);
-  }, [resolvedMeta, metaResolving, isConfigured, name, resolveName]);
+  }, [resolvedMeta, isConfigured, name, resolveName]);
 
   useEffect(() => { doResolve(); }, [doResolve]);
 
@@ -252,6 +269,17 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                           <div style={{ width: "24px", height: "24px", border: `2px solid ${colors.accent.indigo}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
                           <span style={{ fontSize: "13px", color: colors.text.muted }}>Preparing payment...</span>
                         </div>
+                      ) : resolveError ? (
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", paddingTop: "24px", paddingBottom: "24px" }}>
+                          <AlertCircleIcon size={24} color={colors.accent.red} />
+                          <span style={{ fontSize: "13px", color: colors.accent.red }}>Could not resolve {dustName}</span>
+                          <button
+                            style={{ fontSize: "13px", color: colors.accent.indigo, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                            onClick={() => { setResolveError(false); setResolvedMeta(null); }}
+                          >
+                            Retry
+                          </button>
+                        </div>
                       ) : !isConnected ? (
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", paddingTop: "16px", paddingBottom: "16px" }}>
                           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
@@ -283,8 +311,12 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                             <span style={{ fontSize: "12px", color: colors.text.tertiary, display: "block", marginBottom: "8px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>Amount</span>
                             <div style={{ position: "relative" }}>
                               <input
-                                placeholder="0.0" type="number" step="0.001" value={amount}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
+                                placeholder="0.0" type="number" step="0.001" min="0" value={amount}
+                                onKeyDown={(e: React.KeyboardEvent) => { if (['-', 'e', 'E', '+'].includes(e.key)) e.preventDefault(); }}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                  const v = e.target.value;
+                                  if (v === '' || parseFloat(v) >= 0) setAmount(v);
+                                }}
                                 style={{
                                   width: "100%", height: "64px", backgroundColor: colors.bg.input,
                                   border: `1.5px solid ${colors.border.default}`, borderRadius: radius.md,
@@ -361,9 +393,12 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                                 border: "none",
                               }}
                               onClick={handleSend}
+                              disabled={isLoading || chainMismatch}
                             >
                               {isLoading ? (
                                 <div style={{ width: "16px", height: "16px", border: "2px solid #06080F", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                              ) : chainMismatch ? (
+                                <span style={{ fontSize: "14px", fontWeight: 600, color: "#06080F" }}>Switch wallet to {chainConfig.name}</span>
                               ) : (
                                 <>
                                   <SendIcon size={15} color="#06080F" />
