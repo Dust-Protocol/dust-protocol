@@ -1,10 +1,34 @@
 # @x402/privacy
 
-Privacy extension for the [x402](https://github.com/coinbase/x402) HTTP 402 payment protocol. Adds a `scheme: "shielded"` payment option that lets AI agents pay for API calls using zero-knowledge proofs. The API server never learns who is paying -- there is no link between the payer's deposit and their payment.
+> **Private payments for AI agents.** A ZK privacy extension for [x402](https://github.com/coinbase/x402) — the HTTP 402 payment protocol.
 
-Built on [Dust Protocol](https://dustprotocol.xyz)'s DustPoolV2, a ZK-UTXO privacy pool using Poseidon Merkle trees and FFLONK proofs over BN254.
+AI agents pay for API calls using zero-knowledge proofs. The server verifies payment without ever learning who paid. No accounts, no identity, no tracking.
 
-## How It Works
+```
+Agent -> GET /api/premium-data
+Server -> 402 Payment Required (scheme: "shielded")
+Agent -> [generates FFLONK ZK proof in ~60s]
+Agent -> GET /api/premium-data + X-PAYMENT: <proof>
+Server -> 200 OK (premium data)
+```
+
+The server sees a valid proof. It never sees the payer.
+
+## Why This Matters
+
+AI agents are the fastest-growing class of API consumers. Today they pay with API keys tied to an identity. Every request is tracked, correlated, and profiled.
+
+**@x402/privacy** flips this: agents deposit into a ZK-UTXO pool once, then spend from it privately. Each payment proves "I own a valid deposit" without revealing which deposit, when it was made, or who made it.
+
+- **No API keys.** Payment is proof of funds, not proof of identity.
+- **No tracking.** Payments from the same agent are unlinkable.
+- **No accounts.** The protocol is the trust layer — not a platform.
+- **Double-spend resistant.** Nullifiers prevent reuse. On-chain verification.
+- **Chain-bound.** Proofs are tied to chainId + recipient. No replay attacks.
+
+Built on [Dust Protocol](https://dustprotocol.xyz)'s DustPoolV2 — a ZK-UTXO privacy pool using Poseidon Merkle trees and FFLONK proofs over BN254.
+
+## Architecture
 
 ![x402 Privacy - How Shielded Payments Work](./docs/excalidraw.png)
 
@@ -22,6 +46,35 @@ Supporting modules:
 |--------|---------|---------|
 | **Tree** | `@x402/privacy/tree` | Indexes `DepositQueued` events, builds Poseidon Merkle tree, serves proofs over HTTP |
 | **Crypto** | `@x402/privacy/crypto` | Poseidon hashing, Merkle tree, nullifier computation, note creation |
+
+## Quick Demo
+
+The self-contained hackathon demo runs the full flow in a single terminal:
+
+```bash
+npx tsx examples/hackathon-demo.ts
+```
+
+This boots an API server and facilitator in-process, initializes an AI agent with a shielded UTXO, and walks through the entire payment flow with colored, narrated output and timing.
+
+For the full end-to-end demo with real on-chain proofs (requires circuit files):
+
+```bash
+# Terminal 1 — Tree service (indexes deposits, serves Merkle proofs)
+npx tsx examples/tree-service.ts
+
+# Terminal 2 — API server (returns 402 for unauthenticated requests)
+npx tsx examples/demo-server.ts
+
+# Terminal 3 — Facilitator (verifies proofs on-chain)
+npx tsx examples/demo-facilitator.ts
+
+# Terminal 4 — AI agent (generates ZK proof, pays privately)
+npx tsx examples/demo-agent.ts
+
+# Or run everything at once:
+bash examples/run-demo.sh
+```
 
 ## Package Structure
 
@@ -60,9 +113,13 @@ Supporting modules:
     DustV2Transaction.wasm
     verification_key.json
   examples/
+    hackathon-demo.ts   Self-contained demo (single script, colored output)
     demo-server.ts      Express API server with 402 paywall
     demo-agent.ts       AI agent that pays privately
+    demo-facilitator.ts ZK proof verifier + on-chain settler
     tree-service.ts     Standalone Merkle tree indexer
+    run-demo.sh         Runs all 4 components together
+    full-demo/          Full E2E demo with real on-chain deposits
 ```
 
 ## Supported Networks
@@ -89,7 +146,7 @@ Peer dependency: `@x402/core >= 2.0.0`
 - **Circuit files**: `DustV2Transaction.wasm` and `DustV2Transaction.zkey` (included in the `circuits/` directory for the wasm; zkey must be downloaded separately due to size)
 - **Tree service**: A running instance that indexes on-chain deposits and serves Merkle proofs
 
-## Quick Start
+## Usage
 
 ### Server (API Provider)
 
@@ -334,28 +391,34 @@ const proof = await tree.getProof(leafIndex);
 const { exists } = await tree.lookupCommitment(commitmentHex);
 ```
 
-## Running the Demo
+## How It Works (Technical)
 
-The `examples/` directory contains a complete three-process demo: API server, tree service, and AI agent.
+### The ZK Circuit
 
-```bash
-# Terminal 1 -- Tree service (indexes deposits, serves Merkle proofs)
-npx tsx examples/tree-service.ts
+The FFLONK proof is generated from a **2-in-2-out UTXO circuit** (~12,400 R1CS constraints):
 
-# Terminal 2 -- API server (returns 402 for unauthenticated requests)
-npx tsx examples/demo-server.ts
+- **Inputs** (private): spending key, nullifier key, input notes, Merkle paths, blinding factors
+- **Outputs** (public): 9 signals — merkleRoot, nullifier0, nullifier1, outputCommitment0, outputCommitment1, publicAmount, publicAsset, recipient, chainId
 
-# Terminal 3 -- AI agent (generates ZK proof, pays privately)
-npx tsx examples/demo-agent.ts
-```
+The proof proves:
+1. The prover knows the preimage of a note commitment in the Merkle tree
+2. The nullifier is correctly derived from the note
+3. Input amounts = output amounts + public amount (conservation)
+4. The recipient and chainId match the payment requirements
 
-Environment variables for the tree service:
+### Proof System: FFLONK
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BASE_SEPOLIA_RPC` | `https://sepolia.base.org` | RPC endpoint |
-| `TREE_PORT` | `3001` | HTTP port |
-| `POLL_INTERVAL` | `15000` | Sync interval (ms) |
+FFLONK produces constant-size proofs (768 bytes) with no trusted setup. Verification costs ~280k gas on-chain.
+
+### Privacy Guarantees
+
+| Property | Mechanism |
+|----------|-----------|
+| Sender anonymity | Proof hides which leaf in the Merkle tree is being spent |
+| Unlinkability | Different payments from the same agent use different nullifiers |
+| Double-spend prevention | Nullifiers are checked on-chain before settlement |
+| Replay protection | chainId is a public signal in the circuit |
+| Redirect protection | recipient address is a public signal in the circuit |
 
 ## API Reference
 

@@ -2,8 +2,10 @@ src/
 test/
 examples/
 scripts/
+docs/
 *.config.ts
 tsconfig.json
 vitest.config.ts
 .env*
 .gitignore
+PUBLISH-CHECKLIST.md
