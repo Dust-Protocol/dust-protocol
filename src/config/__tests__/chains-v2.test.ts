@@ -85,8 +85,8 @@ describe('Chain config: core functions work', () => {
 
 const VALID_ICON_FAMILIES: ChainIconFamily[] = ['ethereum', 'arbitrum', 'optimism', 'base', 'thanos', 'flow']
 
-// Flow EVM Testnet (545) — contracts not yet deployed, skip contract assertions
-const UNDEPLOYED_CHAIN_IDS = new Set([545])
+// No undeployed chains — all 6 chains have contracts
+const UNDEPLOYED_CHAIN_IDS = new Set<number>([])
 
 describe('Chain config completeness: all supported chains', () => {
   const chains = getSupportedChains()
