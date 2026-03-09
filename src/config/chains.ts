@@ -46,7 +46,7 @@ export interface ChainCreationCodes {
   legacyAccount: string;
 }
 
-export type ChainIconFamily = 'ethereum' | 'arbitrum' | 'optimism' | 'base' | 'thanos';
+export type ChainIconFamily = 'ethereum' | 'arbitrum' | 'optimism' | 'base' | 'thanos' | 'flow';
 
 export interface ChainConfig {
   id: number;
@@ -133,8 +133,6 @@ const THANOS_SEPOLIA_CONFIG: ChainConfig = {
 const SEPOLIA_RPC_URLS = [
   process.env.NEXT_PUBLIC_ALCHEMY_SEPOLIA_RPC,       // Alchemy (archive, 330 req/s, paid)
   'https://sepolia.drpc.org',                         // dRPC (archive, ~100ms, ~100 RPS free)
-  'https://rpc.ankr.com/eth_sepolia',                 // Ankr (archive, 30-100 RPS, no key)
-  'https://1rpc.io/sepolia',                          // 1RPC (privacy-focused, 20K eth_getLogs)
   'https://gateway.tenderly.co/public/sepolia',       // Tenderly (archive, ~250ms, 50K eth_getLogs)
   process.env.NEXT_PUBLIC_INFURA_SEPOLIA_RPC,         // Infura (archive, ~20 RPS free, if key set)
   'https://ethereum-sepolia-rpc.publicnode.com',      // PublicNode (last resort, non-archive)
@@ -429,6 +427,65 @@ const BASE_MAINNET_CONFIG: ChainConfig = {
   iconFamily: 'base',
 };
 
+// ─── Flow EVM Testnet ────────────────────────────────────────────────────────
+
+const flowEvmTestnet = defineChain({
+  id: 545,
+  name: 'Flow EVM Testnet',
+  nativeCurrency: { decimals: 18, name: 'FLOW', symbol: 'FLOW' },
+  rpcUrls: { default: { http: ['https://testnet.evm.nodes.onflow.org'] } },
+  blockExplorers: { default: { name: 'FlowScan', url: 'https://evm-testnet.flowscan.io' } },
+  testnet: true,
+});
+
+const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
+  id: 545,
+  name: 'Flow EVM Testnet',
+  rpcUrl: 'https://testnet.evm.nodes.onflow.org',
+  rpcUrls: ['https://testnet.evm.nodes.onflow.org'],
+  nativeCurrency: { name: 'FLOW', symbol: 'FLOW', decimals: 18 },
+  blockExplorerUrl: 'https://evm-testnet.flowscan.io',
+  viemChain: flowEvmTestnet,
+  contracts: {
+    announcer: '',
+    registry: '',
+    nameRegistry: '',
+    walletFactory: '',
+    legacyWalletFactory: '',
+    accountFactory: '',
+    legacyAccountFactory: '',
+    entryPoint: '',
+    paymaster: '',
+    dustPool: null,
+    dustPoolVerifier: null,
+    subAccount7702: null,
+    nameRegistryMerkle: null,
+    nameVerifier: null,
+    uniswapV4PoolManager: null,
+    uniswapV4StateView: null,
+    uniswapV4Quoter: null,
+    dustPoolV2: null,
+    dustPoolV2Verifier: null,
+    dustPoolV2SplitVerifier: null,
+    dustPoolV2ComplianceVerifier: null,
+    dustSwapAdapterV2: null,
+    dustSwapVanillaPoolKey: null,
+  },
+  creationCodes: {
+    wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
+    legacyWallet: '',
+    account: THANOS_SEPOLIA_CONFIG.creationCodes.account,
+    legacyAccount: '',
+  },
+  deploymentBlock: 0,
+  dustPoolDeploymentBlock: null,
+  supportsEIP7702: false,
+  canonicalForNaming: false,
+  testnet: true,
+  isL2: false,
+  iconFamily: 'flow',
+};
+
 // ─── Registry ──────────────────────────────────────────────────────────────────
 
 const CHAIN_CONFIGS: Record<number, ChainConfig> = {
@@ -437,6 +494,7 @@ const CHAIN_CONFIGS: Record<number, ChainConfig> = {
   [ARBITRUM_SEPOLIA_CONFIG.id]: ARBITRUM_SEPOLIA_CONFIG,
   [OP_SEPOLIA_CONFIG.id]: OP_SEPOLIA_CONFIG,
   [BASE_SEPOLIA_CONFIG.id]: BASE_SEPOLIA_CONFIG,
+  [FLOW_EVM_TESTNET_CONFIG.id]: FLOW_EVM_TESTNET_CONFIG,
   // Base Mainnet (8453) excluded until contracts are deployed
 };
 
@@ -489,4 +547,4 @@ export function getMinClaimableBalance(chainId: number): number {
 export const MIN_CLAIMABLE_BALANCE = 0.0001;
 
 // Re-export viem chain definitions for providers.tsx
-export { thanosSepolia, ethereumSepolia, arbitrumSepolia, optimismSepolia, baseSepolia, base as baseMainnet };
+export { thanosSepolia, ethereumSepolia, arbitrumSepolia, optimismSepolia, baseSepolia, base as baseMainnet, flowEvmTestnet };

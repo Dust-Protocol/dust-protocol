@@ -704,6 +704,7 @@ export const TokenIcon = ({ symbol, size = 24 }: { symbol: string; size?: number
   if (upper === 'ETH' || upper === 'WETH') return <ETHIcon size={size} />;
   if (upper === 'USDC') return <USDCIcon size={size} />;
   if (upper === 'TON' || upper === 'WTON') return <TONIcon size={size} />;
+  if (upper === 'FLOW') return <FlowIcon size={size} />;
   return (
     <div
       style={{ width: size, height: size }}
@@ -729,12 +730,17 @@ export const BaseIcon = ({ size = 24 }: IconProps) => (
   </svg>
 );
 
+export const FlowIcon = ({ size = 24 }: IconProps) => (
+  <img src="/chains/flow.svg" width={size} height={size} alt="Flow" style={{ borderRadius: '50%' }} />
+);
+
 const ICON_BY_FAMILY: Record<string, React.FC<IconProps>> = {
   ethereum: ETHIcon,
   thanos: TONIcon,
   arbitrum: ArbitrumIcon,
   optimism: OptimismIcon,
   base: BaseIcon,
+  flow: FlowIcon,
 };
 
 export const ChainIcon = ({ size = 24, chainId }: IconProps & { chainId?: number }) => {

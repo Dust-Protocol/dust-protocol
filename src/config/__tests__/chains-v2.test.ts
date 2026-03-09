@@ -66,7 +66,7 @@ describe('Chain config: core functions work', () => {
 
   it('getSupportedChains returns all chains', () => {
     const chains = getSupportedChains()
-    expect(chains).toHaveLength(5)
+    expect(chains).toHaveLength(6)
   })
 
   it('isChainSupported works correctly', () => {
@@ -75,6 +75,7 @@ describe('Chain config: core functions work', () => {
     expect(isChainSupported(421614)).toBe(true)
     expect(isChainSupported(11155420)).toBe(true)
     expect(isChainSupported(84532)).toBe(true)
+    expect(isChainSupported(545)).toBe(true)
     expect(isChainSupported(8453)).toBe(false)
     expect(isChainSupported(1)).toBe(false)
   })
@@ -82,83 +83,66 @@ describe('Chain config: core functions work', () => {
 
 // ─── HIGH-8: Chain config completeness (parameterized) ──────────────────────
 
-const VALID_ICON_FAMILIES: ChainIconFamily[] = ['ethereum', 'arbitrum', 'optimism', 'base', 'thanos']
+const VALID_ICON_FAMILIES: ChainIconFamily[] = ['ethereum', 'arbitrum', 'optimism', 'base', 'thanos', 'flow']
+
+// Flow EVM Testnet (545) — contracts not yet deployed, skip contract assertions
+const UNDEPLOYED_CHAIN_IDS = new Set([545])
 
 describe('Chain config completeness: all supported chains', () => {
   const chains = getSupportedChains()
 
   describe.each(chains.map(c => [c.name, c.id]))('%s (%i)', (_name, chainId) => {
     const config = getChainConfig(chainId as number)
+    const deployed = !UNDEPLOYED_CHAIN_IDS.has(chainId as number)
 
     it('has non-empty rpcUrl', () => {
-      // #given a supported chain config
-      // #when checking rpcUrl
-      // #then it is a non-empty string
       expect(config.rpcUrl).toBeTruthy()
       expect(typeof config.rpcUrl).toBe('string')
     })
 
     it('has at least 1 rpcUrl in rpcUrls array', () => {
-      // #given a supported chain config
-      // #when checking rpcUrls
-      // #then array has at least one entry
       expect(config.rpcUrls.length).toBeGreaterThanOrEqual(1)
     })
 
     it('has a valid viemChain with matching id', () => {
-      // #given a supported chain config
-      // #when checking viemChain.id
-      // #then it matches the config id
       expect(config.viemChain).toBeDefined()
       expect(config.viemChain.id).toBe(config.id)
     })
 
-    it('has non-empty announcer address', () => {
-      // #given a supported chain's contracts
-      // #when checking announcer
-      // #then it is a non-empty string
+    it.skipIf(!deployed)('has non-empty announcer address', () => {
       expect(config.contracts.announcer).toBeTruthy()
     })
 
-    it('has non-empty registry address', () => {
+    it.skipIf(!deployed)('has non-empty registry address', () => {
       expect(config.contracts.registry).toBeTruthy()
     })
 
-    it('has non-empty accountFactory address', () => {
+    it.skipIf(!deployed)('has non-empty accountFactory address', () => {
       expect(config.contracts.accountFactory).toBeTruthy()
     })
 
-    it('has non-empty entryPoint address', () => {
+    it.skipIf(!deployed)('has non-empty entryPoint address', () => {
       expect(config.contracts.entryPoint).toBeTruthy()
     })
 
-    it('has non-empty paymaster address', () => {
+    it.skipIf(!deployed)('has non-empty paymaster address', () => {
       expect(config.contracts.paymaster).toBeTruthy()
     })
 
-    it('has a DustPoolV2 address', () => {
-      // #given a supported chain
-      // #when checking dustPoolV2
-      // #then it is non-null and non-empty
+    it.skipIf(!deployed)('has a DustPoolV2 address', () => {
       expect(config.contracts.dustPoolV2).toBeTruthy()
     })
 
-    it('has a DustPoolV2Verifier address', () => {
+    it.skipIf(!deployed)('has a DustPoolV2Verifier address', () => {
       expect(config.contracts.dustPoolV2Verifier).toBeTruthy()
     })
 
-    it('has dustPoolV2ComplianceVerifier set', () => {
-      // #given all supported chains require compliance screening
-      // #when checking dustPoolV2ComplianceVerifier
-      // #then it is non-null
+    it.skipIf(!deployed)('has dustPoolV2ComplianceVerifier set', () => {
       expect(config.contracts.dustPoolV2ComplianceVerifier).not.toBeNull()
       expect(config.contracts.dustPoolV2ComplianceVerifier).toBeTruthy()
     })
 
     it('has a valid iconFamily', () => {
-      // #given a supported chain config
-      // #when checking iconFamily
-      // #then it is one of the known icon families
       expect(VALID_ICON_FAMILIES).toContain(config.iconFamily)
     })
   })

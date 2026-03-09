@@ -69,7 +69,7 @@ Deployment block: `10313992`
 
 | Contract | Address |
 |----------|---------|
-| EntryPoint v0.6 | `0x5c058Eb93CDee95d72398E5441d989ef6453D038` |
+| EntryPoint v0.6 | `0x5c058Eb93CDee95d72398E5441d989ef6453D038` (non-canonical — custom deployment for Thanos chain) |
 | StealthAccountFactory | `0xfE89381ae27a102336074c90123A003e96512954` |
 | StealthWalletFactory | `0xbc8e75a5374a6533cD3C4A427BF4FA19737675D3` |
 | DustPaymaster | `0x9e2eb36F7161C066351DC9E418E7a0620EE5d095` |
@@ -216,7 +216,7 @@ Deployment block: `246396709`
 
 Deployment block: `40332900`
 
-*DustSwap not yet deployed on OP Sepolia (no Uniswap V4 PoolManager).*
+*DustSwap intentionally not deployed on OP Sepolia — no Uniswap V4 PoolManager available on this chain. Private swaps are available on Eth Sepolia, Arbitrum Sepolia, and Base Sepolia.*
 
 ---
 

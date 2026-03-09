@@ -17,7 +17,10 @@ import {
 } from "@/components/stealth/icons";
 import { DustLogo } from "@/components/DustLogo";
 
-const SUPPORTED_CHAINS = getSupportedChains();
+// Only show chains that have core stealth contracts deployed (announcer + registry)
+const SUPPORTED_CHAINS = getSupportedChains().filter(
+  (c) => c.contracts.announcer && c.contracts.registry
+);
 
 // ─── Chain Selector ──────────────────────────────────────────────────────────
 function PayChainSelector({
@@ -219,6 +222,7 @@ export default function PayPageClient({ name }: { name: string }) {
     setSelectedChainId(chainId);
     setSelectedToken(NATIVE_TOKEN_ADDRESS);
     setSendStep("input");
+    setLocalError(null);
   }, []);
 
   const [activeTab, setActiveTab] = useState<"wallet" | "qr">("wallet");
@@ -229,6 +233,7 @@ export default function PayPageClient({ name }: { name: string }) {
   const [sendStep, setSendStep] = useState<"input" | "confirm" | "success">("input");
   const [sendTxHash, setSendTxHash] = useState<string | null>(null);
   const [resolveError, setResolveError] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const fullName = formatName(name);
 
@@ -273,10 +278,12 @@ export default function PayPageClient({ name }: { name: string }) {
 
   const handleSwitchChain = useCallback(async () => {
     setIsSwitching(true);
+    setLocalError(null);
     try {
       await switchChain({ chainId: selectedChainId });
     } catch (e) {
-      console.error('[pay] Chain switch failed:', e);
+      const msg = e instanceof Error ? e.message : 'Failed to switch network';
+      setLocalError(msg.includes('rejected') ? 'Network switch rejected' : `Failed to switch network`);
     } finally {
       setIsSwitching(false);
     }
@@ -284,6 +291,7 @@ export default function PayPageClient({ name }: { name: string }) {
 
   const handleSend = async () => {
     if (!resolvedMeta) return;
+    setLocalError(null);
     let hash: string | null;
     if (isNativeToken) {
       hash = await sendEthToStealth(resolvedMeta, amount);
@@ -509,16 +517,16 @@ export default function PayPageClient({ name }: { name: string }) {
                           isLoading={isLoading}
                           isSwitching={isSwitching}
                           chainMismatch={chainMismatch}
-                          onBack={() => setSendStep("input")}
+                          onBack={() => { setSendStep("input"); setLocalError(null); }}
                           onSend={handleSend}
                           onSwitchChain={handleSwitchChain}
                         />
                       )}
 
-                      {sendError && (
+                      {(sendError || localError) && (
                         <div className="flex gap-2 items-center p-3 mt-3 rounded-sm bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.2)]">
                           <AlertCircleIcon size={13} color="#ef4444" />
-                          <span className="text-[11px] text-[#ef4444] font-mono">{sendError}</span>
+                          <span className="text-[11px] text-[#ef4444] font-mono">{sendError || localError}</span>
                         </div>
                       )}
                     </>
@@ -615,7 +623,12 @@ function ConfirmView({
           }`}
         >
           {isLoading || isSwitching ? (
-            <div className="w-3.5 h-3.5 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+            <>
+              <div className={`w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin ${
+                isSwitching ? "border-[#FFC800]" : "border-[#00FF41]"
+              }`} />
+              <span>{isSwitching ? "SWITCHING..." : "SENDING..."}</span>
+            </>
           ) : chainMismatch ? (
             <span>SWITCH TO {chainName.toUpperCase()}</span>
           ) : (
