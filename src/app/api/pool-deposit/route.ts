@@ -2,7 +2,8 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { DUST_POOL_ABI } from '@/lib/stealth/types';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -37,6 +38,9 @@ function isValidAddress(addr: string): boolean {
  */
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -112,7 +116,7 @@ export async function POST(req: Request) {
 
         console.log('[PoolDeposit] Deploying CREATE2 wallet for', stealthAddress);
         const deployTx = await factory.deploy(owner, { gasLimit: 300_000, ...txOpts });
-        await deployTx.wait();
+        await waitForTx(deployTx);
       }
 
       // Encode DustPool.deposit(commitment) calldata
@@ -133,7 +137,7 @@ export async function POST(req: Request) {
         signature,
         { gasLimit: 8_000_000, ...txOpts },
       );
-      const receipt = await executeTx.wait();
+      const receipt = await waitForTx(executeTx);
 
       // Parse Deposit event to get leafIndex
       const poolContract = new ethers.Contract(dustPoolAddress, DUST_POOL_ABI, provider);

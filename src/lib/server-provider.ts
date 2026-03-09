@@ -44,7 +44,9 @@ class ServerJsonRpcProvider extends ethers.providers.JsonRpcProvider {
 }
 
 // Server-side provider cache — avoids recreating providers on every API request
-const serverProviderCache = new Map<number, ethers.providers.BaseProvider>();
+// TTL prevents stale/broken providers from persisting indefinitely
+const SERVER_PROVIDER_TTL_MS = 5 * 60 * 1000;
+const serverProviderCache = new Map<number, { provider: ethers.providers.BaseProvider; created: number }>();
 
 /**
  * Server-side provider with automatic failover across configured RPCs.
@@ -52,26 +54,30 @@ const serverProviderCache = new Map<number, ethers.providers.BaseProvider>();
  */
 export function getServerProvider(chainId?: number): ethers.providers.BaseProvider {
   const id = chainId ?? DEFAULT_CHAIN_ID;
-  let provider = serverProviderCache.get(id);
-  if (!provider) {
-    const config = getChainConfig(id);
-    const urls = config.rpcUrls;
-    const network = { name: config.name, chainId: config.id };
-    if (urls.length <= 1) {
-      provider = new ServerJsonRpcProvider(urls[0], network);
-    } else {
-      provider = new ethers.providers.FallbackProvider(
-        urls.map((url, i) => ({
-          provider: new ServerJsonRpcProvider(url, network),
-          priority: i + 1,
-          weight: 1,
-          stallTimeout: 2000,
-        })),
-        1
-      );
-    }
-    serverProviderCache.set(id, provider);
+  const cached = serverProviderCache.get(id);
+  if (cached && Date.now() - cached.created < SERVER_PROVIDER_TTL_MS) {
+    return cached.provider;
   }
+  const config = getChainConfig(id);
+  const urls = config.rpcUrls;
+  const network = { name: config.name, chainId: config.id };
+  let provider: ethers.providers.BaseProvider;
+  if (urls.length <= 1) {
+    provider = new ServerJsonRpcProvider(urls[0], network);
+  } else {
+    provider = new ethers.providers.FallbackProvider(
+      urls.map((url, i) => ({
+        provider: new ServerJsonRpcProvider(url, network),
+        priority: i + 1,
+        weight: 1,
+        stallTimeout: 2000,
+      })),
+      1
+    );
+  }
+  serverProviderCache.set(id, { provider, created: Date.now() });
+  // Recreate sponsor wallet when provider refreshes so it uses the new provider
+  sponsorCache.delete(id);
   return provider;
 }
 
@@ -120,6 +126,47 @@ export async function getCachedBlockNumber(chainId: number): Promise<number> {
   const block = await provider.getBlockNumber()
   blockNumberCache.set(chainId, { block, timestamp: Date.now() })
   return block
+}
+
+const TX_WAIT_TIMEOUT_MS = 120_000
+
+/**
+ * Waits for a transaction receipt with a timeout.
+ * Prevents relayer from hanging indefinitely on dropped/stuck transactions.
+ */
+export async function waitForTx(
+  tx: ethers.ContractTransaction,
+  timeoutMs: number = TX_WAIT_TIMEOUT_MS,
+): Promise<ethers.ContractReceipt> {
+  const receipt = await Promise.race([
+    tx.wait(),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`tx.wait() timed out after ${timeoutMs}ms (tx: ${tx.hash})`)), timeoutMs),
+    ),
+  ])
+  return receipt
+}
+
+// Per-chain tx mutex — prevents nonce collisions between ethers and viem sponsor wallets
+// (both use the same private key; concurrent sendTransaction can fetch same nonce)
+const txLocks = new Map<number, Promise<void>>();
+
+/**
+ * Acquire a per-chain lock before sending transactions.
+ * Returns a release function that MUST be called in a finally block.
+ */
+export async function acquireTxLock(chainId: number): Promise<() => void> {
+  const id = chainId ?? DEFAULT_CHAIN_ID;
+  while (txLocks.has(id)) {
+    await txLocks.get(id);
+  }
+  let release!: () => void;
+  const lock = new Promise<void>((resolve) => { release = resolve; });
+  txLocks.set(id, lock);
+  return () => {
+    txLocks.delete(id);
+    release();
+  };
 }
 
 export function parseChainId(body: Record<string, unknown>): number {

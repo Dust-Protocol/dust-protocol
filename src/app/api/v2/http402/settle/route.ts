@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerProvider, getServerSponsor, getMaxGasPrice } from '@/lib/server-provider'
+import { getServerProvider, getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
 import { isChainSupported } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
@@ -212,7 +212,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         },
       )
 
-      const receipt = await tx.wait()
+      const receipt = await waitForTx(tx)
       if (receipt.status !== 1) {
         throw new Error('Transaction reverted on-chain')
       }

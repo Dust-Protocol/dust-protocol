@@ -117,7 +117,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isChainMismatch = isConnected
     && walletChainId !== undefined
-    && isChainSupported(walletChainId)
     && walletChainId !== activeChainId;
 
   const [chainSwitchError, setChainSwitchError] = useState<string | null>(null);

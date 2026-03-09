@@ -1,9 +1,10 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain, getSupportedChains } from '@/config/chains';
-import { getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
 import { onNameRegistered } from '@/lib/naming/rootSync';
 import { getNameMerkleTree } from '@/lib/naming/merkleTree';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -21,10 +22,14 @@ const NAME_REGISTRY_MERKLE_ABI = [
   'function isNameAvailable(string calldata name) external view returns (bool)',
 ];
 
-// Rate limiting: 1 registration per IP/name per 30 seconds
+// Rate limiting: 1 registration per name per 30s + 3 per registrant per 5min
 const registerCooldowns = new Map<string, number>();
 const REGISTER_COOLDOWN_MS = 30_000;
 const MAX_REGISTER_ENTRIES = 500;
+
+const registrantTimestamps = new Map<string, number[]>();
+const REGISTRANT_WINDOW_MS = 5 * 60 * 1000;
+const REGISTRANT_MAX_NAMES = 3;
 
 function checkRegisterCooldown(key: string): boolean {
   const now = Date.now();
@@ -56,7 +61,7 @@ async function registerOnChain(
     if (!available) return null; // already registered on this chain
     // Manual gas limit prevents UNPREDICTABLE_GAS_LIMIT when RPC estimation fails transiently
     const tx = await registry.registerName(stripped, metaBytes, { gasLimit: 300_000 });
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on ${config.name}, tx: ${receipt.transactionHash}`);
 
     // Auto-transfer ownership to the user so getNamesOwnedBy(userAddress) works
@@ -64,7 +69,7 @@ async function registerOnChain(
     if (registrant && /^0x[0-9a-fA-F]{40}$/.test(registrant)) {
       try {
         const transferTx = await registry.transferName(stripped, registrant);
-        await transferTx.wait();
+        await waitForTx(transferTx);
         console.log(`[SponsorNameRegister] Auto-transferred "${stripped}" to ${registrant}`);
       } catch (e) {
         // Non-fatal: name is registered but still deployer-owned
@@ -101,7 +106,7 @@ async function registerOnCanonicalMerkle(
     }
 
     const tx = await merkleRegistry.registerName(stripped, metaBytes);
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on canonical Merkle registry, tx: ${receipt.transactionHash}`);
     return receipt.transactionHash;
   } catch (e) {
@@ -112,6 +117,9 @@ async function registerOnCanonicalMerkle(
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -134,6 +142,18 @@ export async function POST(req: Request) {
     // Rate limit by name
     if (!checkRegisterCooldown(stripped)) {
       return NextResponse.json({ error: 'Please wait before registering again' }, { status: 429 });
+    }
+
+    // Per-registrant rate limit: max 3 names per 5 minutes
+    if (registrant && /^0x[0-9a-fA-F]{40}$/.test(registrant)) {
+      const now = Date.now();
+      const key = registrant.toLowerCase();
+      const timestamps = (registrantTimestamps.get(key) ?? []).filter(t => now - t < REGISTRANT_WINDOW_MS);
+      if (timestamps.length >= REGISTRANT_MAX_NAMES) {
+        return NextResponse.json({ error: 'Too many registrations — try again later' }, { status: 429 });
+      }
+      timestamps.push(now);
+      registrantTimestamps.set(key, timestamps);
     }
 
     const metaBytes = metaAddress.startsWith('st:')

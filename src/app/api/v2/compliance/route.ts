@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerSponsor, getMaxGasPrice } from '@/lib/server-provider'
+import { getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
 import { DEFAULT_CHAIN_ID, isChainSupported } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
@@ -9,6 +9,7 @@ import {
   getExclusionRoot,
   isCommitmentFlagged,
 } from '@/lib/dustpool/v2/exclusion-tree'
+import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 60
 
@@ -90,6 +91,9 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req)
+    if (originError) return originError
+
     const body = await req.json()
     const chainId = typeof body.targetChainId === 'number' ? body.targetChainId : DEFAULT_CHAIN_ID
 
@@ -141,7 +145,7 @@ export async function POST(req: Request) {
         )
       }
       const tx = await contract.updateExclusionRoot(currentRootHex)
-      await tx.wait()
+      await waitForTx(tx)
     }
 
     const feeData = await sponsor.provider.getFeeData()
@@ -164,7 +168,11 @@ export async function POST(req: Request) {
         maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
       },
     )
-    const receipt = await tx.wait()
+    const receipt = await waitForTx(tx)
+
+    if (receipt.status === 0) {
+      throw new Error(`Compliance verification reverted: ${receipt.transactionHash}`)
+    }
 
     console.log(
       `[V2/compliance] Verified: nullifier=${nullifierHex.slice(0, 18)}... tx=${receipt.transactionHash}`,

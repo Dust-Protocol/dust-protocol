@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getSupportedChains, DEFAULT_CHAIN_ID } from '@/config/chains';
-import { getServerSponsor, getServerProvider } from '@/lib/server-provider';
+import { getServerSponsor, getServerProvider, waitForTx } from '@/lib/server-provider';
 
 export const maxDuration = 60;
 
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
             if (!available) continue; // already registered
 
             const tx = await registry.registerName(name, metaBytes);
-            await tx.wait();
+            await waitForTx(tx);
             synced++;
             totalSynced++;
             console.log(`[SyncNames] Synced "${name}" to ${chain.name}`);

@@ -3,6 +3,7 @@ import { ec as EC } from 'elliptic';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain, DEFAULT_CHAIN_ID } from '@/config/chains';
 import { getServerProvider, getServerSponsor } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -22,6 +23,11 @@ const secp256k1 = new EC('secp256k1');
 const resolveCooldowns = new Map<string, number>();
 const COOLDOWN_MS = 3_000;
 const MAX_COOLDOWN_ENTRIES = 1000;
+
+// Global rate limit: max 20 resolutions per minute (each costs gas)
+const GLOBAL_WINDOW_MS = 60_000;
+const GLOBAL_MAX_RESOLVES = 20;
+let globalResolveTimestamps: number[] = [];
 
 function checkRateLimit(key: string): boolean {
   const now = Date.now();
@@ -104,6 +110,9 @@ const NO_STORE = { 'Cache-Control': 'no-store' };
 
 export async function GET(req: Request, { params }: { params: { name: string } }) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -118,6 +127,16 @@ export async function GET(req: Request, { params }: { params: { name: string } }
     const config = getChainConfig(chainId);
     const linkSlug = searchParams.get('link') || undefined;
 
+    // Global rate limit (protects sponsor wallet from cross-name drain)
+    const now = Date.now();
+    globalResolveTimestamps = globalResolveTimestamps.filter(t => now - t < GLOBAL_WINDOW_MS);
+    if (globalResolveTimestamps.length >= GLOBAL_MAX_RESOLVES) {
+      return NextResponse.json(
+        { error: 'Too many requests — try again later' },
+        { status: 429, headers: NO_STORE }
+      );
+    }
+
     // Rate limit by name+link
     const cooldownKey = `${name.toLowerCase()}_${linkSlug || ''}`;
     if (!checkRateLimit(cooldownKey)) {
@@ -126,6 +145,8 @@ export async function GET(req: Request, { params }: { params: { name: string } }
         { status: 429, headers: NO_STORE }
       );
     }
+
+    globalResolveTimestamps.push(now);
 
     const provider = getServerProvider(chainId);
 

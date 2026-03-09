@@ -18,7 +18,7 @@ export default function LinkDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { ownedNames, stealthKeys, activeChainId } = useAuth();
   const { getLink, deleteLink } = usePaymentLinks();
-  const { payments, scanInBackground, stopBackgroundScan, isScanning } = useStealthScanner(stealthKeys);
+  const { payments, scanInBackground, stopBackgroundScan, isScanning } = useStealthScanner(stealthKeys, { chainId: activeChainId });
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showQR, setShowQR] = useState(false);

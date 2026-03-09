@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain } from '@/config/chains';
-import { getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -20,6 +21,9 @@ const MAX_UPDATE_ENTRIES = 500;
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -73,7 +77,10 @@ export async function POST(req: Request) {
     }
 
     const tx = await registry.updateMetaAddress(stripped, metaBytes);
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
+    if (receipt.status === 0) {
+      return NextResponse.json({ error: 'Meta-address update reverted on-chain' }, { status: 500, headers: NO_STORE });
+    }
 
     console.log('[SponsorNameUpdateMeta] Updated:', stripped, 'tx:', receipt.transactionHash);
 

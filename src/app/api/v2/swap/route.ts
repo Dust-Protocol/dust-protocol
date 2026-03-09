@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerSponsor, getMaxGasPrice } from '@/lib/server-provider'
+import { getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
 import { DEFAULT_CHAIN_ID, getChainConfig } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { DUST_SWAP_ADAPTER_V2_ABI } from '@/lib/swap/contracts'
@@ -10,6 +10,7 @@ import { computeAssetId } from '@/lib/dustpool/v2/commitment'
 import { acquireNullifier, releaseNullifier } from '@/lib/dustpool/v2/pending-nullifiers'
 import { checkCooldown } from '@/lib/dustpool/v2/persistent-cooldown'
 import { incrementSwap, observeGasUsed, recordProofVerification } from '@/lib/metrics'
+import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 60
 
@@ -17,6 +18,9 @@ const NO_STORE = { 'Cache-Control': 'no-store' } as const
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req)
+    if (originError) return originError
+
     const body = await req.json()
     const chainId = typeof body.targetChainId === 'number' ? body.targetChainId : DEFAULT_CHAIN_ID
 
@@ -197,7 +201,7 @@ export async function POST(req: Request) {
         },
       )
 
-      const receipt = await tx.wait()
+      const receipt = await waitForTx(tx)
       if (receipt.status !== 1) {
         throw new Error('Transaction reverted on-chain')
       }

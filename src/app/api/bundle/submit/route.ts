@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
 import { ENTRY_POINT_ABI } from '@/lib/stealth/types';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -40,6 +41,9 @@ interface SignedUserOp {
  */
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     const body = await req.json();
     const chainId = parseChainId(body);
     const config = getChainConfig(chainId);
@@ -87,7 +91,7 @@ export async function POST(req: Request) {
           if (sponsorBal.gt(PAYMASTER_TOP_UP_AMOUNT)) {
             console.log(`[Bundle/Submit] Paymaster deposit low: ${ethers.utils.formatEther(deposit)}. Topping up...`);
             const topUpTx = await entryPoint.depositTo(config.contracts.paymaster, { value: PAYMASTER_TOP_UP_AMOUNT, type: 2 });
-            await topUpTx.wait();
+            await waitForTx(topUpTx);
             console.log('[Bundle/Submit] Paymaster topped up with 1.0');
           } else {
             console.warn(`[Bundle/Submit] Paymaster deposit low but sponsor balance insufficient: ${ethers.utils.formatEther(sponsorBal)}`);
@@ -111,7 +115,10 @@ export async function POST(req: Request) {
       gasLimit,
       type: 2,
     });
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
+    if (receipt.status === 0) {
+      return NextResponse.json({ error: 'Bundle execution reverted on-chain' }, { status: 500, headers: NO_STORE });
+    }
 
     console.log('[Bundle/Submit] Success, tx:', receipt.transactionHash);
 

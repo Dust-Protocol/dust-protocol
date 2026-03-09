@@ -1,4 +1,3 @@
-import { fflonk } from 'snarkjs'
 import { parseSplitCalldata } from './split-utils'
 import type { RelayerClient } from './relayer-client'
 
@@ -11,6 +10,7 @@ export const LEAF_POLL_DELAY_MS = 2_000
 export async function generateSplitProof(
   circuitInputs: Record<string, string | string[] | string[][]>
 ): Promise<{ proof: unknown; publicSignals: string[]; proofCalldata: string }> {
+  const { fflonk } = await import('snarkjs')
   const { proof, publicSignals } = await fflonk.fullProve(
     circuitInputs,
     SPLIT_CIRCUIT_WASM,
@@ -29,6 +29,7 @@ export async function verifySplitProofLocally(
   try {
     const vKeyResponse = await fetch(SPLIT_VKEY_PATH)
     const vKey = await vKeyResponse.json()
+    const { fflonk } = await import('snarkjs')
     return await fflonk.verify(vKey, publicSignals, proof)
   } catch (error) {
     console.error('[DustPoolV2] Split proof local verification failed:', error)

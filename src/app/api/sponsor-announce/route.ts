@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
 import { getServerSponsor, parseChainId } from '@/lib/server-provider';
 import { canUseGelato, sponsoredRelay, waitForRelay } from '@/lib/relay/gelato';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -26,6 +27,9 @@ function isValidHex(hex: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }

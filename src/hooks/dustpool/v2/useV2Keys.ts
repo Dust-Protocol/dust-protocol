@@ -16,7 +16,10 @@ export function useV2Keys() {
 
   const hasPin = address ? hasPinStored(address) : false
 
+  const derivingRef = useRef(false)
+
   const deriveKeys = useCallback(async (pin: string): Promise<boolean> => {
+    if (derivingRef.current) return false
     if (!address || !walletClient) {
       setError('Wallet not connected')
       return false
@@ -28,6 +31,7 @@ export function useV2Keys() {
       return false
     }
 
+    derivingRef.current = true
     setIsDeriving(true)
     setError(null)
 
@@ -59,6 +63,7 @@ export function useV2Keys() {
       }
       return false
     } finally {
+      derivingRef.current = false
       setIsDeriving(false)
     }
   }, [address, walletClient])

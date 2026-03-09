@@ -215,7 +215,7 @@ export async function buildTreeFromEvents(
     allLogs = allLogs.concat(chunkLogs);
   }
 
-  console.log(`[DustPool] Fetched ${allLogs.length} Deposit events from blocks ${fromBlock}–${currentBlock}`);
+  if (process.env.NODE_ENV === 'development') console.log(`[DustPool] Fetched ${allLogs.length} Deposit events from blocks ${fromBlock}–${currentBlock}`);
 
   const tree = await MerkleTree.create();
   const deposits: Array<{ commitment: bigint; leafIndex: number; amount: bigint; txHash: string; timestamp: number }> = [];

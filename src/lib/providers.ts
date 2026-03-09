@@ -17,7 +17,9 @@ export async function getProviderWithAccounts(): Promise<ethers.providers.Web3Pr
 }
 
 // Provider caches — avoid creating a new provider on every call
-const providerCache = new Map<number, ethers.providers.BaseProvider>();
+// TTL prevents stale/broken providers from persisting indefinitely
+const PROVIDER_TTL_MS = 5 * 60 * 1000
+const providerCache = new Map<number, { provider: ethers.providers.BaseProvider; created: number }>();
 const batchProviderCache = new Map<number, ethers.providers.JsonRpcBatchProvider>();
 const batchUrlIdx = new Map<number, number>();
 
@@ -29,28 +31,30 @@ const batchUrlIdx = new Map<number, number>();
  */
 export function getChainProvider(chainId?: number): ethers.providers.BaseProvider {
   const id = chainId ?? DEFAULT_CHAIN_ID;
-  let provider = providerCache.get(id);
-  if (!provider) {
-    const config = getChainConfig(id);
-    const urls = config.rpcUrls;
-    // Specify network explicitly so ethers skips the detectNetwork() RPC call.
-    // Prevents NETWORK_ERROR when public RPCs are slow or rate-limited.
-    const network = { chainId: id, name: config.name };
-    if (urls.length <= 1) {
-      provider = new ethers.providers.JsonRpcProvider(urls[0], network);
-    } else {
-      provider = new ethers.providers.FallbackProvider(
-        urls.map((url, i) => ({
-          provider: new ethers.providers.JsonRpcProvider(url, network),
-          priority: i + 1,
-          weight: 1,
-          stallTimeout: 2000,
-        })),
-        1
-      );
-    }
-    providerCache.set(id, provider);
+  const cached = providerCache.get(id);
+  if (cached && Date.now() - cached.created < PROVIDER_TTL_MS) {
+    return cached.provider;
   }
+  const config = getChainConfig(id);
+  const urls = config.rpcUrls;
+  // Specify network explicitly so ethers skips the detectNetwork() RPC call.
+  // Prevents NETWORK_ERROR when public RPCs are slow or rate-limited.
+  const network = { chainId: id, name: config.name };
+  let provider: ethers.providers.BaseProvider;
+  if (urls.length <= 1) {
+    provider = new ethers.providers.JsonRpcProvider(urls[0], network);
+  } else {
+    provider = new ethers.providers.FallbackProvider(
+      urls.map((url, i) => ({
+        provider: new ethers.providers.JsonRpcProvider(url, network),
+        priority: i + 1,
+        weight: 1,
+        stallTimeout: 2000,
+      })),
+      1
+    );
+  }
+  providerCache.set(id, { provider, created: Date.now() });
   return provider;
 }
 
@@ -79,10 +83,6 @@ export function rotateBatchProvider(chainId?: number): ethers.providers.JsonRpcB
   return getChainBatchProvider(id);
 }
 
-/** @deprecated Use getChainProvider() instead */
-export function getThanosProvider(): ethers.providers.BaseProvider {
-  return getChainProvider(DEFAULT_CHAIN_ID);
-}
 
 /** Sign a message using wagmi wallet client (preferred) or ethers fallback */
 export async function signMessage(

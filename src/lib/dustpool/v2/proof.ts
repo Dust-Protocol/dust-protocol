@@ -4,7 +4,6 @@
 // Returns both the raw proof object and the Solidity-formatted calldata
 // (768 bytes = 24 field elements) needed by the relayer.
 
-import { fflonk } from 'snarkjs'
 import type { WorkerResponse } from './proof.worker'
 import type { ProofInputs } from './types'
 import { TREE_DEPTH } from './constants'
@@ -196,6 +195,7 @@ async function generateOnMainThread(
   onProgress?.('Loading circuit...', 0.2)
   onProgress?.('Generating proof...', 0.4)
 
+  const { fflonk } = await import('snarkjs')
   const { proof, publicSignals } = await fflonk.fullProve(
     circuitInputs,
     WASM_PATH,
@@ -231,6 +231,7 @@ export async function verifyV2ProofLocally(
   try {
     const vKeyResponse = await fetch(VKEY_PATH)
     const vKey = await vKeyResponse.json()
+    const { fflonk } = await import('snarkjs')
     return await fflonk.verify(vKey, publicSignals, proof)
   } catch (error) {
     console.error('[DustPoolV2] Local verification failed:', error)

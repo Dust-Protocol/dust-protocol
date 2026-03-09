@@ -150,6 +150,7 @@ export function useStealthName(userMetaAddress?: string | null, chainId?: number
   }, [activeChainId, queryClient]);
 
   const registeringNameRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
 
   const loadOwnedNames = useCallback(async () => {
     // If graph already found names (via any method: owner, meta, wallet) — no need for legacy.
@@ -194,13 +195,15 @@ export function useStealthName(userMetaAddress?: string | null, chainId?: number
       // Server API — most reliable, runs in parallel with RPC chain
       const apiPromise = (async () => {
         try {
-          const res = await fetch(`/api/lookup-wallet-name?address=${address}`);
+          const res = await fetch(`/api/lookup-wallet-name?address=${address}`, {
+            signal: abortRef.current?.signal,
+          });
           if (res.ok) {
             const data = await res.json();
             if (data.name) setNameOnce(data.name);
           }
-        } catch {
-          // Silent — best-effort
+        } catch (e) {
+          if (e instanceof DOMException && e.name === 'AbortError') return;
         }
       })();
 
@@ -256,10 +259,15 @@ export function useStealthName(userMetaAddress?: string | null, chainId?: number
     || (graphEnabled && !userMetaAddress && graphWalletFailed)
     || graphReturnedEmpty;
   useEffect(() => {
+    // Abort previous in-flight fetch when deps change or component unmounts
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+
     if (needsLegacyDiscovery && isConnected && isConfigured) loadOwnedNames();
     else if (needsLegacyDiscovery && isConnected && !isConfigured) setLegacyNamesSettled(true);
     // When !isConnected (Privy still hydrating), do NOT settle — wait for address to resolve.
-    // Line 96 already handles the address=undefined case via setLegacyNamesSettled(!address).
+
+    return () => { abortRef.current?.abort(); };
   }, [needsLegacyDiscovery, isConnected, isConfigured, loadOwnedNames]);
 
   // Settled = all relevant queries have finished loading.

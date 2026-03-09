@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  productionBrowserSourceMaps: false,
   experimental: {
     instrumentationHook: true,
   },
@@ -17,6 +18,20 @@ const nextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.unicorn.studio",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https:",
+              "connect-src 'self' https://*.alchemy.com https://*.infura.io https://*.r2.dev https://*.privy.io wss://*.alchemy.com wss://*.infura.io https://rpc.sepolia.org https://sepolia.optimism.io https://sepolia.base.org https://sepolia-rollup.arbitrum.io https://rpc.thanos-sepolia.tokamak.network https://api.gelato.digital https://cdn.unicorn.studio",
+              "frame-src 'self' https://auth.privy.io https://cdn.unicorn.studio",
+              "worker-src 'self' blob:",
+              "frame-ancestors 'none'",
+            ].join("; "),
           },
         ],
       },

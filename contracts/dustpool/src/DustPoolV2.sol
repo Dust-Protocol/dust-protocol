@@ -157,6 +157,7 @@ contract DustPoolV2 {
     error ComplianceNotEnabled();
     error ZeroNullifier();
     error ZeroExclusionRoot();
+    error ZeroAddress();
     error AssetNotAllowed(address asset);
 
     modifier onlyRelayer() {
@@ -182,8 +183,11 @@ contract DustPoolV2 {
     }
 
     constructor(address _verifier, address _splitVerifier, address _complianceOracle) {
+        if (_verifier == address(0)) revert ZeroAddress();
+        if (_splitVerifier == address(0)) revert ZeroAddress();
         VERIFIER = IFFLONKVerifier(_verifier);
         SPLIT_VERIFIER = IFFLONKSplitVerifier(_splitVerifier);
+        // complianceOracle can be address(0) — disables screening
         complianceOracle = IComplianceOracle(_complianceOracle);
         owner = msg.sender;
         // ETH is always allowed even when whitelist is enabled
@@ -499,9 +503,10 @@ contract DustPoolV2 {
     }
 
     /// @notice Set or unset a relayer address
-    /// @param relayer Address to update
+    /// @param relayer Address to update (must not be address(0))
     /// @param allowed Whether to allow or disallow
     function setRelayer(address relayer, bool allowed) external onlyOwner {
+        if (relayer == address(0)) revert ZeroAddress();
         relayers[relayer] = allowed;
         emit RelayerUpdated(relayer, allowed);
     }

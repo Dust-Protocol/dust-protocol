@@ -2,8 +2,9 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, isL2Chain } from '@/config/chains';
 import { isKnownToken } from '@/config/tokens';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
 import { canUseGelato, sponsoredRelay, waitForRelay } from '@/lib/relay/gelato';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -71,6 +72,9 @@ function isValidAddress(addr: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -228,7 +232,12 @@ async function handleCreate2Claim(body: { stealthAddress: string; owner: string;
       maxPriorityFeePerGas: maxPriorityFee,
     });
   }
-  const receipt = await tx.wait();
+  const receipt = await waitForTx(tx);
+
+  if (receipt.status === 0) {
+    console.error('[Sponsor/CREATE2] Transaction reverted:', receipt.transactionHash);
+    return NextResponse.json({ error: 'Claim transaction reverted on-chain' }, { status: 500 });
+  }
 
   console.log('[Sponsor/CREATE2] Claim complete via sponsor wallet');
 
@@ -347,7 +356,8 @@ async function handleTokenSweep(
             maxFeePerGas,
             maxPriorityFeePerGas: maxPriorityFee,
           });
-          const receipt = await tx.wait();
+          const receipt = await waitForTx(tx);
+          if (receipt.status === 0) throw new Error(`Token sweep reverted: ${receipt.transactionHash}`);
           txHash = receipt.transactionHash;
         }
       } else {
@@ -359,7 +369,8 @@ async function handleTokenSweep(
           maxFeePerGas,
           maxPriorityFeePerGas: maxPriorityFee,
         });
-        const receipt = await tx.wait();
+        const receipt = await waitForTx(tx);
+        if (receipt.status === 0) throw new Error(`Token sweep reverted: ${receipt.transactionHash}`);
         txHash = receipt.transactionHash;
       }
 

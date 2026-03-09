@@ -3,7 +3,6 @@
 // The compliance circuit (~6,884 constraints) is small enough to run on the
 // main thread without a web worker. Follows the same pattern as proof.ts.
 
-import { fflonk } from 'snarkjs'
 
 export const COMPLIANCE_WASM_PATH = '/circuits/v2-compliance/DustV2Compliance.wasm'
 export const COMPLIANCE_ZKEY_PATH = '/circuits/v2-compliance/DustV2Compliance.zkey'
@@ -70,6 +69,7 @@ export async function generateComplianceProof(
 ): Promise<ComplianceProofResult> {
   const circuitInputs = formatCircuitInputs(inputs)
 
+  const { fflonk } = await import('snarkjs')
   const { proof, publicSignals } = await fflonk.fullProve(
     circuitInputs,
     COMPLIANCE_WASM_PATH,
@@ -96,6 +96,7 @@ export async function verifyComplianceProofLocally(
   try {
     const vKeyResponse = await fetch(COMPLIANCE_VKEY_PATH)
     const vKey = await vKeyResponse.json()
+    const { fflonk } = await import('snarkjs')
     return await fflonk.verify(vKey, publicSignals, proof)
   } catch (error) {
     console.error('[Compliance] Local verification failed:', error)

@@ -79,6 +79,16 @@ import { getChainConfig, DEFAULT_CHAIN_ID, getSupportedChains, getCanonicalNamin
 
 import { getChainProvider } from '@/lib/providers';
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
 function getReadOnlyProvider(chainId?: number): ethers.providers.BaseProvider {
   return getChainProvider(chainId ?? DEFAULT_CHAIN_ID);
 }
@@ -130,7 +140,10 @@ async function fetchNameTree(): Promise<TreeCacheEntry | null> {
   }
 
   try {
-    const res = await fetch('/api/name-tree');
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8_000);
+    const res = await fetch('/api/name-tree', { signal: controller.signal });
+    clearTimeout(timer);
     if (!res.ok) return null;
 
     const data = await res.json();
@@ -198,7 +211,7 @@ export async function resolveViaMerkleProof(name: string, chainId?: number): Pro
     if (verifierAddress && !isPlaceholder) {
       const provider = getReadOnlyProvider(verifyChainId);
       const verifier = new ethers.Contract(verifierAddress, NAME_VERIFIER_ABI, provider);
-      const isKnown: boolean = await verifier.isKnownRoot(tree.root);
+      const isKnown: boolean = await withTimeout(verifier.isKnownRoot(tree.root), 8_000, 'isKnownRoot');
       if (!isKnown) {
         console.warn('[names] Merkle root not recognized on-chain, falling back');
         return null;
@@ -225,23 +238,26 @@ export async function registerStealthName(signer: ethers.Signer, name: string, m
 export async function resolveStealthName(_provider: ethers.providers.Provider | null, name: string, chainId?: number): Promise<string | null> {
   const stripped = stripNameSuffix(name);
 
-  // 1. Try privacy tree cache (Merkle proof) first
-  try {
-    const merkleResult = await resolveViaMerkleProof(stripped, chainId);
-    if (merkleResult) return merkleResult;
-  } catch (e) {
-    console.warn('[names] Merkle resolution failed, trying legacy:', e);
-  }
+  // 15s overall timeout prevents infinite spinner on broken RPCs
+  return withTimeout((async () => {
+    // 1. Try privacy tree cache (Merkle proof) first
+    try {
+      const merkleResult = await resolveViaMerkleProof(stripped, chainId);
+      if (merkleResult) return merkleResult;
+    } catch (e) {
+      console.warn('[names] Merkle resolution failed, trying legacy:', e);
+    }
 
-  // 2. Legacy on-chain nameRegistry fallback — try active chain first
-  if (chainId) {
-    const result = await resolveOnChain(chainId, stripped);
-    if (result) return result;
-  }
+    // 2. Legacy on-chain nameRegistry fallback — try active chain first
+    if (chainId) {
+      const result = await resolveOnChain(chainId, stripped);
+      if (result) return result;
+    }
 
-  // Fall back to canonical chain
-  const result = await resolveOnChain(undefined, stripped);
-  return result;
+    // Fall back to canonical chain
+    const result = await resolveOnChain(undefined, stripped);
+    return result;
+  })(), 15_000, 'resolveStealthName');
 }
 
 async function resolveOnChain(chainId: number | undefined, stripped: string): Promise<string | null> {
@@ -251,7 +267,7 @@ async function resolveOnChain(chainId: number | undefined, stripped: string): Pr
     if (!addr) return null;
     const rpcProvider = getReadOnlyProvider(effectiveChainId);
     const registry = new ethers.Contract(addr, NAME_REGISTRY_ABI, rpcProvider);
-    const result = await registry.resolveName(stripped);
+    const result: string = await withTimeout(registry.resolveName(stripped), 8_000, 'resolveOnChain');
     return result && result !== '0x' && result.length > 4 ? result : null;
   } catch {
     return null;
@@ -393,7 +409,7 @@ async function discoverNameOnChain(chainId: number, chainName: string, targetHex
       } catch { continue; }
     }
 
-    if (bestMatch) {
+    if (bestMatch && process.env.NODE_ENV === 'development') {
       console.log(`[names] Discovered name "${bestMatch}" on ${chainName} (${chainId})`);
     }
     return bestMatch;
@@ -484,7 +500,7 @@ export async function discoverNameByWalletHistory(
           }
 
           if (bestMatch) {
-            console.log(`[names] Discovered name "${bestMatch}" via wallet history on ${chain.name} (${chain.id})`);
+            if (process.env.NODE_ENV === 'development') console.log(`[names] Discovered name "${bestMatch}" via wallet history on ${chain.name} (${chain.id})`);
             return bestMatch;
           }
         } catch (e) {

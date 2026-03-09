@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -27,6 +28,9 @@ const MAX_KEY_REGISTER_ENTRIES = 500;
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -74,7 +78,10 @@ export async function POST(req: Request) {
     const registry = new ethers.Contract(config.contracts.registry, REGISTRY_ABI, sponsor);
 
     const tx = await registry.registerKeysOnBehalf(registrant, 1, signature, metaBytes);
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
+    if (receipt.status === 0) {
+      return NextResponse.json({ error: 'Key registration reverted on-chain' }, { status: 500, headers: NO_STORE });
+    }
 
     console.log('[SponsorRegisterKeys] Success:', receipt.transactionHash);
 

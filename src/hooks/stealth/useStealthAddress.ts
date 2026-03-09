@@ -375,6 +375,21 @@ export function useStealthAddress(activeChainId?: number) {
     autoRestoreKeys();
   }, [walletClient, address, isConnected, isHydrated, autoRestoreKeys, autoRestoreFailed]);
 
+  // Clear in-memory keys on wallet disconnect or address change
+  // Prevents cross-account key leakage if user switches wallets
+  const prevAddressRef = useRef(address);
+  useEffect(() => {
+    if (prevAddressRef.current && prevAddressRef.current !== address) {
+      stealthKeysRef.current = null;
+      signatureRef.current = null;
+      setHasStealthKeys(false);
+      setIsRegistered(false);
+      setClaimAddresses([]);
+      setError(null);
+    }
+    prevAddressRef.current = address;
+  }, [address]);
+
   return {
     stealthKeys: stealthKeysRef.current, metaAddress, parsedMetaAddress,
     generateKeys, deriveKeysFromWallet, clearKeys, importKeys, exportKeys,

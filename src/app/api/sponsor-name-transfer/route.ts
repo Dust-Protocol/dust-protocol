@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain } from '@/config/chains';
-import { getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -28,6 +29,9 @@ function isValidName(name: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -78,12 +82,12 @@ export async function POST(req: Request) {
 
     // Transfer name to new owner
     const tx = await registry.transferName(name, newOwner);
-    await tx.wait();
+    const receipt = await waitForTx(tx);
+    if (receipt.status === 0) {
+      return NextResponse.json({ error: 'Name transfer reverted on-chain' }, { status: 500 });
+    }
 
-    // If metaAddress provided, update it (sponsor is no longer owner after transfer, so this won't work)
-    // The new owner will need to call updateMetaAddress themselves
-
-    return NextResponse.json({ success: true, txHash: tx.hash });
+    return NextResponse.json({ success: true, txHash: receipt.transactionHash });
   } catch (e) {
     console.error('[SponsorNameTransfer] Error:', e);
     return NextResponse.json({ error: 'Transfer failed' }, { status: 500 });

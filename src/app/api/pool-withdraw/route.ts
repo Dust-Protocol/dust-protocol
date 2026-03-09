@@ -2,7 +2,8 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { DUST_POOL_ABI } from '@/lib/stealth/types';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -20,6 +21,9 @@ function isValidAddress(addr: string): boolean {
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500 });
     }
@@ -91,7 +95,12 @@ export async function POST(req: Request) {
         maxPriorityFeePerGas: maxPriorityFee,
       },
     );
-    const receipt = await tx.wait();
+    const receipt = await waitForTx(tx);
+
+    if (receipt.status === 0) {
+      console.error('[PoolWithdraw] Transaction reverted:', receipt.transactionHash);
+      return NextResponse.json({ error: 'Transaction reverted on-chain' }, { status: 500, headers: NO_STORE });
+    }
 
     console.log('[PoolWithdraw] Success:', receipt.transactionHash);
 

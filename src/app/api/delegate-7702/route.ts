@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, acquireTxLock } from '@/lib/server-provider';
 import { STEALTH_SUB_ACCOUNT_7702_ABI, DUST_POOL_ABI } from '@/lib/stealth/types';
+import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
 
@@ -61,6 +62,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const originError = checkOrigin(req);
+    if (originError) return originError;
+
     if (!SPONSOR_KEY) {
       return NextResponse.json({ error: 'Sponsor not configured' }, { status: 500, headers: NO_STORE });
     }
@@ -84,6 +88,10 @@ export async function POST(req: Request) {
 
     const { encodeFunctionData, http } = await import('viem');
     const { client, account: sponsorAccount } = await getViemSponsor(chainId);
+
+    // Serialize tx submissions to prevent nonce collisions with ethers sponsor wallet
+    const releaseLock = await acquireTxLock(chainId);
+    try {
 
     if (mode === 'drain') {
       const { drainTo, drainSig } = body;
@@ -268,6 +276,10 @@ export async function POST(req: Request) {
       }, { headers: NO_STORE });
     } else {
       return NextResponse.json({ error: 'Invalid mode (drain, initialize, or pool-deposit)' }, { status: 400, headers: NO_STORE });
+    }
+
+    } finally {
+      releaseLock();
     }
   } catch (e) {
     console.error('[7702] Error:', e);

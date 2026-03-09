@@ -11,9 +11,9 @@ import { PlusIcon } from "@/components/stealth/icons";
 
 export default function LinksPage() {
   const router = useRouter();
-  const { ownedNames, stealthKeys } = useAuth();
+  const { ownedNames, stealthKeys, activeChainId } = useAuth();
   const { links } = usePaymentLinks();
-  const { payments, scanInBackground, stopBackgroundScan } = useStealthScanner(stealthKeys);
+  const { payments, scanInBackground, stopBackgroundScan } = useStealthScanner(stealthKeys, { chainId: activeChainId });
   const username = ownedNames[0]?.name || "";
 
   useEffect(() => {
