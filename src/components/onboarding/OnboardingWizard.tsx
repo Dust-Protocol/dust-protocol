@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UsernameStep } from "./steps/UsernameStep";
 import { PinStep } from "./steps/PinStep";
 import { storageKey } from "@/lib/storageKey";
+import { getChainConfig } from "@/config/chains";
 import { AlertCircle as AlertCircleIcon } from "lucide-react";
 
 type Step = "username" | "pin" | "activating";
@@ -14,7 +15,7 @@ const STEPS_REACTIVATE: Step[] = ["pin"];
 
 export function OnboardingWizard() {
   const router = useRouter();
-  const { address, ownedNames, deriveKeysFromWallet, setPin: storePinEncrypted, registerMetaAddress, registerName } = useAuth();
+  const { address, activeChainId, ownedNames, deriveKeysFromWallet, setPin: storePinEncrypted, registerMetaAddress, registerName } = useAuth();
 
   // Re-activation: user has an on-chain name but localStorage was cleared (new browser / cleared cache)
   const isReactivation = ownedNames.length > 0;
@@ -48,13 +49,13 @@ export function OnboardingWizard() {
 
   // Retry ERC-6538 registration up to 3 times with backoff.
   // Returns true if registration succeeded, false otherwise.
-  const tryRegisterMeta = async (attempts = 3): Promise<boolean> => {
+  const tryRegisterMeta = async (chainId: number, attempts = 3): Promise<boolean> => {
     for (let i = 0; i < attempts; i++) {
-      const txHash = await registerMetaAddress();
+      const txHash = await registerMetaAddress(chainId);
       if (txHash) return true;
       if (i < attempts - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1)));
     }
-    console.error('[OnboardingWizard] ERC-6538 registration failed after', attempts, 'attempts');
+    console.error('[OnboardingWizard] ERC-6538 registration failed after', attempts, 'attempts on chain', chainId);
     return false;
   };
 
@@ -82,7 +83,7 @@ export function OnboardingWizard() {
       if (alreadyHasName) {
         // Wallet already has a name — just re-derive keys and re-register ERC-6538 meta-address.
         // Skip registerName to avoid an unnecessary API call.
-        const metaOk = await tryRegisterMeta();
+        const metaOk = await tryRegisterMeta(activeChainId);
         if (!metaOk) {
           hasMetaWarning = true;
           setMetaRegWarning("Account restored, but stealth keys couldn't be registered on-chain. Your account may not be discoverable from other devices.");
@@ -97,7 +98,7 @@ export function OnboardingWizard() {
           if (reclaimData.name) {
             setUsername(reclaimData.name);
             // Re-register ERC-6538 meta-address in background with retry
-            tryRegisterMeta();
+            tryRegisterMeta(activeChainId);
           } else {
             // No name found — this wallet hasn't registered a name before
             throw new Error("No existing account found — please go back and create a new username");
@@ -110,7 +111,7 @@ export function OnboardingWizard() {
         // registerName returns the txHash string, or 'already-registered' for idempotent re-reg.
         const [nameTx, metaOk] = await Promise.all([
           registerName(username, result.metaAddress),
-          tryRegisterMeta(),
+          tryRegisterMeta(activeChainId),
         ]);
         if (!nameTx) throw new Error("Failed to register name");
         if (!metaOk) {
@@ -192,7 +193,7 @@ export function OnboardingWizard() {
                 </p>
                 {!error && (
                   <p className="text-[11px] text-[rgba(255,255,255,0.25)]">
-                    Registered on Ethereum Sepolia — works across all supported chains
+                    Registering on {getChainConfig(activeChainId).name}
                   </p>
                 )}
               </div>

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
+import { getServerSponsor, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider'
 import { DEFAULT_CHAIN_ID, getChainConfig } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { DUST_SWAP_ADAPTER_V2_ABI } from '@/lib/swap/contracts'
@@ -163,11 +163,7 @@ export async function POST(req: Request) {
       // Swap direction: true if tokenIn is currency0 (swap 0→1), false if currency1 (swap 1→0)
       const zeroForOne = tokenIn.toLowerCase() === poolKey.currency0.toLowerCase()
 
-      const feeData = await sponsor.provider.getFeeData()
-      const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
-      if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-        return NextResponse.json({ error: 'Gas price too high' }, { status: 503, headers: NO_STORE })
-      }
+      const gasOverrides = await getTxGasOverrides(chainId, 900_000)
 
       const tx = await adapter.executeSwap(
         proof,
@@ -193,12 +189,7 @@ export async function POST(req: Request) {
         tokenOut,
         await sponsor.getAddress(),
         relayerFeeBps,
-        {
-          gasLimit: 900_000, // FFLONK verify + swap + re-deposit
-          type: 2,
-          maxFeePerGas,
-          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
-        },
+        gasOverrides,
       )
 
       const receipt = await waitForTx(tx)
@@ -277,6 +268,9 @@ export async function POST(req: Request) {
       if (!nullifier1IsZero) releaseNullifier(nullifier1Hex)
     }
   } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high' }, { status: 503, headers: NO_STORE })
+    }
     console.error('[V2/swap] Error:', e)
     const raw = e instanceof Error ? e.message : String(e)
     let message = 'Swap failed'

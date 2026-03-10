@@ -261,6 +261,39 @@ Deployment block: `38350029`
 
 ---
 
+## Flow EVM Testnet (chain ID: 545)
+
+### Core Stealth
+
+| Contract | Address |
+|----------|---------|
+| ERC5564Announcer | [`0xfE55B104f6A200cbD17D0Be5a90D17a2A2a0d223`](https://evm-testnet.flowscan.io/address/0xfE55B104f6A200cbD17D0Be5a90D17a2A2a0d223) |
+| ERC6538Registry | [`0x5ac18d5AdaC9b65E1Be9291A7C2cDbf33b584a3b`](https://evm-testnet.flowscan.io/address/0x5ac18d5AdaC9b65E1Be9291A7C2cDbf33b584a3b) |
+| NameRegistryMerkle | [`0x2319E5B6DBb639049E98f3E4D1EE9A67E0CB46fb`](https://evm-testnet.flowscan.io/address/0x2319E5B6DBb639049E98f3E4D1EE9A67E0CB46fb) |
+| NameVerifier | [`0x0d25EC7B314E4208EEa29bCDb9F6313965a99BdE`](https://evm-testnet.flowscan.io/address/0x0d25EC7B314E4208EEa29bCDb9F6313965a99BdE) |
+
+### ERC-4337
+
+| Contract | Address |
+|----------|---------|
+| StealthWalletFactory | [`0x97b74D21ca46c3CaB2918fF10c8418c606223638`](https://evm-testnet.flowscan.io/address/0x97b74D21ca46c3CaB2918fF10c8418c606223638) |
+| StealthAccountFactory | [`0x77c3d8c2B0bb27c9A8ACCa39F2398aaa021eb776`](https://evm-testnet.flowscan.io/address/0x77c3d8c2B0bb27c9A8ACCa39F2398aaa021eb776) |
+| DustPaymaster | [`0xC3c8Fa75910FED41D30221615d6875D2079179b8`](https://evm-testnet.flowscan.io/address/0xC3c8Fa75910FED41D30221615d6875D2079179b8) |
+
+### V2 Contracts
+
+| Contract | Address |
+|----------|---------|
+| DustPoolV2 | [`0x72f0bd8d014cdB045efD33311028A3013769d69F`](https://evm-testnet.flowscan.io/address/0x72f0bd8d014cdB045efD33311028A3013769d69F) |
+| FflonkVerifier (9 signals) | [`0x0e4cF377fc18E46BB1184e4274367Bc0dB958573`](https://evm-testnet.flowscan.io/address/0x0e4cF377fc18E46BB1184e4274367Bc0dB958573) |
+| FflonkSplitVerifier (15 signals) | [`0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1`](https://evm-testnet.flowscan.io/address/0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1) |
+| FflonkComplianceVerifier | [`0x5779192B220876221Bc2871511FB764941314e04`](https://evm-testnet.flowscan.io/address/0x5779192B220876221Bc2871511FB764941314e04) |
+| TestnetComplianceOracle | [`0xACe425FC23d7594b829935EC4862f654541Bf0d3`](https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3) |
+
+*DustSwap not yet deployed on Flow EVM Testnet.*
+
+---
+
 ## Base Mainnet (chain ID: 8453)
 
 *Deployment pending. Contract addresses will be added after mainnet deployment.*

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
+import { getServerSponsor, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider'
 import { DEFAULT_CHAIN_ID } from '@/config/chains'
 import { getDustSwapAdapterV2Config, getVanillaPoolKey, DUST_SWAP_ADAPTER_V2_ABI } from '@/lib/swap/contracts'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
@@ -229,12 +229,7 @@ export async function POST(req: Request) {
           // recipient is the adapter contract (validated at line 156), not an end-user.
           // Screening skipped intentionally (matches single swap route behavior).
 
-          const feeData = await sponsor.provider.getFeeData()
-          const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
-          if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-            errors.push({ index: item.originalIndex, error: 'Gas price too high' })
-            continue
-          }
+          const gasOverrides = await getTxGasOverrides(chainId, 1_500_000)
 
           // Determine swap direction from tokenIn vs pool currency0
           const zeroForOne = item.tokenIn.toLowerCase() === poolKey.currency0.toLowerCase()
@@ -263,12 +258,7 @@ export async function POST(req: Request) {
             item.tokenOut,
             await sponsor.getAddress(),
             item.relayerFeeBps,
-            {
-              gasLimit: 1_500_000,
-              type: 2,
-              maxFeePerGas,
-              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
-            },
+            gasOverrides,
           )
 
           const receipt = await waitForTx(tx)

@@ -2,14 +2,15 @@ import { zeroAddress, type Address } from 'viem'
 import type { SplitOutputNote } from './proof-inputs'
 import type { NoteCommitmentV2 } from './types'
 import { getUSDCAddress } from '@/lib/swap/constants'
+import { getChainConfig } from '@/config/chains'
 
 export function resolveTokenSymbol(asset: Address, chainId: number): string {
-  if (asset === zeroAddress) return 'ETH'
+  if (asset === zeroAddress) return getChainConfig(chainId).nativeCurrency.symbol
   try {
     const usdcAddr = getUSDCAddress(chainId)
     if (usdcAddr.toLowerCase() === asset.toLowerCase()) return 'USDC'
   } catch { /* USDC not configured for this chain */ }
-  throw new Error(`Unknown token ${asset} on chain ${chainId}. Supported: ETH, USDC`)
+  throw new Error(`Unknown token ${asset} on chain ${chainId}. Supported: native, USDC`)
 }
 
 export function parseSplitCalldata(calldata: string, numPublicSignals: number): {

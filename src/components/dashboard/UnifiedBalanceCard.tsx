@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { RefreshCwIcon, EyeOffIcon, CheckIcon } from "lucide-react";
 import { getChainConfig } from "@/config/chains";
 import { useAuth } from "@/contexts/AuthContext";
-import { ETHIcon } from "@/components/stealth/icons";
+import { TokenIcon } from "@/components/stealth/icons";
 
 interface UnifiedBalanceCardProps {
   total: number;
@@ -58,7 +58,7 @@ export function UnifiedBalanceCard({
 
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-white font-mono tracking-tight mb-1 flex items-center gap-2">
-          {total.toFixed(4)} <span className="flex items-center gap-1"><ETHIcon size={20} />{symbol}</span>
+          {total.toFixed(4)} <span className="flex items-center gap-1"><TokenIcon symbol={symbol} size={20} />{symbol}</span>
         </h2>
       </div>
 
@@ -71,7 +71,7 @@ export function UnifiedBalanceCard({
             </span>
           </div>
           <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
-            {stealthTotal.toFixed(4)} <ETHIcon size={14} /> {symbol}
+            {stealthTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /> {symbol}
           </span>
         </div>
         <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]">
@@ -82,7 +82,7 @@ export function UnifiedBalanceCard({
             </span>
           </div>
           <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
-            {claimTotal.toFixed(4)} <ETHIcon size={14} /> {symbol}
+            {claimTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /> {symbol}
           </span>
         </div>
       </div>

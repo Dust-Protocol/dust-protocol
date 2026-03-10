@@ -13,8 +13,9 @@ import {
   ShieldIcon,
   LockIcon,
   AlertCircleIcon,
-  ETHIcon,
+  TokenIcon,
 } from "@/components/stealth/icons";
+import { getChainConfig } from "@/config/chains";
 
 interface V2SwapCardProps {
   chainId: number;
@@ -47,6 +48,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
   }, [hasKeys]);
 
   const v2Config = getDustPoolV2Config(chainId);
+  const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
   const unspentCount = notes.filter(n => !n.spent).length;
   const formattedBalance = formatEther(totalEthBalance);
   const displayBalance = parseFloat(formattedBalance).toFixed(4);
@@ -144,8 +146,8 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                         {isLoading ? "-.----" : displayBalance}
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <ETHIcon size={16} />
-                        <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">ETH</span>
+                        <TokenIcon symbol={nativeSymbol} size={16} />
+                        <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">{nativeSymbol}</span>
                       </div>
                     </div>
                   </div>
@@ -278,7 +280,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                   <div className="flex flex-col gap-3 text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
                     <div className="flex items-start gap-2">
                       <span className="text-[#00FF41] font-bold">1</span>
-                      <p>Deposit any amount of ETH into the shielded pool quietly</p>
+                      <p>Deposit any amount of {nativeSymbol} into the shielded pool quietly</p>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-[#00FF41] font-bold">2</span>

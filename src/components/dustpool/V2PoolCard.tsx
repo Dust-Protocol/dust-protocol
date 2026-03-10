@@ -7,7 +7,7 @@ import { formatEther, formatUnits, zeroAddress } from "viem";
 import { useV2Balance, useV2Keys } from "@/hooks/dustpool/v2";
 import { computeAssetId } from "@/lib/dustpool/v2/commitment";
 import { getChainConfig } from "@/config/chains";
-import { ShieldIcon, LockIcon, ETHIcon, USDCIcon } from "@/components/stealth/icons";
+import { ShieldIcon, LockIcon, TokenIcon, USDCIcon } from "@/components/stealth/icons";
 import { V2DepositModal } from "./V2DepositModal";
 import { V2WithdrawModal } from "./V2WithdrawModal";
 import { V2TransferModal } from "./V2TransferModal";
@@ -46,6 +46,7 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
     return () => { cancelled = true; };
   }, [chainId, usdcAddress]);
 
+  const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
   const usdcBalance = usdcAssetId !== null ? (balances.get(usdcAssetId) ?? 0n) : 0n;
   const hasAnyBalance = balances.size > 0 && Array.from(balances.values()).some(v => v > 0n);
 
@@ -124,8 +125,8 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
               {isLoading ? "-.----" : displayBalance}
             </span>
             <div className="flex items-center gap-1.5">
-              <ETHIcon size={16} />
-              <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">ETH</span>
+              <TokenIcon symbol={nativeSymbol} size={16} />
+              <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">{nativeSymbol}</span>
             </div>
             {unspentCount > 0 && (
               <span className="text-[10px] text-[#00FF41] font-mono">

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
+import { getServerSponsor, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider'
 import { DEFAULT_CHAIN_ID } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { syncAndPostRoot } from '@/lib/dustpool/v2/relayer-tree'
@@ -115,11 +115,7 @@ export async function POST(req: Request) {
       // Transfers have publicAmount=0, no actual token transfer — use address(0)
       const tokenAddress = ethers.constants.AddressZero
 
-      const feeData = await sponsor.provider.getFeeData()
-      const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
-      if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-        return NextResponse.json({ error: 'Gas price too high' }, { status: 503, headers: NO_STORE })
-      }
+      const gasOverrides = await getTxGasOverrides(chainId, 800_000)
 
       const tx = await contract.withdraw(
         proof,
@@ -132,12 +128,7 @@ export async function POST(req: Request) {
         publicAsset,
         recipient,
         tokenAddress,
-        {
-          gasLimit: 800_000,
-          type: 2,
-          maxFeePerGas,
-          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
-        },
+        gasOverrides,
       )
 
       const receipt = await waitForTx(tx)
@@ -169,6 +160,9 @@ export async function POST(req: Request) {
       if (!nullifier1IsZero) releaseNullifier(nullifier1Hex)
     }
   } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high' }, { status: 503, headers: NO_STORE })
+    }
     console.error('[V2/transfer] Error:', e)
     const raw = e instanceof Error ? e.message : ''
     let message = 'Transfer failed'

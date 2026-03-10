@@ -19,19 +19,19 @@ const USDC_DENOMINATION_VALUES = [
 export const ETH_DENOMINATIONS: bigint[] = ETH_DENOMINATION_VALUES.map(v => parseEther(v))
 export const USDC_DENOMINATIONS: bigint[] = USDC_DENOMINATION_VALUES.map(v => parseUnits(v, 6))
 
+// 18-decimal native tokens that share the ETH denomination table
+const NATIVE_18_DECIMAL_SYMBOLS = new Set(['ETH', 'FLOW', 'TON'])
+
 /**
  * Get the denomination table for a given token symbol.
  * Returns denominations in descending order (largest first).
+ * All 18-decimal native tokens (ETH, FLOW, TON) share the same table.
  */
 export function getDenominations(token: string): bigint[] {
-  switch (token.toUpperCase()) {
-    case 'ETH':
-      return ETH_DENOMINATIONS
-    case 'USDC':
-      return USDC_DENOMINATIONS
-    default:
-      throw new Error(`No denomination table for token: ${token}. Supported: ETH, USDC`)
-  }
+  const upper = token.toUpperCase()
+  if (NATIVE_18_DECIMAL_SYMBOLS.has(upper)) return ETH_DENOMINATIONS
+  if (upper === 'USDC') return USDC_DENOMINATIONS
+  throw new Error(`No denomination table for token: ${token}. Supported: ${[...NATIVE_18_DECIMAL_SYMBOLS].join(', ')}, USDC`)
 }
 
 /**
@@ -95,8 +95,8 @@ export function decomposeForSplit(amount: bigint, token: string, maxChunks = 7):
  * Returns array of formatted denomination values (e.g., ["1.0", "0.3", "0.05"]).
  */
 export function formatChunks(chunks: bigint[], token: string): string[] {
-  const isUSDC = token.toUpperCase() === 'USDC'
-  return chunks.map(c => isUSDC ? formatUnits(c, 6) : formatEther(c))
+  const decimals = token.toUpperCase() === 'USDC' ? 6 : 18
+  return chunks.map(c => decimals === 6 ? formatUnits(c, 6) : formatEther(c))
 }
 
 /**

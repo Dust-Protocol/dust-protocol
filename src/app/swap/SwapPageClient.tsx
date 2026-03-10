@@ -5,8 +5,13 @@ import { PoolStats } from "@/components/swap/PoolStats";
 import { PoolComposition } from "@/components/swap/PoolComposition";
 import { usePoolStats } from "@/hooks/swap/usePoolStats";
 import { useChainlinkPrice } from "@/hooks/swap/useChainlinkPrice";
+import { isSwapSupported } from "@/lib/swap/constants";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SwapPageClient() {
+  const { activeChainId } = useAuth();
+  const swapSupported = isSwapSupported(activeChainId);
+
   const {
     currentPrice: poolPrice,
     ethReserve,
@@ -52,11 +57,29 @@ export default function SwapPageClient() {
 
       {/* Main Row: Stats | Card | Composition — desktop */}
       <div className="flex items-stretch justify-center gap-5 w-full max-w-[1100px]">
-        <div className="hidden md:flex">
-          <PoolStats {...poolStatsProps} />
-        </div>
+        {swapSupported && (
+          <div className="hidden md:flex">
+            <PoolStats {...poolStatsProps} />
+          </div>
+        )}
         <SwapV2Card onPoolChange={refetch} oraclePrice={oraclePrice} />
-        <div className="hidden md:flex">
+        {swapSupported && (
+          <div className="hidden md:flex">
+            <PoolComposition
+              ethReserve={ethReserve}
+              usdcReserve={usdcReserve}
+              shieldedEth={shieldedEth}
+              shieldedUsdc={shieldedUsdc}
+              currentPrice={oraclePrice}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: Stats and Composition below card */}
+      {swapSupported && (
+        <div className="flex flex-col items-center gap-3 md:hidden w-full">
+          <PoolStats {...poolStatsProps} />
           <PoolComposition
             ethReserve={ethReserve}
             usdcReserve={usdcReserve}
@@ -65,19 +88,7 @@ export default function SwapPageClient() {
             currentPrice={oraclePrice}
           />
         </div>
-      </div>
-
-      {/* Mobile: Stats and Composition below card */}
-      <div className="flex flex-col items-center gap-3 md:hidden w-full">
-        <PoolStats {...poolStatsProps} />
-        <PoolComposition
-          ethReserve={ethReserve}
-          usdcReserve={usdcReserve}
-          shieldedEth={shieldedEth}
-          shieldedUsdc={shieldedUsdc}
-          currentPrice={oraclePrice}
-        />
-      </div>
+      )}
     </div>
   );
 }

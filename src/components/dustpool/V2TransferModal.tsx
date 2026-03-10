@@ -9,10 +9,11 @@ import {
   AlertCircleIcon,
   XIcon,
   SendIcon,
-  ETHIcon,
+  TokenIcon,
 } from "@/components/stealth/icons";
 import type { V2Keys } from "@/lib/dustpool/v2/types";
 import { errorToUserMessage } from "@/lib/dustpool/v2/errors";
+import { getChainConfig } from "@/config/chains";
 
 interface V2TransferModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export function V2TransferModal({
   shieldedBalance,
 }: V2TransferModalProps) {
   const { transfer, isPending, status, txHash, error, clearError } = useV2Transfer(keysRef, chainId);
+  const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
 
   const [amount, setAmount] = useState("");
   const [recipientPubKey, setRecipientPubKey] = useState("");
@@ -141,10 +143,10 @@ export function V2TransferModal({
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-center">
                       <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-                        Transfer Amount (ETH)
+                        Transfer Amount ({nativeSymbol})
                       </label>
                       <span className="text-[10px] text-[rgba(255,255,255,0.4)] font-mono flex items-center gap-1">
-                        Available: {formattedMax} <ETHIcon size={12} /> ETH
+                        Available: {formattedMax} <TokenIcon symbol={nativeSymbol} size={12} /> {nativeSymbol}
                       </span>
                     </div>
                     <input
@@ -191,7 +193,7 @@ export function V2TransferModal({
                     disabled={!canTransfer}
                     className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {parsedAmount ? `Transfer ${amount} ETH` : "Enter Amount"}
+                    {parsedAmount ? `Transfer ${amount} ${nativeSymbol}` : "Enter Amount"}
                   </button>
                 </>
               )}
@@ -219,7 +221,7 @@ export function V2TransferModal({
                       <ShieldCheckIcon size={40} color="#00FF41" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">Transfer Successful</p>
-                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} ETH transferred privately</p>
+                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {nativeSymbol} transferred privately</p>
                   </div>
 
                   {txHash && (

@@ -9,6 +9,7 @@ const SUBGRAPH_URLS: Record<number, string | undefined> = {
   421614: process.env.NEXT_PUBLIC_SUBGRAPH_URL_ARBITRUM_SEPOLIA || undefined,
   11155420: process.env.NEXT_PUBLIC_SUBGRAPH_URL_OP_SEPOLIA || undefined,
   84532: process.env.NEXT_PUBLIC_SUBGRAPH_URL_BASE_SEPOLIA || undefined,
+  545: process.env.NEXT_PUBLIC_SUBGRAPH_URL_FLOW_TESTNET || undefined,
 };
 
 const REQUEST_TIMEOUT_MS = 10_000;

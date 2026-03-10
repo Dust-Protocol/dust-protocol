@@ -14,7 +14,6 @@ import {
   AlertCircleIcon,
   XIcon,
   InfoIcon,
-  ETHIcon,
   USDCIcon,
   TokenIcon,
   ChainIcon,
@@ -67,6 +66,8 @@ export function V2SendModal({
     }
   }, [chainId]);
 
+  const nativeSymbol = useMemo(() => getChainConfig(chainId).nativeCurrency.symbol, [chainId]);
+
   const [knownAssetIds, setKnownAssetIds] = useState<{ eth: bigint | null; usdc: bigint | null }>({ eth: null, usdc: null });
 
   useEffect(() => {
@@ -90,10 +91,10 @@ export function V2SendModal({
       const bal = balances.get(knownAssetIds.eth) ?? 0n;
       if (bal > 0n) {
         assets.push({
-          symbol: "ETH",
+          symbol: nativeSymbol,
           decimals: 18,
           address: zeroAddress,
-          icon: (size: number) => <ETHIcon size={size} />,
+          icon: (size: number) => <TokenIcon symbol={nativeSymbol} size={size} />,
           assetId: knownAssetIds.eth!,
         });
       }
@@ -230,7 +231,7 @@ export function V2SendModal({
 
   const canSend = parsedAmount !== null && !exceedsBalance && isValidRecipient && !isPending && !isSplitPending && !cooldownBlocksSubmit;
 
-  const tokenSymbol = selectedAsset?.symbol ?? "ETH";
+  const tokenSymbol = selectedAsset?.symbol ?? nativeSymbol;
   const chunks = parsedAmount ? decomposeForToken(parsedAmount, tokenSymbol) : [];
   const formattedChunkValues = chunks.length > 0 ? formatChunks(chunks, tokenSymbol) : [];
   const roundSuggestions = parsedAmount && chunks.length > 1
@@ -353,7 +354,7 @@ export function V2SendModal({
                     </p>
                     <p className="text-2xl font-extrabold text-white font-mono flex items-baseline gap-2">
                       {formattedMax} <span className="text-base font-semibold text-[rgba(255,255,255,0.5)] flex items-center gap-1">
-                        {selectedAsset ? selectedAsset.icon(16) : <ETHIcon size={16} />}
+                        {selectedAsset ? selectedAsset.icon(16) : <TokenIcon symbol={nativeSymbol} size={16} />}
                         {tokenSymbol}
                       </span>
                     </p>
@@ -468,10 +469,10 @@ export function V2SendModal({
                       className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {recipient && !isValidRecipient && (
-                      <p className="text-[11px] text-red-400 font-mono">Invalid Ethereum address</p>
+                      <p className="text-[11px] text-red-400 font-mono">Invalid address</p>
                     )}
                     <p className="text-[11px] text-[rgba(255,255,255,0.3)] font-mono">
-                      Any Ethereum address. Sender identity is protected by ZK proof.
+                      Any EVM address. Sender identity is protected by ZK proof.
                     </p>
                   </div>
 

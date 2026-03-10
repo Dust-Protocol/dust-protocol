@@ -15,7 +15,6 @@ import {
   AlertCircleIcon,
   XIcon,
   InfoIcon,
-  ETHIcon,
   USDCIcon,
   TokenIcon,
   ChainIcon,
@@ -60,6 +59,10 @@ export function V2WithdrawModal({
   const cooldownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [selectedAssetIdx, setSelectedAssetIdx] = useState(0);
 
+  const nativeSymbol = useMemo(() => {
+    try { return getChainConfig(chainId).nativeCurrency.symbol; } catch { return "Native"; }
+  }, [chainId]);
+
   // Resolve known token assetIds for this chain
   const usdcTokenAddress = useMemo((): Address | null => {
     try {
@@ -94,10 +97,10 @@ export function V2WithdrawModal({
       const bal = balances.get(knownAssetIds.eth) ?? 0n;
       if (bal > 0n) {
         assets.push({
-          symbol: "ETH",
+          symbol: nativeSymbol,
           decimals: 18,
           address: zeroAddress,
-          icon: (size: number) => <ETHIcon size={size} />,
+          icon: (size: number) => <TokenIcon symbol={nativeSymbol} size={size} />,
           assetId: knownAssetIds.eth!,
         });
       }
@@ -115,7 +118,7 @@ export function V2WithdrawModal({
       }
     }
     return assets;
-  }, [knownAssetIds, balances, usdcTokenAddress]);
+  }, [knownAssetIds, balances, usdcTokenAddress, nativeSymbol]);
 
   const selectedAsset = availableAssets[selectedAssetIdx] ?? availableAssets[0] ?? null;
   const selectedBalance = selectedAsset ? (balances.get(selectedAsset.assetId) ?? 0n) : 0n;
@@ -242,7 +245,7 @@ export function V2WithdrawModal({
 
   const canWithdraw = parsedAmount !== null && !exceedsBalance && isValidRecipient && !isPending && !isSplitPending && !cooldownBlocksSubmit;
 
-  const tokenSymbol = selectedAsset?.symbol ?? "ETH";
+  const tokenSymbol = selectedAsset?.symbol ?? nativeSymbol;
   const chunks = parsedAmount ? decomposeForToken(parsedAmount, tokenSymbol) : [];
   const formattedChunkValues = chunks.length > 0 ? formatChunks(chunks, tokenSymbol) : [];
   const roundSuggestions = parsedAmount && chunks.length > 1
@@ -365,7 +368,7 @@ export function V2WithdrawModal({
                     </p>
                     <p className="text-2xl font-extrabold text-white font-mono flex items-baseline gap-2">
                       {formattedMax} <span className="text-base font-semibold text-[rgba(255,255,255,0.5)] flex items-center gap-1">
-                        {selectedAsset ? selectedAsset.icon(16) : <ETHIcon size={16} />}
+                        {selectedAsset ? selectedAsset.icon(16) : <TokenIcon symbol={nativeSymbol} size={16} />}
                         {tokenSymbol}
                       </span>
                     </p>
@@ -480,7 +483,7 @@ export function V2WithdrawModal({
                       className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {recipient && !isValidRecipient && (
-                      <p className="text-[11px] text-red-400 font-mono">Invalid Ethereum address</p>
+                      <p className="text-[11px] text-red-400 font-mono">Invalid address</p>
                     )}
                     <p className="text-[11px] text-[rgba(255,255,255,0.3)] font-mono">
                       Use a fresh address for maximum privacy. Defaults to connected wallet.

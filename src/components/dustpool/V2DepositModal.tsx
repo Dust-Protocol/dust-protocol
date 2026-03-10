@@ -11,8 +11,8 @@ import {
   ShieldCheckIcon,
   AlertCircleIcon,
   XIcon,
-  ETHIcon,
   USDCIcon,
+  TokenIcon,
   WalletIcon,
   CopyIcon,
   CheckIcon,
@@ -443,7 +443,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
-                        <ETHIcon size={14} /> ETH
+                        <TokenIcon symbol={nativeSymbol} size={14} /> {nativeSymbol}
                       </button>
                       <button
                         onClick={() => selectToken("USDC")}
@@ -468,7 +468,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         onClick={handleMaxClick}
                         className="flex items-center gap-1 text-[10px] text-[#00FF41] font-mono hover:underline"
                       >
-                        {isUSDC ? <USDCIcon size={12} /> : <ETHIcon size={12} />}
+                        {isUSDC ? <USDCIcon size={12} /> : <TokenIcon symbol={nativeSymbol} size={12} />}
                         MAX: {walletBalanceFormatted} {tokenSymbol}
                       </button>
                     </div>
@@ -544,7 +544,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
-                        <ETHIcon size={14} /> ETH
+                        <TokenIcon symbol={nativeSymbol} size={14} /> {nativeSymbol}
                       </button>
                       <button
                         onClick={() => selectToken("USDC")}

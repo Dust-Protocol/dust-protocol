@@ -73,16 +73,20 @@ describe('resolveTokenSymbol', () => {
     expect(() => resolveTokenSymbol(asset, unknownChainId)).toThrow('Unknown token')
   })
 
-  it('returns ETH for zero address on any chain', () => {
-    // #given — ETH is always zero address regardless of chain
-    const chains = [1, 11155111, 111551119090, 42161]
+  it('returns native token symbol for zero address on supported chains', () => {
+    // #given — zero address is native token, symbol varies by chain
+    const expected: [number, string][] = [
+      [11155111, 'ETH'],
+      [111551119090, 'TON'],
+      [545, 'FLOW'],
+    ]
 
-    for (const chainId of chains) {
+    for (const [chainId, symbol] of expected) {
       // #when
       const result = resolveTokenSymbol(zeroAddress, chainId)
 
       // #then
-      expect(result).toBe('ETH')
+      expect(result).toBe(symbol)
     }
   })
 })

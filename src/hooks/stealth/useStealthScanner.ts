@@ -30,6 +30,7 @@ const BG_SCAN_INTERVAL_MS: Record<number, number> = {
   421614: 10_000,      // Arbitrum Sepolia (~0.25s blocks, strict rate limits)
   11155420: 10_000,    // OP Sepolia (2s blocks)
   84532: 10_000,       // Base Sepolia (2s blocks)
+  545: 10_000,         // Flow EVM Testnet
 };
 const DEFAULT_BG_SCAN_INTERVAL_MS = 10_000;
 

@@ -6,7 +6,7 @@
 
 import { ethers } from 'ethers'
 import { readFile, writeFile } from 'fs/promises'
-import { getServerProvider, getServerSponsor, getCachedBlockNumber } from '@/lib/server-provider'
+import { getServerProvider, getServerSponsor, getCachedBlockNumber, getTxGasOverrides } from '@/lib/server-provider'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from './contracts'
 import { MerkleTree } from '../merkle'
 import { toBytes32Hex } from '../poseidon'
@@ -20,6 +20,7 @@ const V2_START_BLOCKS: Record<number, number> = {
   421614: 246397522,
   11155420: 40333105,
   84532: 38350239,
+  545: 99040904,       // Flow EVM Testnet (matches deploymentBlock in chains.ts)
 }
 
 // L2s support larger log ranges; drpc.org enforces 10K on Eth Sepolia
@@ -29,6 +30,7 @@ const EVENT_SCAN_CHUNK_BY_CHAIN: Record<number, number> = {
   84532: 50_000,        // Base Sepolia (2s blocks, native RPC)
   421614: 50_000,       // Arbitrum Sepolia (~0.25s blocks)
   11155420: 50_000,     // OP Sepolia (2s blocks)
+  545: 50_000,          // Flow EVM Testnet (~1s blocks)
 }
 const DEFAULT_EVENT_SCAN_CHUNK = 10_000
 
@@ -216,7 +218,8 @@ export async function postRootIfNeeded(chainId: number): Promise<boolean> {
   const rootHex = toBytes32Hex(currentRoot)
 
   try {
-    const tx = await contract.updateRoot(rootHex)
+    const gasOverrides = await getTxGasOverrides(chainId, 200_000)
+    const tx = await contract.updateRoot(rootHex, gasOverrides)
     await tx.wait()
     state.lastPostedRoot = currentRoot
     console.log(`[V2Relayer] Posted root ${rootHex.slice(0, 18)}... on chain ${chainId}`)

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
+import { getChainConfig, isChainSupported } from "@/config/chains";
 
 interface ChainMetrics {
   name: string;
@@ -113,7 +114,7 @@ export function ProtocolMetrics() {
           <StatCard label="Stealth Payments" value="--" />
           <StatCard label="Pool Deposits" value="--" />
           <StatCard label="Pool Withdrawals" value="--" />
-          <StatCard label="TVL" value="--" suffix="ETH" />
+          <StatCard label="TVL" value="--" />
         </div>
       </div>
     );
@@ -134,6 +135,9 @@ export function ProtocolMetrics() {
     { announcements: 0, deposits: 0, withdrawals: 0, uniqueAddresses: 0 },
   );
 
+  // Aggregate TVL across chains with potentially different native currencies (ETH, TON, FLOW).
+  // Only meaningful when all chains share the same native token; displayed without a suffix
+  // to avoid misrepresenting a cross-currency sum.
   const totalTVL = chains.reduce(
     (acc, c) => acc.add(ethers.BigNumber.from(c.tvlWei || "0")),
     ethers.BigNumber.from(0),
@@ -166,9 +170,8 @@ export function ProtocolMetrics() {
           value={totals.withdrawals.toLocaleString()}
         />
         <StatCard
-          label="TVL"
+          label="TVL (native)"
           value={formatTVL(totalTVL.toString())}
-          suffix="ETH"
         />
       </div>
 
@@ -200,7 +203,7 @@ export function ProtocolMetrics() {
                     <span>{c.announcements} sends</span>
                     <span>{c.deposits} deposits</span>
                     {c.tvlWei !== "0" && (
-                      <span>{formatTVL(c.tvlWei)} ETH</span>
+                      <span>{formatTVL(c.tvlWei)} {isChainSupported(c.chainId) ? getChainConfig(c.chainId).nativeCurrency.symbol : "ETH"}</span>
                     )}
                   </div>
                 </div>

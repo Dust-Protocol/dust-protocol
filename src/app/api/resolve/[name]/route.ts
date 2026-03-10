@@ -123,8 +123,10 @@ export async function GET(req: Request, { params }: { params: { name: string } }
     const requestedChainId = parseInt(searchParams.get('chainId') || '') || DEFAULT_CHAIN_ID;
     const requestedConfig = getChainConfig(requestedChainId);
     // Route to canonical chain for name resolution when chain has no nameRegistry (L2s)
-    const chainId = requestedConfig.contracts.nameRegistry ? requestedChainId : getCanonicalNamingChain().id;
-    const config = getChainConfig(chainId);
+    const namingChainId = requestedConfig.contracts.nameRegistry ? requestedChainId : getCanonicalNamingChain().id;
+    const namingConfig = getChainConfig(namingChainId);
+    // Stealth address + announcement must happen on the requested chain (where payment occurs)
+    const paymentConfig = requestedConfig;
     const linkSlug = searchParams.get('link') || undefined;
 
     // Global rate limit (protects sponsor wallet from cross-name drain)
@@ -148,10 +150,10 @@ export async function GET(req: Request, { params }: { params: { name: string } }
 
     globalResolveTimestamps.push(now);
 
-    const provider = getServerProvider(chainId);
+    const namingProvider = getServerProvider(namingChainId);
 
-    // 1. Resolve name → meta-address bytes (strip .dust suffix, matching names.ts)
-    const registry = new ethers.Contract(config.contracts.nameRegistry, NAME_REGISTRY_ABI, provider);
+    // 1. Resolve name → meta-address bytes from canonical/naming chain
+    const registry = new ethers.Contract(namingConfig.contracts.nameRegistry, NAME_REGISTRY_ABI, namingProvider);
     const normalized = stripDustSuffix(name);
 
     const metaBytes: string | null = await (async () => {
@@ -172,8 +174,8 @@ export async function GET(req: Request, { params }: { params: { name: string } }
     // 2. Parse meta-address → spending + viewing public keys (with validation)
     const { spendingPublicKey, viewingPublicKey } = parseMetaAddressBytes(metaBytes);
 
-    // 3. Generate fresh stealth address (random ephemeral key)
-    const { stealthAddress, ephemeralPublicKey, viewTag } = generateStealthAddress(spendingPublicKey, viewingPublicKey, chainId);
+    // 3. Generate fresh stealth address on the payment chain (not the naming chain)
+    const { stealthAddress, ephemeralPublicKey, viewTag } = generateStealthAddress(spendingPublicKey, viewingPublicKey, requestedChainId);
 
     // 4. Build metadata: viewTag + optional linkSlug hex
     let metadata = '0x' + viewTag;
@@ -185,10 +187,10 @@ export async function GET(req: Request, { params }: { params: { name: string } }
       metadata += slugHex;
     }
 
-    // 5. Announce on-chain (deployer pays gas) — await TX submission, background confirmation.
+    // 5. Announce on the payment chain (deployer pays gas) — await TX submission, background confirmation.
     //    Without a successful announcement, the recipient's scanner cannot find the payment.
-    const sponsor = getServerSponsor(chainId);
-    const announcer = new ethers.Contract(config.contracts.announcer, ANNOUNCER_ABI, sponsor);
+    const sponsor = getServerSponsor(requestedChainId);
+    const announcer = new ethers.Contract(paymentConfig.contracts.announcer, ANNOUNCER_ABI, sponsor);
     const ephPubKeyHex = '0x' + ephemeralPublicKey.replace(/^0x/, '');
 
     // Retry TX submission up to 3 times (handles transient nonce/gas errors)
@@ -224,8 +226,8 @@ export async function GET(req: Request, { params }: { params: { name: string } }
     return NextResponse.json(
       {
         stealthAddress,
-        network: config.name,
-        chainId: config.id,
+        network: paymentConfig.name,
+        chainId: paymentConfig.id,
       },
       { headers: NO_STORE }
     );

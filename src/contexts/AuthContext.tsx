@@ -44,7 +44,7 @@ interface AuthState {
   deriveKeysFromWallet: (pin?: string) => Promise<{ sig: string; metaAddress: string } | null>;
   clearKeys: () => void;
   isRegistered: boolean;
-  registerMetaAddress: () => Promise<string | null>;
+  registerMetaAddress: (chainId?: number) => Promise<string | null>;
   isKeyLoading: boolean;
   isSigningMessage: boolean;
   keyError: string | null;

@@ -112,12 +112,29 @@ const BASE_SEPOLIA_TOKENS: TokenConfig[] = [
   },
 ];
 
+// Flow EVM Testnet tokens
+const FLOW_EVM_TESTNET_TOKENS: TokenConfig[] = [
+  {
+    address: '0xd3bF53DAC106A0290B0483EcBC89d40FcC961f3e',
+    symbol: 'WFLOW',
+    decimals: 18,
+    name: 'Wrapped FLOW',
+  },
+  {
+    address: '0xd431955D55a99EF69BEb96BA34718d0f9fBc91b1',
+    symbol: 'USDC',
+    decimals: 6,
+    name: 'USD Coin',
+  },
+];
+
 const TOKEN_REGISTRY: Record<number, TokenConfig[]> = {
   [11155111]: ETHEREUM_SEPOLIA_TOKENS,
   [111551119090]: THANOS_SEPOLIA_TOKENS,
   [421614]: ARBITRUM_SEPOLIA_TOKENS,
   [11155420]: OP_SEPOLIA_TOKENS,
   [84532]: BASE_SEPOLIA_TOKENS,
+  [545]: FLOW_EVM_TESTNET_TOKENS,
 };
 
 export function getTokensForChain(chainId: number): TokenConfig[] {

@@ -61,6 +61,7 @@ export interface ChainConfig {
   deploymentBlock: number;
   dustPoolDeploymentBlock: number | null;
   supportsEIP7702: boolean;
+  supportsEIP1559: boolean;
   canonicalForNaming: boolean;
   testnet: boolean;
   isL2: boolean;
@@ -120,6 +121,7 @@ const THANOS_SEPOLIA_CONFIG: ChainConfig = {
   deploymentBlock: 6272527,
   dustPoolDeploymentBlock: 6372598,
   supportsEIP7702: false,
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: true,
   isL2: false,
@@ -196,6 +198,7 @@ const ETHEREUM_SEPOLIA_CONFIG: ChainConfig = {
   deploymentBlock: 10251347,
   dustPoolDeploymentBlock: 10259728,
   supportsEIP7702: true,
+  supportsEIP1559: true,
   canonicalForNaming: true,
   testnet: true,
   isL2: false,
@@ -252,6 +255,7 @@ const ARBITRUM_SEPOLIA_CONFIG: ChainConfig = {
   deploymentBlock: 246396709,
   dustPoolDeploymentBlock: null,
   supportsEIP7702: false,
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: true,
   isL2: true,
@@ -308,6 +312,7 @@ const OP_SEPOLIA_CONFIG: ChainConfig = {
   deploymentBlock: 40332900,
   dustPoolDeploymentBlock: null,
   supportsEIP7702: false,
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: true,
   isL2: true,
@@ -364,6 +369,7 @@ const BASE_SEPOLIA_CONFIG: ChainConfig = {
   deploymentBlock: 38350029,
   dustPoolDeploymentBlock: null,
   supportsEIP7702: false,
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: true,
   isL2: true,
@@ -421,6 +427,7 @@ const BASE_MAINNET_CONFIG: ChainConfig = {
   deploymentBlock: 0,
   dustPoolDeploymentBlock: null,
   supportsEIP7702: false,
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: false,
   isL2: true,
@@ -449,7 +456,7 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
   contracts: {
     announcer: '0xfE55B104f6A200cbD17D0Be5a90D17a2A2a0d223',
     registry: '0x5ac18d5AdaC9b65E1Be9291A7C2cDbf33b584a3b',
-    nameRegistry: '0x2319E5B6DBb639049E98f3E4D1EE9A67E0CB46fb',
+    nameRegistry: '',
     walletFactory: '0x97b74D21ca46c3CaB2918fF10c8418c606223638',
     legacyWalletFactory: '',
     accountFactory: '0x77c3d8c2B0bb27c9A8ACCa39F2398aaa021eb776',
@@ -480,6 +487,8 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
   deploymentBlock: 99040904,
   dustPoolDeploymentBlock: 99040904,
   supportsEIP7702: false,
+  // Flow EVM blocks include baseFeePerGas (post-Crescendo EIP-1559 support confirmed)
+  supportsEIP1559: true,
   canonicalForNaming: false,
   testnet: true,
   isL2: false,

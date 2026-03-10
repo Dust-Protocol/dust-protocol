@@ -152,7 +152,70 @@ const thanosContracts = [
   },
 ];
 
-export const metadata = docsMetadata("Smart Contracts — Deployed Addresses & Standards", "All Dust Protocol smart contract addresses on Ethereum Sepolia and Thanos Sepolia. Includes ERC-5564 Announcer, ERC-6538 Registry, DustPool, and DustPaymaster.", "/docs/contracts");
+const flowContracts = [
+  {
+    name: "ERC5564Announcer",
+    address: "0xfE55B104f6A200cbD17D0Be5a90D17a2A2a0d223",
+    explorer: "https://evm-testnet.flowscan.io/address/0xfE55B104f6A200cbD17D0Be5a90D17a2A2a0d223",
+  },
+  {
+    name: "ERC6538Registry",
+    address: "0x5ac18d5AdaC9b65E1Be9291A7C2cDbf33b584a3b",
+    explorer: "https://evm-testnet.flowscan.io/address/0x5ac18d5AdaC9b65E1Be9291A7C2cDbf33b584a3b",
+  },
+  {
+    name: "NameRegistryMerkle",
+    address: "0x2319E5B6DBb639049E98f3E4D1EE9A67E0CB46fb",
+    explorer: "https://evm-testnet.flowscan.io/address/0x2319E5B6DBb639049E98f3E4D1EE9A67E0CB46fb",
+  },
+  {
+    name: "NameVerifier",
+    address: "0x0d25EC7B314E4208EEa29bCDb9F6313965a99BdE",
+    explorer: "https://evm-testnet.flowscan.io/address/0x0d25EC7B314E4208EEa29bCDb9F6313965a99BdE",
+  },
+  {
+    name: "StealthWalletFactory",
+    address: "0x97b74D21ca46c3CaB2918fF10c8418c606223638",
+    explorer: "https://evm-testnet.flowscan.io/address/0x97b74D21ca46c3CaB2918fF10c8418c606223638",
+  },
+  {
+    name: "StealthAccountFactory",
+    address: "0x77c3d8c2B0bb27c9A8ACCa39F2398aaa021eb776",
+    explorer: "https://evm-testnet.flowscan.io/address/0x77c3d8c2B0bb27c9A8ACCa39F2398aaa021eb776",
+  },
+  {
+    name: "DustPaymaster",
+    address: "0xC3c8Fa75910FED41D30221615d6875D2079179b8",
+    explorer: "https://evm-testnet.flowscan.io/address/0xC3c8Fa75910FED41D30221615d6875D2079179b8",
+  },
+  {
+    name: "FflonkVerifier (9 signals)",
+    address: "0x0e4cF377fc18E46BB1184e4274367Bc0dB958573",
+    explorer: "https://evm-testnet.flowscan.io/address/0x0e4cF377fc18E46BB1184e4274367Bc0dB958573",
+  },
+  {
+    name: "FflonkSplitVerifier (15 signals)",
+    address: "0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1",
+    explorer: "https://evm-testnet.flowscan.io/address/0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1",
+  },
+  {
+    name: "FflonkComplianceVerifier",
+    address: "0x5779192B220876221Bc2871511FB764941314e04",
+    explorer: "https://evm-testnet.flowscan.io/address/0x5779192B220876221Bc2871511FB764941314e04",
+  },
+  {
+    name: "TestnetComplianceOracle",
+    address: "0xACe425FC23d7594b829935EC4862f654541Bf0d3",
+    explorer: "https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3",
+  },
+  {
+    name: "DustPoolV2",
+    address: "0x72f0bd8d014cdB045efD33311028A3013769d69F",
+    explorer: "https://evm-testnet.flowscan.io/address/0x72f0bd8d014cdB045efD33311028A3013769d69F",
+  },
+];
+
+export const metadata = docsMetadata("Smart Contracts — Deployed Addresses & Standards", "All Dust Protocol smart contract addresses on Ethereum Sepolia, Thanos Sepolia, and Flow EVM Testnet. Includes ERC-5564 Announcer, ERC-6538 Registry, DustPool, and DustPaymaster.", "/docs/contracts");
 
 export default function ContractsPage() {
   return (
@@ -225,6 +288,39 @@ export default function ContractsPage() {
 
         <div className="space-y-2">
           {thanosContracts.map((c) => (
+            <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
+              <div className="px-4 py-3 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
+                </div>
+                <a
+                  href={c.explorer}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
+                >
+                  Explorer ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Flow EVM Testnet */}
+      <section className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-sm font-mono font-semibold text-white tracking-wider uppercase">Flow EVM Testnet</h2>
+          <span className="text-[10px] font-mono text-[rgba(255,255,255,0.3)]">Chain ID: 545</span>
+          <DocsBadge variant="muted">Flow Network</DocsBadge>
+        </div>
+        <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
+          Flow EVM Testnet has core stealth transfer, V2 ZK-UTXO pool, and compliance contracts. DustSwap not yet deployed.
+        </p>
+
+        <div className="space-y-2">
+          {flowContracts.map((c) => (
             <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
               <div className="px-4 py-3 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">

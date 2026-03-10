@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { NextResponse } from 'next/server'
-import { getServerProvider, getServerSponsor, getMaxGasPrice, waitForTx } from '@/lib/server-provider'
+import { getServerProvider, getServerSponsor, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider'
 import { isChainSupported } from '@/config/chains'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from '@/lib/dustpool/v2/contracts'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
@@ -184,14 +184,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       const publicAmount = BigInt(proof.publicSignals[5])
       const publicAsset = BigInt(proof.publicSignals[6])
 
-      const feeData = await sponsor.provider.getFeeData()
-      const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
-      if (maxFeePerGas.gt(getMaxGasPrice(proof.chainId))) {
-        return NextResponse.json(
-          { error: 'Gas price too high, try again later' },
-          { status: 503, headers: NO_STORE },
-        )
-      }
+      const gasOverrides = await getTxGasOverrides(proof.chainId, 700_000)
 
       const tx = await contract.withdraw(
         proof.proof,
@@ -204,12 +197,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         publicAsset,
         proof.recipient,
         proof.asset,
-        {
-          gasLimit: 700_000,
-          type: 2,
-          maxFeePerGas,
-          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
-        },
+        gasOverrides,
       )
 
       const receipt = await waitForTx(tx)
@@ -243,6 +231,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       if (!nullifier1IsZero) releaseNullifier(nullifier1Hex)
     }
   } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high, try again later' }, { status: 503, headers: NO_STORE })
+    }
     console.error('[http402/settle] Error:', e)
     const raw = e instanceof Error ? e.message : String(e)
     let message = 'Settlement failed'

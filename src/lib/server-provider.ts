@@ -105,12 +105,54 @@ const MAX_GAS_PRICE_BY_CHAIN: Record<number, ethers.BigNumber> = {
   11155420: ethers.utils.parseUnits('5', 'gwei'),
   84532: ethers.utils.parseUnits('5', 'gwei'),
   8453: ethers.utils.parseUnits('5', 'gwei'),
+  // Flow EVM gas is 100 gwei base — cap at 500 gwei to handle spikes
+  545: ethers.utils.parseUnits('500', 'gwei'),
 };
 // Default 10 gwei — conservative for unknown L2s where 100 gwei would waste ETH
 const DEFAULT_MAX_GAS = ethers.utils.parseUnits('10', 'gwei');
 
 export function getMaxGasPrice(chainId: number): ethers.BigNumber {
   return MAX_GAS_PRICE_BY_CHAIN[chainId] ?? DEFAULT_MAX_GAS;
+}
+
+export class GasPriceTooHighError extends Error {
+  constructor(chainId: number, price: ethers.BigNumber) {
+    super(`Gas price too high on chain ${chainId}: ${ethers.utils.formatUnits(price, 'gwei')} gwei`)
+    this.name = 'GasPriceTooHighError'
+  }
+}
+
+/**
+ * Build gas overrides for a relayer transaction on the given chain.
+ * Reads supportsEIP1559 from chain config to decide between type 2 (EIP-1559)
+ * and type 0 (legacy). All current chains support EIP-1559.
+ */
+export async function getTxGasOverrides(
+  chainId: number,
+  gasLimit: number,
+): Promise<Record<string, unknown>> {
+  const config = getChainConfig(chainId)
+  const sponsor = getServerSponsor(chainId)
+  const feeData = await sponsor.provider.getFeeData()
+
+  if (!config.supportsEIP1559) {
+    const gasPrice = feeData.gasPrice || ethers.utils.parseUnits('100', 'gwei')
+    if (gasPrice.gt(getMaxGasPrice(chainId))) {
+      throw new GasPriceTooHighError(chainId, gasPrice)
+    }
+    return { gasLimit, type: 0, gasPrice }
+  }
+
+  const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
+  if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
+    throw new GasPriceTooHighError(chainId, maxFeePerGas)
+  }
+  return {
+    gasLimit,
+    type: 2,
+    maxFeePerGas,
+    maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
+  }
 }
 
 // Block number cache — avoids redundant RPC calls on hot paths (2s TTL ~ one Base block)
