@@ -32,7 +32,7 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
   const { data: walletClient } = useWalletClient();
   const wagmiChainId = useChainId();
   const chainId = chainIdOverride ?? wagmiChainId;
-  const { keysRef, hasKeys, hasPin, isDeriving, error: keyError, deriveKeys } = useSharedV2Keys();
+  const { keysRef, hasKeys, hasPin, isDeriving, error: keyError, deriveKeys, isRestoring, restoreMessage } = useSharedV2Keys();
   const { balances, totalEthBalance, notes, isLoading, refreshBalances } = useV2Balance(keysRef, chainId);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [pinInput, setPinInput] = useState("");
@@ -232,6 +232,17 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
         <div className="mb-4 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00FF41] pl-2">
           Private amounts &middot; Zero-knowledge proofs
         </div>
+
+        {isRestoring && (
+          <div className="mb-4 p-3 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.15)]">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+              <span className="text-[11px] text-[#00FF41] font-mono">
+                {restoreMessage || 'Restoring your notes...'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Balance */}
         <div className="flex flex-col gap-1.5 mb-5">
