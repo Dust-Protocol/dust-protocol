@@ -26,6 +26,7 @@ contract NameRegistryMerkle {
 
     mapping(bytes32 => NameEntry) public names;
     mapping(address => bytes32[]) public ownedNames;
+    mapping(address => string[]) private ownedNameStrings;
 
     // ─── Access Control ─────────────────────────────────────────────────
     address public sponsor;
@@ -97,6 +98,7 @@ contract NameRegistryMerkle {
             registeredAt: block.timestamp
         });
         ownedNames[msg.sender].push(nameHash);
+        ownedNameStrings[msg.sender].push(name);
 
         emit NameRegistered(
             name, nameHash, stealthMetaAddress,
@@ -138,15 +140,19 @@ contract NameRegistryMerkle {
 
         // Remove from old owner's ownedNames array
         bytes32[] storage oldOwnerNames = ownedNames[oldOwner];
+        string[] storage oldOwnerStrings = ownedNameStrings[oldOwner];
         for (uint256 i = 0; i < oldOwnerNames.length; i++) {
             if (oldOwnerNames[i] == nameHash) {
                 oldOwnerNames[i] = oldOwnerNames[oldOwnerNames.length - 1];
                 oldOwnerNames.pop();
+                oldOwnerStrings[i] = oldOwnerStrings[oldOwnerStrings.length - 1];
+                oldOwnerStrings.pop();
                 break;
             }
         }
 
         ownedNames[newOwner].push(nameHash);
+        ownedNameStrings[newOwner].push(name);
 
         emit NameTransferred(nameHash, oldOwner, newOwner);
     }
@@ -173,6 +179,10 @@ contract NameRegistryMerkle {
     function getOwner(string calldata name) external view returns (address) {
         bytes32 nameHash = keccak256(abi.encodePacked(name));
         return names[nameHash].owner;
+    }
+
+    function getNamesOwnedBy(address owner) external view returns (string[] memory) {
+        return ownedNameStrings[owner];
     }
 
     function getLastRoot() external view returns (bytes32) {

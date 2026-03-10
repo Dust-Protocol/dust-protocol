@@ -34,8 +34,8 @@ export function getNameRegistryAddress(): string {
     if (windowEnv) return windowEnv;
   }
 
-  // Hardcoded fallback (Ethereum Sepolia canonical, deployed 2026-02-20)
-  return registryAddress || '0x857e17A85891Ef1C595e51Eb7Cd56c607dB21313';
+  // Hardcoded fallback (Flow EVM Testnet canonical NameRegistryMerkle v2 with getNamesOwnedBy)
+  return registryAddress || '0x5aA616d612E8f9603a5d68c53E38011f7B43830c';
 }
 
 export function isNameRegistryConfigured(): boolean {

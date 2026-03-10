@@ -193,11 +193,11 @@ describe('Chain config completeness: chain-specific assertions', () => {
     expect(config.contracts.dustSwapAdapterV2).toBeNull()
   })
 
-  it('Eth Sepolia is canonicalForNaming', () => {
-    // #given Eth Sepolia is the canonical naming chain
+  it('Flow EVM Testnet is canonicalForNaming', () => {
+    // #given Flow is the canonical naming chain (hackathon branch)
     // #when checking canonicalForNaming
     // #then it is true
-    const config = getChainConfig(11155111)
+    const config = getChainConfig(545)
     expect(config.canonicalForNaming).toBe(true)
   })
 

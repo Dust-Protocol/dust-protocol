@@ -66,11 +66,11 @@ describe('Flow EVM Testnet: chain config', () => {
     expect(config.supportsEIP7702).toBe(false)
   })
 
-  it('is not canonical for naming', () => {
-    // #given only Eth Sepolia is canonical for naming
+  it('is canonical for naming (hackathon branch)', () => {
+    // #given Flow is the canonical naming chain for hackathon
     // #when reading canonicalForNaming
-    // #then Flow is false
-    expect(config.canonicalForNaming).toBe(false)
+    // #then Flow is true
+    expect(config.canonicalForNaming).toBe(true)
   })
 
   it('has no swap support', () => {
