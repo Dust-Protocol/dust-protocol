@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { DUST_POOL_ABI } from '@/lib/stealth/types';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider';
 import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
@@ -76,19 +76,7 @@ export async function POST(req: Request) {
     const provider = getServerProvider(chainId);
     const sponsor = getServerSponsor(chainId);
 
-    const [feeData, block] = await Promise.all([
-      provider.getFeeData(),
-      provider.getBlock('latest'),
-    ]);
-    const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-    const maxPriorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
-    const maxFeePerGas = baseFee.add(maxPriorityFee).mul(2);
-
-    if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-      return NextResponse.json({ error: 'Gas price too high' }, { status: 503 });
-    }
-
-    const txOpts = { type: 2 as const, maxFeePerGas, maxPriorityFeePerGas: maxPriorityFee };
+    const txOpts = await getTxGasOverrides(chainId, 300_000);
     const dustPoolAddress = config.contracts.dustPool;
 
     if (walletType === 'create2' && owner && signature) {
@@ -115,7 +103,7 @@ export async function POST(req: Request) {
         }
 
         console.log('[PoolDeposit] Deploying CREATE2 wallet for', stealthAddress);
-        const deployTx = await factory.deploy(owner, { gasLimit: 300_000, ...txOpts });
+        const deployTx = await factory.deploy(owner, { ...txOpts, gasLimit: 300_000 });
         await waitForTx(deployTx);
       }
 
@@ -135,7 +123,7 @@ export async function POST(req: Request) {
         balance,
         depositCalldata,
         signature,
-        { gasLimit: 8_000_000, ...txOpts },
+        { ...txOpts, gasLimit: 8_000_000 },
       );
       const receipt = await waitForTx(executeTx);
 
@@ -172,6 +160,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid wallet type or missing parameters' }, { status: 400 });
     }
   } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high' }, { status: 503 });
+    }
     console.error('[PoolDeposit] Error:', e);
     return NextResponse.json({ error: 'Pool deposit failed' }, { status: 500 });
   }

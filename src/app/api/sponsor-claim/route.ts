@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, isL2Chain } from '@/config/chains';
 import { isKnownToken } from '@/config/tokens';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider';
 import { canUseGelato, sponsoredRelay, waitForRelay } from '@/lib/relay/gelato';
 import { checkOrigin } from '@/lib/api-auth';
 
@@ -144,23 +144,17 @@ async function handleCreate2Claim(body: { stealthAddress: string; owner: string;
     return NextResponse.json({ error: 'No funds in stealth address' }, { status: 400 });
   }
 
-  const [feeData, block] = await Promise.all([
-    provider.getFeeData(),
-    provider.getBlock('latest'),
-  ]);
-  const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-  const maxPriorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
-  const maxFeePerGas = baseFee.mul(3).lt(baseFee.add(maxPriorityFee))
-    ? baseFee.add(maxPriorityFee).mul(2)
-    : baseFee.mul(3);
-
-  if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-    return NextResponse.json({ error: 'Gas price too high, try again later' }, { status: 503 });
+  let gasOverrides: Record<string, unknown>;
+  try {
+    gasOverrides = await getTxGasOverrides(chainId, 600_000);
+  } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high, try again later' }, { status: 503 });
+    }
+    throw e;
   }
 
   console.log('[Sponsor/CREATE2] Processing claim');
-
-  const gasLimit = ethers.BigNumber.from(600_000);
 
   // Check if wallet is already deployed (e.g. from a previous partial claim)
   const existingCode = await provider.getCode(stealthAddress);
@@ -217,20 +211,10 @@ async function handleCreate2Claim(body: { stealthAddress: string; owner: string;
   let tx;
   if (alreadyDeployed) {
     const wallet = new ethers.Contract(stealthAddress, STEALTH_WALLET_ABI, sponsor);
-    tx = await wallet.drain(recipient, signature, {
-      gasLimit,
-      type: 2,
-      maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFee,
-    });
+    tx = await wallet.drain(recipient, signature, gasOverrides);
   } else {
     const factory = new ethers.Contract(target, FACTORY_ABI, sponsor);
-    tx = await factory.deployAndDrain(owner, recipient, signature, {
-      gasLimit,
-      type: 2,
-      maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFee,
-    });
+    tx = await factory.deployAndDrain(owner, recipient, signature, gasOverrides);
   }
   const receipt = await waitForTx(tx);
 
@@ -294,18 +278,14 @@ async function handleTokenSweep(
     return NextResponse.json({ error: 'Wallet not deployed — drain native balance first' }, { status: 400 });
   }
 
-  const [feeData, block] = await Promise.all([
-    provider.getFeeData(),
-    provider.getBlock('latest'),
-  ]);
-  const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-  const maxPriorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
-  const maxFeePerGas = baseFee.mul(3).lt(baseFee.add(maxPriorityFee))
-    ? baseFee.add(maxPriorityFee).mul(2)
-    : baseFee.mul(3);
-
-  if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-    return NextResponse.json({ error: 'Gas price too high, try again later' }, { status: 503 });
+  let sweepGasOverrides: Record<string, unknown>;
+  try {
+    sweepGasOverrides = await getTxGasOverrides(chainId, 200_000);
+  } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high, try again later' }, { status: 503 });
+    }
+    throw e;
   }
 
   const walletIface = new ethers.utils.Interface(STEALTH_WALLET_ABI);
@@ -350,12 +330,7 @@ async function handleTokenSweep(
           console.warn(`[TokenSweep/Gelato] Failed for ${sweep.tokenAddress}, falling back:`, gelatoErr);
           // Fallback to sponsor wallet
           const wallet = new ethers.Contract(stealthAddress, STEALTH_WALLET_ABI, sponsor);
-          const tx = await wallet.execute(sweep.tokenAddress, 0, transferData, sweep.signature, {
-            gasLimit: ethers.BigNumber.from(200_000),
-            type: 2,
-            maxFeePerGas,
-            maxPriorityFeePerGas: maxPriorityFee,
-          });
+          const tx = await wallet.execute(sweep.tokenAddress, 0, transferData, sweep.signature, sweepGasOverrides);
           const receipt = await waitForTx(tx);
           if (receipt.status === 0) throw new Error(`Token sweep reverted: ${receipt.transactionHash}`);
           txHash = receipt.transactionHash;
@@ -363,12 +338,7 @@ async function handleTokenSweep(
       } else {
         // Sponsor wallet path
         const wallet = new ethers.Contract(stealthAddress, STEALTH_WALLET_ABI, sponsor);
-        const tx = await wallet.execute(sweep.tokenAddress, 0, transferData, sweep.signature, {
-          gasLimit: ethers.BigNumber.from(200_000),
-          type: 2,
-          maxFeePerGas,
-          maxPriorityFeePerGas: maxPriorityFee,
-        });
+        const tx = await wallet.execute(sweep.tokenAddress, 0, transferData, sweep.signature, sweepGasOverrides);
         const receipt = await waitForTx(tx);
         if (receipt.status === 0) throw new Error(`Token sweep reverted: ${receipt.transactionHash}`);
         txHash = receipt.transactionHash;

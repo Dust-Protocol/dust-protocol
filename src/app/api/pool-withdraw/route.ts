@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { DUST_POOL_ABI } from '@/lib/stealth/types';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId, getMaxGasPrice, waitForTx } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getTxGasOverrides, GasPriceTooHighError, waitForTx } from '@/lib/server-provider';
 import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
@@ -66,17 +66,7 @@ export async function POST(req: Request) {
     const provider = getServerProvider(chainId);
     const sponsor = getServerSponsor(chainId);
 
-    const [feeData, block] = await Promise.all([
-      provider.getFeeData(),
-      provider.getBlock('latest'),
-    ]);
-    const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-    const maxPriorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
-    const maxFeePerGas = baseFee.add(maxPriorityFee).mul(2);
-
-    if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
-      return NextResponse.json({ error: 'Gas price too high' }, { status: 503 });
-    }
+    const gasOverrides = await getTxGasOverrides(chainId, 500_000);
 
     const poolContract = new ethers.Contract(config.contracts.dustPool, DUST_POOL_ABI, sponsor);
 
@@ -88,12 +78,7 @@ export async function POST(req: Request) {
       nullifierHash,
       recipient,
       amount,
-      {
-        gasLimit: 500_000, // Groth16 verify ~350K + transfer
-        type: 2,
-        maxFeePerGas,
-        maxPriorityFeePerGas: maxPriorityFee,
-      },
+      gasOverrides,
     );
     const receipt = await waitForTx(tx);
 
@@ -109,8 +94,10 @@ export async function POST(req: Request) {
       txHash: receipt.transactionHash,
     }, { headers: NO_STORE });
   } catch (e) {
+    if (e instanceof GasPriceTooHighError) {
+      return NextResponse.json({ error: 'Gas price too high' }, { status: 503 });
+    }
     console.error('[PoolWithdraw] Error:', e);
-    // Sanitize — don't leak RPC URLs, contract addresses, or revert data
     const raw = e instanceof Error ? e.message : '';
     let message = 'Withdrawal failed';
     if (raw.includes('invalid proof') || raw.includes('InvalidProof')) message = 'Invalid proof';

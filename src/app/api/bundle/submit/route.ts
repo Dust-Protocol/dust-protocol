@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getTxGasOverrides, waitForTx } from '@/lib/server-provider';
 import { ENTRY_POINT_ABI } from '@/lib/stealth/types';
 import { checkOrigin } from '@/lib/api-auth';
 
@@ -90,7 +90,8 @@ export async function POST(req: Request) {
           const sponsorBal = await provider.getBalance(sponsor.address);
           if (sponsorBal.gt(PAYMASTER_TOP_UP_AMOUNT)) {
             console.log(`[Bundle/Submit] Paymaster deposit low: ${ethers.utils.formatEther(deposit)}. Topping up...`);
-            const topUpTx = await entryPoint.depositTo(config.contracts.paymaster, { value: PAYMASTER_TOP_UP_AMOUNT, type: 2 });
+            const topUpOverrides = await getTxGasOverrides(chainId, 100_000);
+            const topUpTx = await entryPoint.depositTo(config.contracts.paymaster, { value: PAYMASTER_TOP_UP_AMOUNT, ...topUpOverrides });
             await waitForTx(topUpTx);
             console.log('[Bundle/Submit] Paymaster topped up with 1.0');
           } else {
@@ -111,10 +112,8 @@ export async function POST(req: Request) {
     const computedGasLimit = preGas.add(verGas.mul(2)).add(callGas).add(overhead);
     const gasLimit = computedGasLimit.gt(1_500_000) ? computedGasLimit : ethers.BigNumber.from(1_500_000);
 
-    const tx = await entryPoint.handleOps([userOp], sponsor.address, {
-      gasLimit,
-      type: 2,
-    });
+    const handleOpsOverrides = await getTxGasOverrides(chainId, gasLimit.toNumber());
+    const tx = await entryPoint.handleOps([userOp], sponsor.address, handleOpsOverrides);
     const receipt = await waitForTx(tx);
     if (receipt.status === 0) {
       return NextResponse.json({ error: 'Bundle execution reverted on-chain' }, { status: 500, headers: NO_STORE });
