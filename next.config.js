@@ -27,7 +27,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://*.alchemy.com https://*.infura.io https://*.r2.dev https://*.privy.io wss://*.alchemy.com wss://*.infura.io https://rpc.sepolia.org https://sepolia.optimism.io https://sepolia.base.org https://sepolia-rollup.arbitrum.io https://rpc.thanos-sepolia.tokamak.network https://api.gelato.digital https://cdn.unicorn.studio",
+              "connect-src 'self' https://*.alchemy.com https://*.infura.io https://*.r2.dev https://*.privy.io wss://*.alchemy.com wss://*.infura.io https://rpc.sepolia.org https://sepolia.optimism.io https://sepolia.base.org https://sepolia-rollup.arbitrum.io https://rpc.thanos-sepolia.tokamak.network https://testnet.evm.nodes.onflow.org https://api.gelato.digital https://cdn.unicorn.studio https://assets.unicorn.studio",
               "frame-src 'self' https://auth.privy.io https://cdn.unicorn.studio",
               "worker-src 'self' blob:",
               "frame-ancestors 'none'",

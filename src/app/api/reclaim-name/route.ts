@@ -7,7 +7,7 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { getServerProvider } from '@/lib/server-provider';
-import { getSupportedChains } from '@/config/chains';
+import { getVisibleChains } from '@/config/chains';
 
 export const maxDuration = 15;
 
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
 
     // Strategy 2: Direct RPC — scan deployer-owned names on all chains
     if (!foundName) {
-      const chains = getSupportedChains();
+      const chains = getVisibleChains();
       for (const chain of chains) {
         if (!chain.contracts.nameRegistry) continue;
         try {

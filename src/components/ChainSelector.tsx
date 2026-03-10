@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getSupportedChains, type ChainConfig } from "@/config/chains";
+import { getVisibleChains, type ChainConfig } from "@/config/chains";
 import { ChainIcon as ChainTokenIcon } from "@/components/stealth/icons";
 
-const chains = getSupportedChains();
+const chains = getVisibleChains();
 
 function ChainIcon({ chain, size = 16 }: { chain: ChainConfig; size?: number }) {
   return <ChainTokenIcon size={size} chainId={chain.id} />;

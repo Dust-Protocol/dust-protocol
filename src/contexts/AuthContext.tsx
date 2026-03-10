@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useStealthAddress, useStealthName, usePin } from "@/hooks/stealth";
-import { DEFAULT_CHAIN_ID, isChainSupported } from "@/config/chains";
+import { DEFAULT_CHAIN_ID, isChainSupported, isChainVisible } from "@/config/chains";
 import type { StealthKeyPair } from "@/lib/stealth";
 import type { OwnedName } from "@/lib/design/types";
 
@@ -83,14 +83,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(CHAIN_STORAGE_KEY);
     if (stored) {
       const id = parseInt(stored, 10);
-      if (isChainSupported(id)) setActiveChainIdState(id);
+      if (isChainVisible(id)) setActiveChainIdState(id);
     }
   }, []);
 
   // Auto-switch wallet to active chain if connected on an unsupported chain
   useEffect(() => {
     if (!isConnected || !walletChainId || !switchChain) return;
-    if (!isChainSupported(walletChainId)) {
+    if (!isChainVisible(walletChainId)) {
       try {
         switchChain({ chainId: activeChainId });
       } catch {
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [isConnected, walletChainId, activeChainId, switchChain]);
 
   const setActiveChain = useCallback((chainId: number) => {
-    if (!isChainSupported(chainId)) return;
+    if (!isChainVisible(chainId)) return;
     setActiveChainIdState(chainId);
     if (typeof window !== 'undefined') {
       localStorage.setItem(CHAIN_STORAGE_KEY, chainId.toString());
@@ -154,14 +154,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // User is onboarded if:
   //  1. They have an on-chain name registered to their wallet (universal, works across browsers/devices)
   //     — only counted once isNamesSettled=true so we don't flash false negatives
-  //  2. A PIN is stored in localStorage (same browser, key already setup — optimization for returning users)
-  //  3. Stealth keys + claim addresses present (legacy fallback for active sessions)
-  //  4. The explicit localStorage flag is set (optimization, but not required)
-  const isOnboarded =
-    (nameHook.isNamesSettled && nameHook.ownedNames.length > 0) ||
+  //  2. While names are still loading, trust localStorage signals (PIN, flag) to avoid flash
+  //  3. Once names settle with NO on-chain name, user must re-onboard (handles chain migration)
+  const hasOnChainName = nameHook.isNamesSettled && nameHook.ownedNames.length > 0;
+  const namesStillLoading = !nameHook.isNamesSettled;
+  const isOnboarded = hasOnChainName || (namesStillLoading && (
     pinHook.hasPin ||
     (stealthAddr.isHydrated && !!stealthAddr.stealthKeys && stealthAddr.claimAddressesInitialized) ||
-    hasOnboardedFlag;
+    hasOnboardedFlag
+  ));
 
   const value: AuthState = {
     isConnected,

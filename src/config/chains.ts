@@ -487,8 +487,8 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
   deploymentBlock: 99040904,
   dustPoolDeploymentBlock: 99040904,
   supportsEIP7702: false,
-  // Flow EVM blocks include baseFeePerGas (post-Crescendo EIP-1559 support confirmed)
-  supportsEIP1559: true,
+  // Flow EVM reports baseFeePerGas but rejects type-2 txs — use legacy (type 0)
+  supportsEIP1559: false,
   canonicalForNaming: true,
   testnet: true,
   isL2: false,
@@ -534,6 +534,10 @@ export function getSupportedViemChains(): Chain[] {
 
 export function isChainSupported(chainId: number): boolean {
   return chainId in CHAIN_CONFIGS;
+}
+
+export function isChainVisible(chainId: number): boolean {
+  return getVisibleChains().some(c => c.id === chainId);
 }
 
 export function getCanonicalNamingChain(): ChainConfig {

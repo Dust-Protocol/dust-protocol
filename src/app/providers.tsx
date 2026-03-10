@@ -7,10 +7,10 @@ import { http, fallback } from "wagmi";
 import { injected, metaMask } from "wagmi/connectors";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getSupportedChains } from "@/config/chains";
+import { getVisibleChains } from "@/config/chains";
 import { PRIVY_APP_ID, PRIVY_CONFIG, isPrivyEnabled } from "@/config/privy";
 
-const supportedChains = getSupportedChains();
+const supportedChains = getVisibleChains();
 const viemChains = supportedChains.map(c => c.viemChain);
 const transports = Object.fromEntries(
   supportedChains.map(c => [

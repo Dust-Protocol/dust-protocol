@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain } from '@/config/chains';
-import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx, getTxGasOverrides } from '@/lib/server-provider';
 import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
@@ -81,7 +81,8 @@ export async function POST(req: Request) {
     }
 
     // Transfer name to new owner
-    const tx = await registry.transferName(name, newOwner);
+    const gasOverrides = await getTxGasOverrides(chainId, 200_000);
+    const tx = await registry.transferName(name, newOwner, gasOverrides);
     const receipt = await waitForTx(tx);
     if (receipt.status === 0) {
       return NextResponse.json({ error: 'Name transfer reverted on-chain' }, { status: 500 });

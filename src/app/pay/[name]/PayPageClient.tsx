@@ -6,7 +6,7 @@ import { injected } from "wagmi/connectors";
 import { getExplorerBase } from "@/lib/design/tokens";
 import { useStealthSend, useStealthName } from "@/hooks/stealth";
 import { NAME_SUFFIX } from "@/lib/stealth";
-import { getSupportedChains, getChainConfig, DEFAULT_CHAIN_ID } from "@/config/chains";
+import { getVisibleChains, getChainConfig, DEFAULT_CHAIN_ID } from "@/config/chains";
 import { getTokensForChain, NATIVE_TOKEN_ADDRESS, type TokenConfig } from "@/config/tokens";
 import { ChainIcon, TokenIcon } from "@/components/stealth/icons";
 import Link from "next/link";
@@ -18,7 +18,7 @@ import {
 import { DustLogo } from "@/components/DustLogo";
 
 // Only show chains that have core stealth contracts deployed (announcer + registry)
-const SUPPORTED_CHAINS = getSupportedChains().filter(
+const SUPPORTED_CHAINS = getVisibleChains().filter(
   (c) => c.contracts.announcer && c.contracts.registry
 );
 
@@ -455,7 +455,8 @@ export default function PayPageClient({ name }: { name: string }) {
                         </div>
                       ) : sendStep === "input" ? (
                         <div className="flex flex-col gap-4">
-                          {/* Chain selector */}
+                          {/* Chain selector — hidden when single chain */}
+                          {SUPPORTED_CHAINS.length > 1 && (
                           <div>
                             <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono block mb-1.5">
                               Network
@@ -465,6 +466,7 @@ export default function PayPageClient({ name }: { name: string }) {
                               onChange={handleChainChange}
                             />
                           </div>
+                          )}
 
                           {/* Amount + Token */}
                           <div>

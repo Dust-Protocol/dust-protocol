@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
-import { getChainConfig, getCanonicalNamingChain, getSupportedChains } from '@/config/chains';
-import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { getChainConfig, getCanonicalNamingChain, getVisibleChains } from '@/config/chains';
+import { getServerSponsor, parseChainId, waitForTx, getTxGasOverrides } from '@/lib/server-provider';
 import { onNameRegistered } from '@/lib/naming/rootSync';
 import { getNameMerkleTree } from '@/lib/naming/merkleTree';
 import { checkOrigin } from '@/lib/api-auth';
@@ -59,8 +59,8 @@ async function registerOnChain(
     const registry = new ethers.Contract(config.contracts.nameRegistry, NAME_REGISTRY_ABI, sponsor);
     const available = await registry.isNameAvailable(stripped);
     if (!available) return null; // already registered on this chain
-    // Manual gas limit prevents UNPREDICTABLE_GAS_LIMIT when RPC estimation fails transiently
-    const tx = await registry.registerName(stripped, metaBytes, { gasLimit: 300_000 });
+    const gasOverrides = await getTxGasOverrides(chainId, 300_000);
+    const tx = await registry.registerName(stripped, metaBytes, gasOverrides);
     const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on ${config.name}, tx: ${receipt.transactionHash}`);
 
@@ -68,7 +68,8 @@ async function registerOnChain(
     // on future logins (even without ERC-6538 registration)
     if (registrant && /^0x[0-9a-fA-F]{40}$/.test(registrant)) {
       try {
-        const transferTx = await registry.transferName(stripped, registrant);
+        const transferOverrides = await getTxGasOverrides(chainId, 200_000);
+        const transferTx = await registry.transferName(stripped, registrant, transferOverrides);
         await waitForTx(transferTx);
         console.log(`[SponsorNameRegister] Auto-transferred "${stripped}" to ${registrant}`);
       } catch (e) {
@@ -105,7 +106,8 @@ async function registerOnCanonicalMerkle(
       return null;
     }
 
-    const tx = await merkleRegistry.registerName(stripped, metaBytes);
+    const merkleGasOverrides = await getTxGasOverrides(canonicalChain.id, 500_000);
+    const tx = await merkleRegistry.registerName(stripped, metaBytes, merkleGasOverrides);
     const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on canonical Merkle registry, tx: ${receipt.transactionHash}`);
     return receipt.transactionHash;
@@ -214,8 +216,8 @@ export async function POST(req: Request) {
       console.warn('[SponsorNameRegister] Canonical Merkle registration error:', e);
     });
 
-    // Mirror to all other supported chains (fire and forget — don't block the response)
-    const otherChains = getSupportedChains().filter(
+    // Mirror to all other visible chains (fire and forget — don't block the response)
+    const otherChains = getVisibleChains().filter(
       c => c.id !== effectivePrimaryChainId && c.contracts.nameRegistry
     );
     if (otherChains.length > 0) {

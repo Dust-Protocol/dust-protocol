@@ -108,6 +108,11 @@ const MAX_GAS_PRICE_BY_CHAIN: Record<number, ethers.BigNumber> = {
   // Flow EVM gas is 100 gwei base — cap at 500 gwei to handle spikes
   545: ethers.utils.parseUnits('500', 'gwei'),
 };
+
+// Flow RPC returns ~1.5 gwei in feeData but rejects txs below ~16 gwei minimum
+const MIN_GAS_PRICE_BY_CHAIN: Record<number, ethers.BigNumber> = {
+  545: ethers.utils.parseUnits('100', 'gwei'),
+};
 // Default 10 gwei — conservative for unknown L2s where 100 gwei would waste ETH
 const DEFAULT_MAX_GAS = ethers.utils.parseUnits('10', 'gwei');
 
@@ -136,22 +141,28 @@ export async function getTxGasOverrides(
   const feeData = await sponsor.provider.getFeeData()
 
   if (!config.supportsEIP1559) {
-    const gasPrice = feeData.gasPrice || ethers.utils.parseUnits('100', 'gwei')
+    const minGasLegacy = MIN_GAS_PRICE_BY_CHAIN[chainId]
+    let gasPrice = feeData.gasPrice || ethers.utils.parseUnits('100', 'gwei')
+    if (minGasLegacy && gasPrice.lt(minGasLegacy)) gasPrice = minGasLegacy
     if (gasPrice.gt(getMaxGasPrice(chainId))) {
       throw new GasPriceTooHighError(chainId, gasPrice)
     }
     return { gasLimit, type: 0, gasPrice }
   }
 
-  const maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
+  const minGas = MIN_GAS_PRICE_BY_CHAIN[chainId]
+  let maxFeePerGas = feeData.maxFeePerGas || ethers.utils.parseUnits('5', 'gwei')
+  if (minGas && maxFeePerGas.lt(minGas)) maxFeePerGas = minGas
   if (maxFeePerGas.gt(getMaxGasPrice(chainId))) {
     throw new GasPriceTooHighError(chainId, maxFeePerGas)
   }
+  let maxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei')
+  if (minGas && maxPriorityFeePerGas.lt(minGas)) maxPriorityFeePerGas = minGas
   return {
     gasLimit,
     type: 2,
     maxFeePerGas,
-    maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei'),
+    maxPriorityFeePerGas,
   }
 }
 

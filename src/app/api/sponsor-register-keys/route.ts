@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerSponsor, parseChainId, waitForTx } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, waitForTx, getTxGasOverrides } from '@/lib/server-provider';
 import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
@@ -77,7 +77,8 @@ export async function POST(req: Request) {
     const sponsor = getServerSponsor(chainId);
     const registry = new ethers.Contract(config.contracts.registry, REGISTRY_ABI, sponsor);
 
-    const tx = await registry.registerKeysOnBehalf(registrant, 1, signature, metaBytes);
+    const gasOverrides = await getTxGasOverrides(chainId, 300_000);
+    const tx = await registry.registerKeysOnBehalf(registrant, 1, signature, metaBytes, gasOverrides);
     const receipt = await waitForTx(tx);
     if (receipt.status === 0) {
       return NextResponse.json({ error: 'Key registration reverted on-chain' }, { status: 500, headers: NO_STORE });

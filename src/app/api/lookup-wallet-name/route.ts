@@ -10,7 +10,7 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { getServerProvider } from '@/lib/server-provider';
-import { getSupportedChains } from '@/config/chains';
+import { getVisibleChains } from '@/config/chains';
 import { getNameMerkleTree } from '@/lib/naming/merkleTree';
 
 export const maxDuration = 15;
@@ -65,7 +65,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const chains = getSupportedChains();
+    const chains = getVisibleChains();
     const historicalMetas = new Set<string>();
 
     // Strategy 0: Direct name ownership — check if wallet directly owns names
