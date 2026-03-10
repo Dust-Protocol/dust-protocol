@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     const sponsor = getServerSponsor(chainId);
     const registry = new ethers.Contract(config.contracts.registry, REGISTRY_ABI, sponsor);
 
-    const gasOverrides = await getTxGasOverrides(chainId, 300_000);
+    const gasOverrides = await getTxGasOverrides(chainId, 600_000);
     const tx = await registry.registerKeysOnBehalf(registrant, 1, signature, metaBytes, gasOverrides);
     const receipt = await waitForTx(tx);
     if (receipt.status === 0) {

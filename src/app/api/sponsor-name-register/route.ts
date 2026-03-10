@@ -59,7 +59,7 @@ async function registerOnChain(
     const registry = new ethers.Contract(config.contracts.nameRegistry, NAME_REGISTRY_ABI, sponsor);
     const available = await registry.isNameAvailable(stripped);
     if (!available) return null; // already registered on this chain
-    const gasOverrides = await getTxGasOverrides(chainId, 300_000);
+    const gasOverrides = await getTxGasOverrides(chainId, 600_000);
     const tx = await registry.registerName(stripped, metaBytes, gasOverrides);
     const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on ${config.name}, tx: ${receipt.transactionHash}`);
@@ -68,7 +68,7 @@ async function registerOnChain(
     // on future logins (even without ERC-6538 registration)
     if (registrant && /^0x[0-9a-fA-F]{40}$/.test(registrant)) {
       try {
-        const transferOverrides = await getTxGasOverrides(chainId, 200_000);
+        const transferOverrides = await getTxGasOverrides(chainId, 400_000);
         const transferTx = await registry.transferName(stripped, registrant, transferOverrides);
         await waitForTx(transferTx);
         console.log(`[SponsorNameRegister] Auto-transferred "${stripped}" to ${registrant}`);
@@ -106,7 +106,7 @@ async function registerOnCanonicalMerkle(
       return null;
     }
 
-    const merkleGasOverrides = await getTxGasOverrides(canonicalChain.id, 500_000);
+    const merkleGasOverrides = await getTxGasOverrides(canonicalChain.id, 600_000);
     const tx = await merkleRegistry.registerName(stripped, metaBytes, merkleGasOverrides);
     const receipt = await waitForTx(tx);
     console.log(`[SponsorNameRegister] Registered "${stripped}" on canonical Merkle registry, tx: ${receipt.transactionHash}`);

@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     }
 
     // Transfer name to new owner
-    const gasOverrides = await getTxGasOverrides(chainId, 200_000);
+    const gasOverrides = await getTxGasOverrides(chainId, 400_000);
     const tx = await registry.transferName(name, newOwner, gasOverrides);
     const receipt = await waitForTx(tx);
     if (receipt.status === 0) {
