@@ -121,7 +121,7 @@ if (block.timestamp < depositTimestamp[C] + 1 hour) {
           history without gaining the ability to spend your funds. It contains two components:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-          <div className="p-4 border border-[rgba(0,239,139,0.12)] rounded-sm">
+          <div className="p-4 border border-[rgba(0,255,65,0.12)] rounded-sm">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[12px] font-mono font-semibold text-white">ownerPubKey</p>
               <DocsBadge variant="muted">PUBLIC</DocsBadge>

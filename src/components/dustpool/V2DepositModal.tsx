@@ -53,9 +53,9 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-1 text-[10px] text-[rgba(255,255,255,0.5)] hover:text-[#00EF8B] font-mono transition-colors"
+      className="flex items-center gap-1 text-[10px] text-[rgba(255,255,255,0.5)] hover:text-[#00FF41] font-mono transition-colors"
     >
-      {copied ? <CheckIcon size={12} color="#00EF8B" /> : <CopyIcon size={12} />}
+      {copied ? <CheckIcon size={12} color="#00FF41" /> : <CopyIcon size={12} />}
       {label ?? (copied ? "Copied" : "Copy")}
     </button>
   );
@@ -283,7 +283,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
-                <ShieldIcon size={16} color="#00EF8B" />
+                <ShieldIcon size={16} color="#00FF41" />
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
                   [ DEPOSIT_V2 ]
                 </span>
@@ -307,7 +307,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   disabled={isBusy}
                   className={`flex-1 pb-2 text-xs font-mono tracking-wider transition-all ${
                     depositMode === "self"
-                      ? "text-[#00EF8B] border-b-2 border-[#00EF8B]"
+                      ? "text-[#00FF41] border-b-2 border-[#00FF41]"
                       : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)]"
                   } disabled:opacity-50`}
                 >
@@ -318,7 +318,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   disabled={isBusy}
                   className={`flex-1 pb-2 text-xs font-mono tracking-wider transition-all ${
                     depositMode === "external"
-                      ? "text-[#00EF8B] border-b-2 border-[#00EF8B]"
+                      ? "text-[#00FF41] border-b-2 border-[#00FF41]"
                       : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)]"
                   } disabled:opacity-50`}
                 >
@@ -360,7 +360,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         }
                       }}
                       placeholder="••••••"
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm text-center tracking-[0.5em] focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm text-center tracking-[0.5em] focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {keyError && (
                       <p className="text-[11px] text-red-400 font-mono">{keyError}</p>
@@ -372,16 +372,16 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                       if (onDeriveKeys) onDeriveKeys(pinInput).then(ok => { if (ok) setPinInput(""); });
                     }}
                     disabled={pinInput.length !== 6 || isDeriving || !onDeriveKeys}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isDeriving ? (
                       <>
-                        <div className="w-3 h-3 border border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3 h-3 border border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                         Unlocking...
                       </>
                     ) : (
                       <>
-                        <LockIcon size={14} color="#00EF8B" />
+                        <LockIcon size={14} color="#00FF41" />
                         Unlock Keys
                       </>
                     )}
@@ -396,7 +396,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   {isScreening && (
                     <div className="p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)]">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 border border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3 h-3 border border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                         <p className="text-xs text-[rgba(255,255,255,0.5)] font-mono">Screening address...</p>
                       </div>
                     </div>
@@ -412,9 +412,9 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                     </div>
                   )}
                   {isScreeningPassed && !isScreening && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
                       <div className="flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0"><ShieldCheckIcon size={14} color="#00EF8B" /></div>
+                        <div className="mt-0.5 shrink-0"><ShieldCheckIcon size={14} color="#00FF41" /></div>
                         <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
                           Address cleared. V2 pool supports arbitrary deposit amounts. Note stored locally in IndexedDB.
                         </p>
@@ -439,7 +439,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         onClick={() => selectToken("native")}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-sm text-[10px] font-mono font-bold tracking-wider transition-all ${
                           !isUSDC
-                            ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B] border border-[rgba(0,239,139,0.2)]"
+                            ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41] border border-[rgba(0,255,65,0.2)]"
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
@@ -449,7 +449,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         onClick={() => selectToken("USDC")}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-sm text-[10px] font-mono font-bold tracking-wider transition-all ${
                           isUSDC
-                            ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B] border border-[rgba(0,239,139,0.2)]"
+                            ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41] border border-[rgba(0,255,65,0.2)]"
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
@@ -466,7 +466,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                       </label>
                       <button
                         onClick={handleMaxClick}
-                        className="flex items-center gap-1 text-[10px] text-[#00EF8B] font-mono hover:underline"
+                        className="flex items-center gap-1 text-[10px] text-[#00FF41] font-mono hover:underline"
                       >
                         {isUSDC ? <USDCIcon size={12} /> : <TokenIcon symbol={nativeSymbol} size={12} />}
                         MAX: {walletBalanceFormatted} {tokenSymbol}
@@ -481,7 +481,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         setAmount(e.target.value.replace(/[^0-9.]/g, ""));
                       }}
                       placeholder="0.0"
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {exceedsBalance && (
                       <p className="text-[11px] text-red-400 font-mono">Insufficient {tokenSymbol} balance</p>
@@ -495,7 +495,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                     data-testid="deposit-submit"
                     onClick={handleDeposit}
                     disabled={!canSelfDeposit}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {parsedAmount ? `Deposit ${amount} ${tokenSymbol}` : "Enter Amount"}
                   </button>
@@ -505,7 +505,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* Self deposit — approving USDC */}
               {depositMode === "self" && isApproving && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Approving USDC...</p>
                   <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Confirm the approval in your wallet</p>
                 </div>
@@ -514,7 +514,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* Self deposit — processing */}
               {depositMode === "self" && isPending && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Depositing {tokenSymbol} to V2 pool...</p>
                   <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Confirm the transaction in your wallet</p>
                 </div>
@@ -540,7 +540,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         onClick={() => selectToken("native")}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-sm text-[10px] font-mono font-bold tracking-wider transition-all ${
                           !isUSDC
-                            ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B] border border-[rgba(0,239,139,0.2)]"
+                            ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41] border border-[rgba(0,255,65,0.2)]"
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
@@ -550,7 +550,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         onClick={() => selectToken("USDC")}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-sm text-[10px] font-mono font-bold tracking-wider transition-all ${
                           isUSDC
-                            ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B] border border-[rgba(0,239,139,0.2)]"
+                            ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41] border border-[rgba(0,255,65,0.2)]"
                             : "text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] border border-transparent"
                         }`}
                       >
@@ -572,7 +572,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         setAmount(e.target.value.replace(/[^0-9.]/g, ""));
                       }}
                       placeholder="0.0"
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                   </div>
 
@@ -581,9 +581,9 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                     <button
                       onClick={handleExternalDeposit}
                       disabled={!canExternalDeposit}
-                      className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      <WalletIcon size={16} color="#00EF8B" />
+                      <WalletIcon size={16} color="#00FF41" />
                       {parsedAmount ? `Connect & Deposit ${amount} ${tokenSymbol}` : "Enter Amount"}
                     </button>
                   )}
@@ -611,7 +611,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* External — connecting */}
               {depositMode === "external" && ext.status === "connecting-wallet" && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Connecting external wallet...</p>
                   <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Your Dust session remains active</p>
                 </div>
@@ -620,7 +620,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* External — awaiting tx */}
               {depositMode === "external" && ext.status === "awaiting-tx" && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Confirm in external wallet</p>
                   <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Sign the deposit transaction in MetaMask / Rabby</p>
                 </div>
@@ -629,7 +629,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* External — confirming tx */}
               {depositMode === "external" && (ext.status === "confirming" || ext.status === "polling-relayer") && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">
                     {ext.status === "confirming" ? "Confirming on-chain..." : "Waiting for relayer..."}
                   </p>
@@ -642,7 +642,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {/* External — generating note */}
               {depositMode === "external" && ext.status === "generating-note" && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Generating commitment...</p>
                 </div>
               )}
@@ -693,7 +693,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   {/* Confirm deposit button */}
                   <button
                     onClick={ext.startPolling}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider"
                   >
                     I&apos;ve Sent the Deposit
                   </button>
@@ -712,16 +712,16 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                 <div className="flex flex-col gap-4">
                   <div className="text-center py-2">
                     <div className="inline-flex mb-3">
-                      <ShieldCheckIcon size={40} color="#00EF8B" />
+                      <ShieldCheckIcon size={40} color="#00FF41" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">Deposit Successful</p>
                     <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} deposited to V2 privacy pool</p>
                   </div>
 
                   {(txHash || ext.txHash) && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
                       <p className="text-[11px] text-[rgba(255,255,255,0.4)] mb-1 font-mono">Transaction</p>
-                      <p className="text-xs font-mono text-[#00EF8B] break-all">{txHash ?? ext.txHash}</p>
+                      <p className="text-xs font-mono text-[#00FF41] break-all">{txHash ?? ext.txHash}</p>
                     </div>
                   )}
 
@@ -741,7 +741,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
 
                   <button
                     onClick={handleClose}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider"
                   >
                     Done
                   </button>
@@ -777,7 +777,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                         setAmount("");
                         setShowDepositLink(false);
                       }}
-                      className="flex-1 py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono tracking-wider transition-all"
+                      className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
                     >
                       Try Again
                     </button>

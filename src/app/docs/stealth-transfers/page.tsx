@@ -118,9 +118,9 @@ export default function StealthTransfersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
-              <tr><td className="py-2.5 pr-6 text-white">Primary name</td><td className="py-2.5 pr-6 text-[#00EF8B]">alice.dust</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Main identity</td></tr>
-              <tr><td className="py-2.5 pr-6 text-white">Sub-account</td><td className="py-2.5 pr-6 text-[#00EF8B]">work.alice.dust</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Segment payment streams</td></tr>
-              <tr><td className="py-2.5 pr-6 text-white">Custom link</td><td className="py-2.5 pr-6 text-[#00EF8B]">/pay/alice/freelance</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Track per-campaign analytics</td></tr>
+              <tr><td className="py-2.5 pr-6 text-white">Primary name</td><td className="py-2.5 pr-6 text-[#00FF41]">alice.dust</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Main identity</td></tr>
+              <tr><td className="py-2.5 pr-6 text-white">Sub-account</td><td className="py-2.5 pr-6 text-[#00FF41]">work.alice.dust</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Segment payment streams</td></tr>
+              <tr><td className="py-2.5 pr-6 text-white">Custom link</td><td className="py-2.5 pr-6 text-[#00FF41]">/pay/alice/freelance</td><td className="py-2.5 text-[rgba(255,255,255,0.5)]">Track per-campaign analytics</td></tr>
             </tbody>
           </table>
         </div>
@@ -143,7 +143,7 @@ export default function StealthTransfersPage() {
             { label: "V2 Keys (BN254)", desc: "DustPool V2 uses separate keys on the BN254 curve for FFLONK proofs. The spending key and nullifier key are derived from the same wallet signature + PIN but reduced modulo the BN254 field order." },
           ].map(({ label, desc }) => (
             <div key={label} className="flex gap-4 p-3 border border-[rgba(255,255,255,0.05)] rounded-sm">
-              <code className="shrink-0 text-[11px] text-[#00EF8B] mt-0.5">{label}</code>
+              <code className="shrink-0 text-[11px] text-[#00FF41] mt-0.5">{label}</code>
               <p className="text-xs text-[rgba(255,255,255,0.55)] leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -169,7 +169,7 @@ export default function StealthTransfersPage() {
           <DocsBadge variant="muted">Poseidon (V2)</DocsBadge>
         </div>
         <p className="mt-3 text-xs text-[rgba(255,255,255,0.35)] leading-relaxed">
-          <Link href="/docs/contracts" className="text-[rgba(0,239,139,0.7)] hover:text-[#00EF8B]">View contract addresses →</Link>
+          <Link href="/docs/contracts" className="text-[rgba(0,255,65,0.7)] hover:text-[#00FF41]">View contract addresses →</Link>
         </p>
       </section>
     </DocsPage>

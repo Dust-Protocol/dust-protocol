@@ -229,7 +229,7 @@ export function SendForm() {
             </div>
           </div>
           <button
-            className="h-12 w-full py-2 px-4 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-12 w-full py-2 px-4 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handlePreview}
             disabled={(!resolvedAddress && !recipient.startsWith("st:")) || !amount || isLoading || isResolving}
           >
@@ -267,12 +267,12 @@ export function SendForm() {
               Back
             </button>
             <button
-              className="flex-[2] h-11 px-4 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-[2] h-11 px-4 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               onClick={handleSend}
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="w-4 h-4 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
               ) : "Send Payment"}
             </button>
           </div>
@@ -297,7 +297,7 @@ export function SendForm() {
             </a>
           )}
           <button
-            className="h-11 px-7 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono transition-all duration-150"
+            className="h-11 px-7 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono transition-all duration-150"
             onClick={reset}
           >
             Send Another

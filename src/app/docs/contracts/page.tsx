@@ -258,13 +258,13 @@ export default function ContractsPage() {
                   {"role" in c && (
                     <p className="text-xs text-[rgba(255,255,255,0.45)] leading-relaxed mb-2">{c.role}</p>
                   )}
-                  <code className="text-[10px] font-mono text-[rgba(0,239,139,0.6)] break-all">{c.address}</code>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
                 </div>
                 <a
                   href={c.explorer}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00EF8B] transition-colors pt-1"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
                 >
                   Explorer ↗
                 </a>
@@ -292,13 +292,13 @@ export default function ContractsPage() {
               <div className="px-4 py-3 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
-                  <code className="text-[10px] font-mono text-[rgba(0,239,139,0.6)] break-all">{c.address}</code>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
                 </div>
                 <a
                   href={c.explorer}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00EF8B] transition-colors pt-1"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
                 >
                   Explorer ↗
                 </a>
@@ -325,13 +325,13 @@ export default function ContractsPage() {
               <div className="px-4 py-3 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
-                  <code className="text-[10px] font-mono text-[rgba(0,239,139,0.6)] break-all">{c.address}</code>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
                 </div>
                 <a
                   href={c.explorer}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00EF8B] transition-colors pt-1"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
                 >
                   Explorer ↗
                 </a>
@@ -358,7 +358,7 @@ export default function ContractsPage() {
             { name: "ChainalysisScreener.sol", path: "contracts/dustpool/src/ChainalysisScreener.sol", desc: "Compliance oracle wrapper for deposit screening" },
           ].map(({ name, path, desc }) => (
             <div key={name} className="flex items-center gap-4 px-3 py-2.5 border border-[rgba(255,255,255,0.04)] rounded-sm hover:border-[rgba(255,255,255,0.08)] transition-colors">
-              <code className="text-[11px] font-mono text-[#00EF8B] shrink-0">{name}</code>
+              <code className="text-[11px] font-mono text-[#00FF41] shrink-0">{name}</code>
               <span className="text-xs text-[rgba(255,255,255,0.3)] flex-1 min-w-0 truncate">{path}</span>
               <span className="text-xs text-[rgba(255,255,255,0.4)] shrink-0 hidden sm:block">{desc}</span>
             </div>

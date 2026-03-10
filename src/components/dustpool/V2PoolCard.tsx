@@ -83,9 +83,9 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
         className="w-full p-6 rounded-sm border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm relative overflow-hidden"
       >
         <div className="flex items-center gap-2 mb-3">
-          <ShieldIcon size={14} color="#00EF8B" />
+          <ShieldIcon size={14} color="#00FF41" />
           <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">PRIVACY_POOL_V2</span>
-          <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,239,139,0.15)] text-[9px] text-[#00EF8B] font-mono font-bold">V2</span>
+          <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,255,65,0.15)] text-[9px] text-[#00FF41] font-mono font-bold">V2</span>
         </div>
         <p className="text-[11px] text-[rgba(255,255,255,0.3)] font-mono">Connect wallet to access V2 privacy pool</p>
         <CornerAccents />
@@ -99,22 +99,22 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
-        className="w-full p-6 rounded-sm border border-[rgba(0,239,139,0.12)] bg-[rgba(0,239,139,0.02)] backdrop-blur-sm relative overflow-hidden"
+        className="w-full p-6 rounded-sm border border-[rgba(0,255,65,0.12)] bg-[rgba(0,255,65,0.02)] backdrop-blur-sm relative overflow-hidden"
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            <ShieldIcon size={14} color="#00EF8B" />
+            <ShieldIcon size={14} color="#00FF41" />
             <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">PRIVACY_POOL_V2</span>
-            <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,239,139,0.15)] text-[9px] text-[#00EF8B] font-mono font-bold">V2</span>
+            <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,255,65,0.15)] text-[9px] text-[#00FF41] font-mono font-bold">V2</span>
           </div>
           {isLoading && (
-            <div className="w-3 h-3 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+            <div className="w-3 h-3 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
           )}
         </div>
 
         {/* V2 feature highlight */}
-        <div className="mb-4 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00EF8B] pl-2">
+        <div className="mb-4 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00FF41] pl-2">
           Arbitrary amounts &middot; UTXO model &middot; FFLONK proofs
         </div>
 
@@ -129,7 +129,7 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
               <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">{nativeSymbol}</span>
             </div>
             {unspentCount > 0 && (
-              <span className="text-[10px] text-[#00EF8B] font-mono">
+              <span className="text-[10px] text-[#00FF41] font-mono">
                 {unspentCount} note{unspentCount !== 1 ? "s" : ""}
               </span>
             )}
@@ -201,8 +201,8 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
         {/* Unlocked indicator */}
         {hasKeys && (
           <div className="mb-4 flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
-            <span className="text-[10px] text-[#00EF8B] font-mono">V2 keys active</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
+            <span className="text-[10px] text-[#00FF41] font-mono">V2 keys active</span>
           </div>
         )}
 
@@ -211,14 +211,14 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
           <button
             onClick={() => setActiveModal("deposit")}
             disabled={!hasKeys}
-            className="py-2.5 px-2 rounded-sm border border-[rgba(0,239,139,0.2)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.08)] transition-all text-xs font-bold text-[#00EF8B] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(0,239,139,0.2)] disabled:hover:bg-transparent"
+            className="py-2.5 px-2 rounded-sm border border-[rgba(0,255,65,0.2)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.08)] transition-all text-xs font-bold text-[#00FF41] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(0,255,65,0.2)] disabled:hover:bg-transparent"
           >
             [ DEPOSIT ]
           </button>
           <button
             onClick={() => setActiveModal("withdraw")}
             disabled={!hasKeys || !hasAnyBalance}
-            className="py-2.5 px-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all text-xs font-bold text-white hover:text-[#00EF8B] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(255,255,255,0.1)] disabled:hover:bg-transparent disabled:hover:text-white"
+            className="py-2.5 px-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all text-xs font-bold text-white hover:text-[#00FF41] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(255,255,255,0.1)] disabled:hover:bg-transparent disabled:hover:text-white"
           >
             [ WITHDRAW ]
           </button>
@@ -232,7 +232,7 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
           <button
             onClick={() => setActiveModal("transfer")}
             disabled={!hasKeys || !hasAnyBalance}
-            className="py-2.5 px-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all text-xs font-bold text-white hover:text-[#00EF8B] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(255,255,255,0.1)] disabled:hover:bg-transparent disabled:hover:text-white"
+            className="py-2.5 px-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all text-xs font-bold text-white hover:text-[#00FF41] font-mono disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[rgba(255,255,255,0.1)] disabled:hover:bg-transparent disabled:hover:text-white"
           >
             [ TRANSFER ]
           </button>

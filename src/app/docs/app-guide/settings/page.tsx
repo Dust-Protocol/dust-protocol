@@ -87,7 +87,7 @@ export default function SettingsPage() {
         <SettingsClaimSnippet />
         <ul className="space-y-3 text-sm text-[rgba(255,255,255,0.6)] leading-relaxed list-none pl-0">
           <li>
-            <strong className="text-[#00EF8B]">ERC-4337 (Recommended)</strong> — Account Abstraction with DustPaymaster.
+            <strong className="text-[#00FF41]">ERC-4337 (Recommended)</strong> — Account Abstraction with DustPaymaster.
             The paymaster sponsors gas, so you can claim without holding ETH on the stealth address. Best for most users.
           </li>
           <li>

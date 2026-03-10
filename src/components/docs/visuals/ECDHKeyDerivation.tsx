@@ -121,7 +121,7 @@ export function ECDHKeyDerivation() {
                             <path
                                 d="M0,0.5 L7,3 L0,5.5"
                                 fill="none"
-                                stroke="rgba(0,239,139,0.4)"
+                                stroke="rgba(0,255,65,0.4)"
                                 strokeWidth="0.8"
                             />
                         </marker>
@@ -168,7 +168,7 @@ export function ECDHKeyDerivation() {
                         x2={P.badge.x + P.badge.w / 2}
                         y2={P.step2.y}
                         stroke={
-                            step >= 2 ? 'rgba(0,239,139,0.25)' : 'rgba(255,255,255,0.06)'
+                            step >= 2 ? 'rgba(0,255,65,0.25)' : 'rgba(255,255,255,0.06)'
                         }
                         strokeWidth="1"
                         strokeDasharray="3 3"
@@ -180,7 +180,7 @@ export function ECDHKeyDerivation() {
                         x2={P.badge.x + P.badge.w / 2}
                         y2={P.step3.y}
                         stroke={
-                            step >= 3 ? 'rgba(0,239,139,0.25)' : 'rgba(255,255,255,0.06)'
+                            step >= 3 ? 'rgba(0,255,65,0.25)' : 'rgba(255,255,255,0.06)'
                         }
                         strokeWidth="1"
                         strokeDasharray="3 3"
@@ -203,7 +203,7 @@ export function ECDHKeyDerivation() {
                             y1={P.sender.y + P.sender.h}
                             x2={P.curveViz.x + P.curveViz.w / 2}
                             y2={P.curveViz.y}
-                            stroke="#00EF8B"
+                            stroke="#00FF41"
                             strokeWidth="1"
                             strokeDasharray="4 3"
                             markerEnd="url(#ecdhArrow)"
@@ -249,7 +249,7 @@ export function ECDHKeyDerivation() {
                             y1={P.secret.y + P.secret.h}
                             x2={P.stealth.x + P.stealth.w / 2}
                             y2={P.stealth.y}
-                            stroke="#00EF8B"
+                            stroke="#00FF41"
                             strokeWidth="1"
                             strokeDasharray="4 3"
                             markerEnd="url(#ecdhArrow)"
@@ -260,7 +260,7 @@ export function ECDHKeyDerivation() {
                     <path
                         d={`M ${P.curveViz.x + 10} ${P.curveViz.y + 45} Q ${P.curveViz.x + P.curveViz.w / 2} ${P.curveViz.y + 5} ${P.curveViz.x + P.curveViz.w - 10} ${P.curveViz.y + 45}`}
                         fill="none"
-                        stroke="#00EF8B"
+                        stroke="#00FF41"
                         strokeOpacity="0.2"
                         strokeWidth="1"
                     />
@@ -269,13 +269,13 @@ export function ECDHKeyDerivation() {
                         cx={P.curveViz.x + 30}
                         cy={P.curveViz.y + 40}
                         r="3"
-                        fill="#00EF8B"
+                        fill="#00FF41"
                         fillOpacity="0.6"
                     />
                     <text
                         x={P.curveViz.x + 22}
                         y={P.curveViz.y + 56}
-                        fill="#00EF8B"
+                        fill="#00FF41"
                         fontSize="8"
                         fontFamily="JetBrains Mono"
                     >
@@ -286,7 +286,7 @@ export function ECDHKeyDerivation() {
                         cx={P.curveViz.x + P.curveViz.w - 30}
                         cy={P.curveViz.y + 40}
                         r="3"
-                        fill={step >= 1 ? "#00EF8B" : "rgba(0,239,139,0.2)"}
+                        fill={step >= 1 ? "#00FF41" : "rgba(0,255,65,0.2)"}
                         fillOpacity={step >= 1 ? "0.8" : "0.3"}
                     >
                         {step >= 1 && (
@@ -309,7 +309,7 @@ export function ECDHKeyDerivation() {
                     <text
                         x={P.curveViz.x + P.curveViz.w - 45}
                         y={P.curveViz.y + 56}
-                        fill="#00EF8B"
+                        fill="#00FF41"
                         fontSize="8"
                         fontFamily="JetBrains Mono"
                     >
@@ -362,7 +362,7 @@ export function ECDHKeyDerivation() {
                     }}
                 >
                     <div
-                        className={`w-full h-full border ${step === 1 ? 'border-[rgba(0,239,139,0.3)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center transition-all duration-300`}
+                        className={`w-full h-full border ${step === 1 ? 'border-[rgba(0,255,65,0.3)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center transition-all duration-300`}
                     >
                         <span className="text-[10px] font-bold">SENDER</span>
                     </div>
@@ -489,13 +489,13 @@ export function ECDHKeyDerivation() {
                             step === 3
                                 ? {
                                     boxShadow: [
-                                        '0 0 0px rgba(0,239,139,0)',
-                                        '0 0 20px rgba(0,239,139,0.3)',
-                                        '0 0 8px rgba(0,239,139,0.1)',
+                                        '0 0 0px rgba(0,255,65,0)',
+                                        '0 0 20px rgba(0,255,65,0.3)',
+                                        '0 0 8px rgba(0,255,65,0.1)',
                                     ],
                                 }
                                 : {
-                                    boxShadow: '0 0 0px rgba(0,239,139,0)',
+                                    boxShadow: '0 0 0px rgba(0,255,65,0)',
                                 }
                         }
                         transition={{

@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="search" type="application/opensearchdescription+xml" title="Dust Protocol" href="/opensearch.xml" />
         <link rel="alternate" type="application/rss+xml" title="Dust Protocol Docs" href="/docs/feed.xml" />
       </head>
-      <body className="bg-[#06080F] text-white font-mono selection:bg-[#00EF8B] selection:text-black">
+      <body className="bg-[#06080F] text-white font-mono selection:bg-[#00FF41] selection:text-black">
         {/* XSS-safe: all values are hardcoded string literals from jsonLd.ts. safeJsonLd() escapes '<' as \u003c. No user input. */}
         <script
           type="application/ld+json"
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             backgroundSize: '40px 40px'
           }}
         />
-        <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,239,139,0.04),transparent_60%)]" />
+        <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,255,65,0.04),transparent_60%)]" />
         <div className="relative z-10">
           <Providers>
             <AuthLayoutWrapper>{children}</AuthLayoutWrapper>

@@ -116,7 +116,7 @@ export function ConsolidateModal({
                       <span className="text-xs text-[rgba(255,255,255,0.6)] font-mono">
                         Deposit #{i + 1}
                       </span>
-                      <span className="text-xs font-semibold text-[#00EF8B] font-mono">
+                      <span className="text-xs font-semibold text-[#00FF41] font-mono">
                         {parseFloat(ethers.utils.formatEther(d.amount)).toFixed(6)} {symbol}
                       </span>
                     </div>
@@ -136,7 +136,7 @@ export function ConsolidateModal({
                       placeholder="0x..."
                       value={recipient}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     <p className="text-[11px] text-[rgba(255,255,255,0.3)] font-mono">
                       Use a fresh address with no on-chain history for maximum privacy
@@ -146,7 +146,7 @@ export function ConsolidateModal({
                   <button
                     onClick={() => canConsolidate && onConsolidate(recipient)}
                     disabled={!canConsolidate}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     [ WITHDRAW_ALL_ZK ]
                   </button>
@@ -158,7 +158,7 @@ export function ConsolidateModal({
                 <div className="flex flex-col gap-2">
                   <div className="h-1.5 w-full bg-[rgba(255,255,255,0.08)] rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-[#00EF8B] rounded-full"
+                      className="h-full bg-[#00FF41] rounded-full"
                       style={{ width: `${progressPercent}%` }}
                       transition={{ duration: 0.3 }}
                     />
@@ -171,8 +171,8 @@ export function ConsolidateModal({
 
               {/* Done state */}
               {progress.phase === "done" && (
-                <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
-                  <p className="text-sm font-semibold text-[#00EF8B] font-mono text-center">
+                <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
+                  <p className="text-sm font-semibold text-[#00FF41] font-mono text-center">
                     {progress.message}
                   </p>
                 </div>

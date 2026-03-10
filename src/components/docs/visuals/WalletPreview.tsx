@@ -2,7 +2,7 @@
 
 const SNIPPET_WRAPPER = "my-6 rounded-sm border border-[rgba(255,255,255,0.08)] overflow-hidden";
 const BG = "bg-[#06080F]";
-const ACCENT = "#00EF8B";
+const ACCENT = "#00FF41";
 
 const MOCK_ADDRESSES = [
   { addr: "0x1a2b...3c4d", balance: "0.5000", status: "unclaimed" as const },
@@ -13,15 +13,15 @@ const MOCK_ADDRESSES = [
 function StatusBadge({ status }: { status: "unclaimed" | "claimed" | "empty" }) {
   if (status === "claimed") {
     return (
-      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.15)]">
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.15)]">
         <svg viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5" className="w-3 h-3"><polyline points="20 6 9 17 4 12" /></svg>
-        <span className="text-[10px] font-mono font-bold text-[#00EF8B]">CLAIMED</span>
+        <span className="text-[10px] font-mono font-bold text-[#00FF41]">CLAIMED</span>
       </div>
     );
   }
   if (status === "unclaimed") {
     return (
-      <div className="flex items-center justify-center px-3 py-1.5 rounded-sm bg-[#00EF8B] text-[10px] font-mono font-bold text-black">
+      <div className="flex items-center justify-center px-3 py-1.5 rounded-sm bg-[#00FF41] text-[10px] font-mono font-bold text-black">
         CLAIM
       </div>
     );
@@ -51,9 +51,9 @@ export function WalletAddressListSnippet() {
               <div className="flex items-center gap-3">
                 <div className={`p-1.5 rounded-full ${
                   entry.status === "claimed"
-                    ? "bg-[rgba(0,239,139,0.1)]"
+                    ? "bg-[rgba(0,255,65,0.1)]"
                     : entry.status === "unclaimed"
-                    ? "bg-[rgba(0,239,139,0.06)]"
+                    ? "bg-[rgba(0,255,65,0.06)]"
                     : "bg-[rgba(255,255,255,0.03)]"
                 }`}>
                   {entry.status === "claimed" ? (
@@ -95,7 +95,7 @@ export function WalletSendSnippet() {
               <span className="text-xs font-mono text-white">0.5 ETH</span>
             </div>
           </div>
-          <div className="flex items-center justify-center py-2 rounded-sm bg-[#00EF8B] font-mono font-bold text-xs text-black">
+          <div className="flex items-center justify-center py-2 rounded-sm bg-[#00FF41] font-mono font-bold text-xs text-black">
             Send
           </div>
         </div>
@@ -114,7 +114,7 @@ export function WalletReceiveSnippet() {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-mono font-bold text-[#00EF8B]">dust.alice</span>
+            <span className="text-sm font-mono font-bold text-[#00FF41]">dust.alice</span>
             <span className="text-[10px] font-mono text-[rgba(255,255,255,0.4)]">st:thanos:0x04a1b2...c3d4e5</span>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)]">
@@ -144,8 +144,8 @@ export function WalletV1V2ComparisonSnippet() {
               <span className="text-[9px] font-mono text-[rgba(255,255,255,0.3)]">ECDH + ERC-5564</span>
             </div>
           </div>
-          <div className="rounded-sm border border-[rgba(0,239,139,0.15)] bg-[rgba(0,239,139,0.03)] p-3">
-            <div className="text-[10px] font-mono font-bold text-[#00EF8B] tracking-wider mb-2">V2: UTXO POOL</div>
+          <div className="rounded-sm border border-[rgba(0,255,65,0.15)] bg-[rgba(0,255,65,0.03)] p-3">
+            <div className="text-[10px] font-mono font-bold text-[#00FF41] tracking-wider mb-2">V2: UTXO POOL</div>
             <div className="flex flex-col gap-1.5 text-[10px] font-mono text-[rgba(255,255,255,0.5)]">
               <span>ZK proof withdrawal</span>
               <span>Hidden amounts (Pedersen)</span>
@@ -153,7 +153,7 @@ export function WalletV1V2ComparisonSnippet() {
             </div>
             <div className="mt-2.5 flex items-center gap-1.5">
               <svg viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" className="w-3 h-3"><polyline points="7 7 12 12 7 17" /></svg>
-              <span className="text-[9px] font-mono text-[rgba(0,239,139,0.5)]">FFLONK + Poseidon</span>
+              <span className="text-[9px] font-mono text-[rgba(0,255,65,0.5)]">FFLONK + Poseidon</span>
             </div>
           </div>
         </div>

@@ -151,7 +151,7 @@ export default function DashboardPageClient() {
         <div className="flex gap-2.5">
           <button
             onClick={() => setShowSendModal(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-sm bg-[#00EF8B] hover:bg-[rgba(0,239,139,0.85)] active:scale-[0.98] transition-all font-mono font-bold text-sm text-black"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-sm bg-[#00FF41] hover:bg-[rgba(0,255,65,0.85)] active:scale-[0.98] transition-all font-mono font-bold text-sm text-black"
           >
             <SendIcon size={17} color="#000" />
             Send

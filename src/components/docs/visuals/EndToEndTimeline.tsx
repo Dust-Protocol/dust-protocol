@@ -89,10 +89,10 @@ export function EndToEndTimeline() {
                             {/* Number Box */}
                             <motion.div
                                 animate={{
-                                    borderColor: isActive ? '#00EF8B' : 'rgba(0,239,139,0.2)',
+                                    borderColor: isActive ? '#00FF41' : 'rgba(0,255,65,0.2)',
                                     backgroundColor: isActive
-                                        ? 'rgba(0,239,139,0.12)'
-                                        : 'rgba(0,239,139,0.08)',
+                                        ? 'rgba(0,255,65,0.12)'
+                                        : 'rgba(0,255,65,0.08)',
                                 }}
                                 className="w-9 h-9 flex-shrink-0 flex items-center justify-center border text-[12px] font-bold font-mono text-dust-green z-10"
                             >

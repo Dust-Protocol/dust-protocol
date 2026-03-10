@@ -16,7 +16,7 @@ export function FeatureMatrix({ chainId }: FeatureMatrixProps) {
         <div
           key={key}
           className={`text-[10px] font-mono tracking-wide flex items-center gap-2 ${
-            available ? 'text-[#00EF8B]/70' : 'text-white/20'
+            available ? 'text-[#00FF41]/70' : 'text-white/20'
           }`}
         >
           <span>{available ? '>' : '—'}</span>

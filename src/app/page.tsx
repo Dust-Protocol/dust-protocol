@@ -136,7 +136,7 @@ export default function Home() {
       <div className="min-h-screen bg-[#06080F] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="opacity-60">
-            <DustLogo size={40} color="#00EF8B" />
+            <DustLogo size={40} color="#00FF41" />
           </div>
           <p className="text-[14px] font-mono text-white/40">
             {loadingTooLong ? "Checking your account..." : "Loading..."}
@@ -159,8 +159,8 @@ export default function Home() {
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes btn-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(0,239,139,0.2), 0 0 60px rgba(0,239,139,0.06); }
-          50% { box-shadow: 0 0 30px rgba(0,239,139,0.35), 0 0 80px rgba(0,239,139,0.1); }
+          0%, 100% { box-shadow: 0 0 20px rgba(0,255,65,0.2), 0 0 60px rgba(0,255,65,0.06); }
+          50% { box-shadow: 0 0 30px rgba(0,255,65,0.35), 0 0 80px rgba(0,255,65,0.1); }
         }
         .fade-up { animation: fade-up 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
         .d1 { animation-delay: 0.1s; }
@@ -191,14 +191,14 @@ export default function Home() {
           <div className="w-full flex items-center justify-between">
             {/* Left: Logo + Built on Flow badge */}
             <div className="flex items-center gap-3">
-              <DustLogo size={40} color="#00EF8B" />
+              <DustLogo size={40} color="#00FF41" />
               <div className="hidden sm:flex items-baseline gap-2">
                 <span className="text-2xl font-bold tracking-widest text-white font-mono">DUST</span>
-                <span className="text-[13px] font-bold font-mono tracking-[0.25em] text-[rgba(0,239,139,0.35)] uppercase">PROTOCOL</span>
+                <span className="text-[13px] font-bold font-mono tracking-[0.25em] text-[rgba(0,255,65,0.35)] uppercase">PROTOCOL</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 border border-[#00EF8B]/20 bg-[#00EF8B]/[0.05] rounded-full">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 border border-[#00FF41]/20 bg-[#00FF41]/[0.05] rounded-full">
                 <img src="/chains/flow.svg" alt="Flow" className="w-4 h-4" />
-                <span className="text-[10px] font-mono tracking-[0.15em] text-[#00EF8B]/80 uppercase">Built on Flow</span>
+                <span className="text-[10px] font-mono tracking-[0.15em] text-[#00FF41]/80 uppercase">Built on Flow</span>
               </div>
             </div>
 
@@ -206,13 +206,13 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <a
                 href="/docs"
-                className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 border border-white/15 text-white/70 rounded-sm font-mono font-bold text-sm tracking-wider uppercase transition-all hover:border-[rgba(0,239,139,0.4)] hover:text-[#00EF8B] hover:-translate-y-px backdrop-blur-sm"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 border border-white/15 text-white/70 rounded-sm font-mono font-bold text-sm tracking-wider uppercase transition-all hover:border-[rgba(0,255,65,0.4)] hover:text-[#00FF41] hover:-translate-y-px backdrop-blur-sm"
               >
                 Docs
               </a>
             <div className="flex flex-col items-end gap-1">
               <button
-                className="flex items-center gap-2 px-4 md:px-5 py-2.5 bg-[#00EF8B] text-[#06080F] rounded-sm font-mono font-bold text-sm tracking-wider uppercase cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_0_20px_rgba(0,239,139,0.4)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="flex items-center gap-2 px-4 md:px-5 py-2.5 bg-[#00FF41] text-[#06080F] rounded-sm font-mono font-bold text-sm tracking-wider uppercase cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_0_20px_rgba(0,255,65,0.4)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 style={{ animation: "btn-glow 3s ease-in-out infinite" }}
                 onClick={handleConnect}
                 disabled={isConnecting}
@@ -257,14 +257,14 @@ export default function Home() {
             {/* Pay Search Input */}
             <div className="flex items-center gap-2 w-full">
               <input
-                className="flex-1 h-12 bg-[rgba(20,20,25,0.6)] border border-white/15 rounded-2xl text-white text-sm px-4 backdrop-blur-lg placeholder:text-white/50 focus:border-[#00EF8B] focus:outline-none focus:bg-[rgba(20,20,25,0.8)] transition-all"
+                className="flex-1 h-12 bg-[rgba(20,20,25,0.6)] border border-white/15 rounded-2xl text-white text-sm px-4 backdrop-blur-lg placeholder:text-white/50 focus:border-[#00FF41] focus:outline-none focus:bg-[rgba(20,20,25,0.8)] transition-all"
                 placeholder="username.dust"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") handlePaySearch(); }}
               />
               <button
-                className="w-12 h-12 shrink-0 bg-[#00EF8B] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_0_20px_rgba(0,239,139,0.4)] transition-all"
+                className="w-12 h-12 shrink-0 bg-[#00FF41] rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_0_20px_rgba(0,255,65,0.4)] transition-all"
                 onClick={handlePaySearch}
               >
                 <ArrowUpRightIcon size={20} color="#06080F" />
@@ -296,14 +296,14 @@ export default function Home() {
             <div className="flex flex-col gap-3 w-full max-w-[380px] items-start fade-up d2">
               <div className="flex items-center gap-2 w-full">
                 <input
-                  className="flex-1 h-14 bg-[rgba(0,0,0,0.4)] border border-white/15 rounded-sm text-white text-base px-5 font-mono backdrop-blur-lg placeholder:text-white/50 hover:border-[rgba(0,239,139,0.3)] focus:border-[#00EF8B] focus:outline-none focus:bg-[rgba(0,0,0,0.6)] focus:shadow-[0_0_0_1px_rgba(0,239,139,0.2)] transition-all"
+                  className="flex-1 h-14 bg-[rgba(0,0,0,0.4)] border border-white/15 rounded-sm text-white text-base px-5 font-mono backdrop-blur-lg placeholder:text-white/50 hover:border-[rgba(0,255,65,0.3)] focus:border-[#00FF41] focus:outline-none focus:bg-[rgba(0,0,0,0.6)] focus:shadow-[0_0_0_1px_rgba(0,255,65,0.2)] transition-all"
                   placeholder="username.dust"
                   value={searchName}
                   onChange={(e) => setSearchName(e.target.value)}
                   onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") handlePaySearch(); }}
                 />
                 <button
-                  className="w-14 h-14 shrink-0 bg-white/10 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer backdrop-blur-lg transition-all hover:bg-[#00EF8B] hover:border-[#00EF8B] hover:-translate-y-px"
+                  className="w-14 h-14 shrink-0 bg-white/10 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer backdrop-blur-lg transition-all hover:bg-[#00FF41] hover:border-[#00FF41] hover:-translate-y-px"
                   onClick={handlePaySearch}
                 >
                   <ArrowUpRightIcon size={20} color="white" />
@@ -348,7 +348,7 @@ export default function Home() {
             href="https://x.com/DustProtocolApp"
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto text-white/40 hover:text-[#00EF8B] text-[10px] sm:text-[11px] font-mono uppercase tracking-wider transition-colors"
+            className="pointer-events-auto text-white/40 hover:text-[#00FF41] text-[10px] sm:text-[11px] font-mono uppercase tracking-wider transition-colors"
           >
             Follow us on X
           </a>

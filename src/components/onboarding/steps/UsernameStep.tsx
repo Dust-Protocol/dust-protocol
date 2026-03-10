@@ -55,7 +55,7 @@ export function UsernameStep({ onNext, onReclaim, initialName = "" }: UsernameSt
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setNameInput(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))
             }
-            className="w-full p-3 pr-[65px] rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] transition-all placeholder-[rgba(255,255,255,0.2)]"
+            className="w-full p-3 pr-[65px] rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] transition-all placeholder-[rgba(255,255,255,0.2)]"
           />
           <span className="absolute right-[14px] top-1/2 -translate-y-1/2 text-[14px] font-medium text-[rgba(255,255,255,0.3)] font-mono pointer-events-none">
             {NAME_SUFFIX}
@@ -67,7 +67,7 @@ export function UsernameStep({ onNext, onReclaim, initialName = "" }: UsernameSt
           {isChecking && (
             <div className="flex items-center gap-[5px]">
               <svg
-                className="animate-spin w-3 h-3 text-[rgba(0,239,139,0.6)]"
+                className="animate-spin w-3 h-3 text-[rgba(0,255,65,0.6)]"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export function UsernameStep({ onNext, onReclaim, initialName = "" }: UsernameSt
         className={[
           "w-full h-11 rounded-sm text-[14px] font-bold font-mono tracking-wider transition-all",
           canContinue
-            ? "py-3 px-4 bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-[#00EF8B]"
+            ? "py-3 px-4 bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-[#00FF41]"
             : "bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.3)] cursor-not-allowed",
         ].join(" ")}
       >

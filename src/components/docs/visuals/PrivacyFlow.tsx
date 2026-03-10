@@ -83,7 +83,7 @@ export function PrivacyFlow() {
     // Helper to determine stroke color based on active step
     const getStrokeColor = (activeStep: number, currentStep: number) => {
         // For the final step (4), we might want to keep the "success" color or just green
-        return currentStep >= activeStep ? '#00EF8B' : 'rgba(255,255,255,0.12)'
+        return currentStep >= activeStep ? '#00FF41' : 'rgba(255,255,255,0.12)'
     }
 
     const getStrokeWidth = (activeStep: number, currentStep: number) => {
@@ -130,7 +130,7 @@ export function PrivacyFlow() {
                             <path
                                 d="M0,0 L8,3 L0,6"
                                 fill="none"
-                                stroke="#00EF8B"
+                                stroke="#00FF41"
                                 strokeWidth="1"
                             />
                         </marker>
@@ -160,7 +160,7 @@ export function PrivacyFlow() {
                             <path
                                 d="M0,0 L8,3 L0,6"
                                 fill="none"
-                                stroke="#00EF8B"
+                                stroke="#00FF41"
                                 strokeWidth="1"
                             />
                         </marker>
@@ -229,7 +229,7 @@ export function PrivacyFlow() {
                         fill="none"
                         initial={{ stroke: 'rgba(255,255,255,0.12)', strokeOpacity: 0.1 }}
                         animate={{
-                            stroke: step >= 3 ? '#00EF8B' : 'rgba(255,255,255,0.12)',
+                            stroke: step >= 3 ? '#00FF41' : 'rgba(255,255,255,0.12)',
                             strokeOpacity: step >= 3 ? 1 : 0.1,
                             strokeWidth: step >= 3 ? 1.5 : 1,
                         }}
@@ -239,7 +239,7 @@ export function PrivacyFlow() {
                     <text
                         x={right(POSITIONS.node3) + 60}
                         y={cy(POSITIONS.node3) - 30}
-                        fill={step >= 3 ? "#00EF8B" : "rgba(255,255,255,0.3)"}
+                        fill={step >= 3 ? "#00FF41" : "rgba(255,255,255,0.3)"}
                         fontSize="9"
                         textAnchor="middle"
                         fontFamily="JetBrains Mono"
@@ -281,7 +281,7 @@ export function PrivacyFlow() {
                     }}
                 >
                     <div
-                        className={`w-full h-full border ${isActive(0) || step > 0 ? 'border-[rgba(0,239,139,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex flex-col items-center justify-center transition-all duration-300`}
+                        className={`w-full h-full border ${isActive(0) || step > 0 ? 'border-[rgba(0,255,65,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex flex-col items-center justify-center transition-all duration-300`}
                     >
                         <Wallet className={`w-5 h-5 ${isActive(0) || step > 0 ? 'text-dust-green' : 'text-dust-muted'} mb-1.5`} />
                         <span className="text-[10px] tracking-wider">SENDER</span>
@@ -299,7 +299,7 @@ export function PrivacyFlow() {
                     }}
                 >
                     <div
-                        className={`w-full h-full border ${isActive(1) || step > 1 ? 'border-[rgba(0,239,139,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex flex-col items-center justify-center transition-all duration-300`}
+                        className={`w-full h-full border ${isActive(1) || step > 1 ? 'border-[rgba(0,255,65,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex flex-col items-center justify-center transition-all duration-300`}
                     >
                         <span className="text-[10px] font-bold">STEALTH ADDRESS</span>
                         <span className="text-[8px] text-dust-muted mt-0.5">
@@ -319,7 +319,7 @@ export function PrivacyFlow() {
                     }}
                 >
                     <div
-                        className={`w-full h-full border ${isActive(2) || step > 2 ? 'border-[rgba(0,239,139,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 transition-all duration-300`}
+                        className={`w-full h-full border ${isActive(2) || step > 2 ? 'border-[rgba(0,255,65,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 transition-all duration-300`}
                     >
                         <span className="text-[10px] font-bold">ANNOUNCEMENT</span>
                         <span className="px-1 py-0.5 border border-dust-green/20 bg-dust-green/8 text-[7px] text-dust-green tracking-wider">
@@ -339,7 +339,7 @@ export function PrivacyFlow() {
                     }}
                 >
                     <div
-                        className={`w-full h-full border ${isActive(3) || step > 3 ? 'border-[rgba(0,239,139,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 transition-all duration-300`}
+                        className={`w-full h-full border ${isActive(3) || step > 3 ? 'border-[rgba(0,255,65,0.4)] shadow-glow-green' : 'border-dust-border'} bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 transition-all duration-300`}
                     >
                         <span className="text-[10px] font-bold">ZK PROOF</span>
                         <span className="px-1 py-0.5 border border-dust-border bg-[rgba(255,255,255,0.03)] text-[7px] text-dust-muted tracking-wider">

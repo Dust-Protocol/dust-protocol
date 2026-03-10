@@ -174,11 +174,11 @@ export function DisclosureSection({ keysRef, chainId }: DisclosureSectionProps) 
               </div>
               <div className="px-3 py-2.5 bg-[rgba(255,255,255,0.03)] rounded-sm">
                 <p className="text-[10px] text-[rgba(255,255,255,0.4)] font-mono uppercase tracking-wider">Unspent</p>
-                <p className="text-sm text-[#00EF8B] font-mono font-semibold mt-0.5 flex items-center gap-1">
+                <p className="text-sm text-[#00FF41] font-mono font-semibold mt-0.5 flex items-center gap-1">
                   <ETHIcon size={14} />{formatAmount(totalEthUnspent, 18)} ETH
                 </p>
                 {totalUsdcUnspent > 0n && (
-                  <p className="text-sm text-[#00EF8B] font-mono font-semibold mt-0.5">
+                  <p className="text-sm text-[#00FF41] font-mono font-semibold mt-0.5">
                     {formatAmount(totalUsdcUnspent, 6)} USDC
                   </p>
                 )}

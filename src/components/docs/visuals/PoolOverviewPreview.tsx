@@ -51,7 +51,7 @@ export function PoolShieldedSnippet() {
           <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider">Shielded</span>
         </div>
         <div className="flex gap-0.5 h-1.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.08)]">
-          <div className="bg-[#00EF8B] opacity-60" style={{ width: `${ethPercent}%` }} />
+          <div className="bg-[#00FF41] opacity-60" style={{ width: `${ethPercent}%` }} />
           <div className="bg-[rgba(255,255,255,0.2)]" style={{ width: `${100 - ethPercent}%` }} />
         </div>
         <div className="flex justify-between text-[10px] text-[rgba(255,255,255,0.4)] mt-1.5">
@@ -76,7 +76,7 @@ export function PoolOracleSnippet() {
             <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
           </svg>
           <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider">Oracle</span>
-          <span className="text-[8px] px-1 py-px rounded-sm leading-tight text-[#00EF8B] bg-[rgba(0,239,139,0.08)]">CHAINLINK</span>
+          <span className="text-[8px] px-1 py-px rounded-sm leading-tight text-[#00FF41] bg-[rgba(0,255,65,0.08)]">CHAINLINK</span>
         </div>
         <div className="flex items-center gap-1 text-xs font-bold text-white">
           <span className="text-[rgba(255,255,255,0.5)]">1</span>
@@ -134,7 +134,7 @@ export function PoolCapacitySnippet() {
           <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider">Capacity</span>
         </div>
         <div className="flex gap-0.5 h-1 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.08)]">
-          <div className="bg-[#00EF8B] opacity-60" style={{ width: `${capacityPercent}%` }} />
+          <div className="bg-[#00FF41] opacity-60" style={{ width: `${capacityPercent}%` }} />
         </div>
         <span className="text-[9px] text-[rgba(255,255,255,0.25)] mt-1 block">47 / 1.05M slots</span>
       </div>
@@ -154,7 +154,7 @@ export function PoolNetworksSnippet() {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
             <span className="text-[10px] text-[rgba(255,255,255,0.6)]">Eth Sepolia</span>
           </div>
           <div className="flex items-center gap-1.5">

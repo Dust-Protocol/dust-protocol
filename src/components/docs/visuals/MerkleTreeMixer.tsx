@@ -203,7 +203,7 @@ export function MerkleTreeMixer() {
                                         y2={child0.y - NODE_SIZE / 2 - 2}
                                         stroke={
                                             isOnPath(level + 1, pi * 2)
-                                                ? '#00EF8B'
+                                                ? '#00FF41'
                                                 : 'rgba(255,255,255,0.08)'
                                         }
                                         strokeWidth={isOnPath(level + 1, pi * 2) ? 1.5 : 0.5}
@@ -216,7 +216,7 @@ export function MerkleTreeMixer() {
                                         y2={child1.y - NODE_SIZE / 2 - 2}
                                         stroke={
                                             isOnPath(level + 1, pi * 2 + 1)
-                                                ? '#00EF8B'
+                                                ? '#00FF41'
                                                 : 'rgba(255,255,255,0.08)'
                                         }
                                         strokeWidth={isOnPath(level + 1, pi * 2 + 1) ? 1.5 : 0.5}
@@ -243,22 +243,22 @@ export function MerkleTreeMixer() {
                             let fill = 'rgba(255,255,255,0.02)'
                             let glowFilter = ''
                             if (level === 0) {
-                                stroke = '#00EF8B'
+                                stroke = '#00FF41'
                                 if (depHL) {
-                                    fill = 'rgba(0,239,139,0.15)'
+                                    fill = 'rgba(0,255,65,0.15)'
                                     glowFilter = 'url(#treeGlow)'
                                 }
                             } else if (depHL) {
-                                stroke = '#00EF8B'
-                                fill = 'rgba(0,239,139,0.1)'
+                                stroke = '#00FF41'
+                                fill = 'rgba(0,255,65,0.1)'
                                 glowFilter = 'url(#treeGlow)'
                             } else if (witHL) {
                                 stroke = '#FFB000'
                                 fill = 'rgba(255,176,0,0.1)'
                                 glowFilter = 'url(#treeGlow)'
                             } else if (filled) {
-                                stroke = 'rgba(0,239,139,0.4)'
-                                fill = 'rgba(0,239,139,0.08)'
+                                stroke = 'rgba(0,255,65,0.4)'
+                                fill = 'rgba(0,255,65,0.08)'
                             }
                             return (
                                 <Fragment key={`node-${level}-${i}`}>
@@ -278,7 +278,7 @@ export function MerkleTreeMixer() {
                                         <text
                                             x={pos.x}
                                             y={pos.y - half - 6}
-                                            fill="#00EF8B"
+                                            fill="#00FF41"
                                             fontSize="9"
                                             textAnchor="middle"
                                             fontFamily="JetBrains Mono"
@@ -315,7 +315,7 @@ export function MerkleTreeMixer() {
                                     y={target.y - NODE_SIZE / 2}
                                     width={NODE_SIZE}
                                     height={NODE_SIZE}
-                                    fill="rgba(0,239,139,0.4)"
+                                    fill="rgba(0,255,65,0.4)"
                                     filter="url(#treeGlow)"
                                     initial={{
                                         opacity: 0,
@@ -352,13 +352,13 @@ export function MerkleTreeMixer() {
                                         y1={root.y}
                                         x2={root.x + 80}
                                         y2={root.y}
-                                        stroke="#00EF8B"
+                                        stroke="#00FF41"
                                         strokeWidth="1"
                                     />
                                     <text
                                         x={root.x + 90}
                                         y={root.y - 6}
-                                        fill="#00EF8B"
+                                        fill="#00FF41"
                                         fontSize="9"
                                         fontFamily="JetBrains Mono"
                                     >

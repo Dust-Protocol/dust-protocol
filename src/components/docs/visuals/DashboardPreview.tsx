@@ -36,7 +36,7 @@ export function DashboardBalanceSnippet() {
       <Card>
         <div className="flex justify-between items-center mb-2.5">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B] shadow-[0_0_4px_#00EF8B]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41] shadow-[0_0_4px_#00FF41]" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">BALANCE_OVERVIEW</span>
           </div>
         </div>
@@ -70,25 +70,25 @@ export function DashboardBalanceSnippet() {
 export function DashboardPoolSnippet() {
   return (
     <SnippetWrapper>
-      <Card className="border-[rgba(0,239,139,0.12)] bg-[rgba(0,239,139,0.02)]">
+      <Card className="border-[rgba(0,255,65,0.12)] bg-[rgba(0,255,65,0.02)]">
         <div className="flex justify-between items-center mb-2.5">
           <div className="flex items-center gap-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" className="w-3.5 h-3.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" className="w-3.5 h-3.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">PRIVACY_POOL_V2</span>
-            <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,239,139,0.15)] text-[9px] text-[#00EF8B] font-mono font-bold">V2</span>
+            <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,255,65,0.15)] text-[9px] text-[#00FF41] font-mono font-bold">V2</span>
           </div>
         </div>
 
         <div className="flex items-baseline gap-3 mb-3">
           <span className="text-xl font-bold text-white font-mono tracking-tight">10.0000 ETH</span>
-          <span className="text-[10px] text-[#00EF8B] font-mono">4 notes</span>
+          <span className="text-[10px] text-[#00FF41] font-mono">4 notes</span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
           {["DEPOSIT", "WITHDRAW", "TRANSFER"].map((label) => (
             <div
               key={label}
-              className="py-1.5 rounded-sm border border-[rgba(0,239,139,0.2)] text-center text-[10px] font-bold text-[#00EF8B] font-mono"
+              className="py-1.5 rounded-sm border border-[rgba(0,255,65,0.2)] text-center text-[10px] font-bold text-[#00FF41] font-mono"
             >
               [ {label} ]
             </div>
@@ -122,7 +122,7 @@ export function DashboardActivitySnippet() {
               key={f}
               className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wide border ${
                 i === 0
-                  ? "bg-[rgba(0,239,139,0.1)] border-[rgba(0,239,139,0.2)] text-[#00EF8B]"
+                  ? "bg-[rgba(0,255,65,0.1)] border-[rgba(0,255,65,0.2)] text-[#00FF41]"
                   : "bg-transparent border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)]"
               }`}
             >
@@ -140,7 +140,7 @@ export function DashboardActivitySnippet() {
               <div className="flex items-center gap-2.5">
                 <div className={`p-1 rounded-full ${
                   item.type === "deposit"
-                    ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B]"
+                    ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41]"
                     : item.type === "withdraw"
                     ? "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.6)]"
                     : "bg-[rgba(100,160,255,0.1)] text-[rgba(100,160,255,0.8)]"
@@ -179,7 +179,7 @@ export function DashboardLinkSnippet() {
         </div>
         <div className="flex justify-between items-end">
           <div>
-            <h3 className="text-lg font-bold text-[#00EF8B] font-mono mb-0.5">alice.dust</h3>
+            <h3 className="text-lg font-bold text-[#00FF41] font-mono mb-0.5">alice.dust</h3>
             <span className="text-[10px] text-[rgba(255,255,255,0.4)] font-mono">/pay/alice</span>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm border border-[rgba(255,255,255,0.1)]">

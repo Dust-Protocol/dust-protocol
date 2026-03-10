@@ -51,7 +51,7 @@ export default function TransfersPage() {
           <thead>
             <tr className="border-b border-[rgba(255,255,255,0.08)]">
               <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.45)] py-2 pr-4" />
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#00EF8B] py-2 pr-4">
+              <th className="text-left text-[10px] uppercase tracking-wider text-[#00FF41] py-2 pr-4">
                 Transfer
               </th>
               <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.45)] py-2">
@@ -77,7 +77,7 @@ export default function TransfersPage() {
             </tr>
             <tr>
               <td className="py-2.5 pr-4 text-[rgba(255,255,255,0.45)]">Privacy</td>
-              <td className="py-2.5 pr-4 text-[#00EF8B]">Maximum &mdash; never leaves privacy set</td>
+              <td className="py-2.5 pr-4 text-[#00FF41]">Maximum &mdash; never leaves privacy set</td>
               <td className="py-2.5">Reduced &mdash; funds exit to public address</td>
             </tr>
           </tbody>

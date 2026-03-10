@@ -57,7 +57,7 @@ export function KeyManagement() {
                 animate={{
                     borderColor: [
                         'rgba(255,255,255,0.08)',
-                        'rgba(0,239,139,0.3)',
+                        'rgba(0,255,65,0.3)',
                         'rgba(255,255,255,0.08)',
                     ],
                 }}
@@ -86,7 +86,7 @@ export function KeyManagement() {
                 <span className="text-[9px] text-dust-muted uppercase tracking-wider">Two keys are derived</span>
             </div>
             <div className="grid grid-cols-2 gap-4">
-                <div className="border border-dust-green/40 bg-[rgba(0,239,139,0.03)] p-4 flex flex-col items-center text-center">
+                <div className="border border-dust-green/40 bg-[rgba(0,255,65,0.03)] p-4 flex flex-col items-center text-center">
                     <Lock className="w-5 h-5 text-dust-green mb-2" />
                     <div className="text-[12px] font-bold text-white">Spend Key</div>
                     <div className="text-[9px] text-dust-green mt-1">Controls funds</div>

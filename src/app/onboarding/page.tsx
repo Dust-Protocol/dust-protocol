@@ -61,10 +61,10 @@ export default function OnboardingPage() {
         <header className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(6,8,15,0.2)] backdrop-blur-md relative z-[100] px-6 py-4">
           <div className="flex items-center justify-between max-w-[1200px] mx-auto">
             <div className="flex items-center gap-3">
-              <DustLogo size={26} color="#00EF8B" />
+              <DustLogo size={26} color="#00FF41" />
               <div className="flex items-baseline gap-1.5">
                 <span className="text-base font-bold tracking-widest text-white font-mono">DUST</span>
-                <span className="text-[10px] font-mono tracking-[0.25em] text-[rgba(0,239,139,0.35)] uppercase">PROTOCOL</span>
+                <span className="text-[10px] font-mono tracking-[0.25em] text-[rgba(0,255,65,0.35)] uppercase">PROTOCOL</span>
               </div>
             </div>
             <ConnectButton />

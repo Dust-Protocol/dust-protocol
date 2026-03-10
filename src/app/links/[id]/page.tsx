@@ -61,7 +61,7 @@ export default function LinkDetailPage({ params }: { params: { id: string } }) {
 
   const dustName = `${link.slug}.${username}.dust`;
   const payPath = `/pay/${username}/${link.slug}`;
-  const accentColor = link.emojiBg || "#00EF8B";
+  const accentColor = link.emojiBg || "#00FF41";
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(dustName);

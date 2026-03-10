@@ -17,9 +17,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={loading || disabled}
         className={[
-          "py-2 px-4 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)]",
-          "hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B]",
-          "text-sm font-bold text-[#00EF8B] font-mono transition-all",
+          "py-2 px-4 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)]",
+          "hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41]",
+          "text-sm font-bold text-[#00FF41] font-mono transition-all",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           className ?? "",
         ].join(" ")}

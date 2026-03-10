@@ -74,10 +74,10 @@ export function PinGate({ onUnlocked }: PinGateProps) {
 
           {/* Icon + Title */}
           <div className="flex flex-col items-center gap-3 text-center">
-            <div className="w-14 h-14 rounded-full bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.15)] flex items-center justify-center">
-              <ShieldIcon size={28} color="#00EF8B" />
+            <div className="w-14 h-14 rounded-full bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.15)] flex items-center justify-center">
+              <ShieldIcon size={28} color="#00FF41" />
             </div>
-            <p className="text-[11px] font-mono font-bold tracking-[0.25em] text-[#00EF8B] uppercase">
+            <p className="text-[11px] font-mono font-bold tracking-[0.25em] text-[#00FF41] uppercase">
               ENTER_PIN
             </p>
             <p className="text-[13px] font-mono text-white/40">
@@ -101,7 +101,7 @@ export function PinGate({ onUnlocked }: PinGateProps) {
                 onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(i, e)}
                 disabled={isVerifying}
                 style={{ WebkitTextSecurity: "disc" } as React.CSSProperties}
-                className="w-12 h-14 rounded-sm border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] text-center text-xl font-bold font-mono text-white focus:border-[#00EF8B] focus:outline-none focus:bg-[rgba(0,239,139,0.02)] transition-all caret-[#00EF8B] disabled:opacity-40"
+                className="w-12 h-14 rounded-sm border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] text-center text-xl font-bold font-mono text-white focus:border-[#00FF41] focus:outline-none focus:bg-[rgba(0,255,65,0.02)] transition-all caret-[#00FF41] disabled:opacity-40"
               />
             ))}
           </div>
@@ -109,7 +109,7 @@ export function PinGate({ onUnlocked }: PinGateProps) {
           {/* Verifying spinner */}
           {isVerifying && (
             <div className="flex items-center gap-2">
-              <svg className="animate-spin w-4 h-4 text-[#00EF8B]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin w-4 h-4 text-[#00FF41]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>

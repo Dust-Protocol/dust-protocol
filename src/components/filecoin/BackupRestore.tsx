@@ -6,7 +6,7 @@ import { useFilecoinBackup } from '@/hooks/useFilecoinBackup';
 function Spinner() {
   return (
     <svg
-      className="animate-spin h-4 w-4 text-[#00EF8B]"
+      className="animate-spin h-4 w-4 text-[#00FF41]"
       viewBox="0 0 24 24"
       fill="none"
     >
@@ -29,7 +29,7 @@ function Spinner() {
 
 function CheckmarkIcon() {
   return (
-    <svg className="h-4 w-4 text-[#00EF8B]" viewBox="0 0 20 20" fill="currentColor">
+    <svg className="h-4 w-4 text-[#00FF41]" viewBox="0 0 20 20" fill="currentColor">
       <path
         fillRule="evenodd"
         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -91,7 +91,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
         <button
           onClick={startBackup}
           disabled={backup.isLoading}
-          className="w-full h-10 bg-[#00EF8B]/10 border border-[#00EF8B]/30 text-[#00EF8B] font-mono text-sm font-bold tracking-wider uppercase transition-all hover:bg-[#00EF8B]/20 hover:border-[#00EF8B]/50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full h-10 bg-[#00FF41]/10 border border-[#00FF41]/30 text-[#00FF41] font-mono text-sm font-bold tracking-wider uppercase transition-all hover:bg-[#00FF41]/20 hover:border-[#00FF41]/50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {backup.isLoading ? (
             <>
@@ -107,7 +107,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
           <div className="mt-3 space-y-2">
             <div className="flex items-center gap-1.5">
               <CheckmarkIcon />
-              <span className="text-xs font-mono text-[#00EF8B]">Backup complete</span>
+              <span className="text-xs font-mono text-[#00FF41]">Backup complete</span>
             </div>
             <div className="flex items-center gap-2">
               <code className="flex-1 text-[11px] font-mono text-white/70 bg-black/40 border border-white/10 px-2.5 py-1.5 truncate">
@@ -115,7 +115,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
               </code>
               <button
                 onClick={handleCopyCid}
-                className="shrink-0 h-8 w-8 flex items-center justify-center border border-white/10 text-white/50 hover:text-[#00EF8B] hover:border-[#00EF8B]/30 transition-all"
+                className="shrink-0 h-8 w-8 flex items-center justify-center border border-white/10 text-white/50 hover:text-[#00FF41] hover:border-[#00FF41]/30 transition-all"
                 title="Copy CID"
               >
                 {copied ? (
@@ -155,7 +155,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
             }}
             placeholder="Paste CID here"
             disabled={restore.isLoading}
-            className="flex-1 h-10 bg-black/40 border border-white/10 text-white text-sm font-mono px-3 placeholder:text-white/25 focus:border-[#00EF8B]/50 focus:outline-none disabled:opacity-40 transition-all"
+            className="flex-1 h-10 bg-black/40 border border-white/10 text-white text-sm font-mono px-3 placeholder:text-white/25 focus:border-[#00FF41]/50 focus:outline-none disabled:opacity-40 transition-all"
           />
           <button
             onClick={handleRestore}
@@ -176,7 +176,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
         {restore.success && restore.restoredCount !== null && (
           <div className="mt-3 flex items-center gap-1.5">
             <CheckmarkIcon />
-            <span className="text-xs font-mono text-[#00EF8B]">
+            <span className="text-xs font-mono text-[#00FF41]">
               Restored {restore.restoredCount} note{restore.restoredCount !== 1 ? 's' : ''}
             </span>
           </div>

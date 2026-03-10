@@ -58,7 +58,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isHydrated || !isConnected || !address) {
     return (
       <div className="min-h-screen bg-[#06080F] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -76,7 +76,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         {isAutoRestoring ? (
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="flex flex-col items-center gap-3">
-              <div className="w-6 h-6 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
               <span className="text-[13px] font-mono text-white/40">Restoring keys...</span>
             </div>
           </div>

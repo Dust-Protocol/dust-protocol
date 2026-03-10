@@ -24,9 +24,9 @@ const VARIANT_STYLES: Record<ToastVariant, { bg: string; border: string; text: s
     text: "text-[#ef4444]",
   },
   info: {
-    bg: "bg-[rgba(0,239,139,0.06)]",
-    border: "border-[rgba(0,239,139,0.2)]",
-    text: "text-[#00EF8B]",
+    bg: "bg-[rgba(0,255,65,0.06)]",
+    border: "border-[rgba(0,255,65,0.2)]",
+    text: "text-[#00FF41]",
   },
 };
 

@@ -447,14 +447,14 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowDepositModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(0,239,139,0.06)] hover:border-[rgba(0,239,139,0.25)] transition-all text-[11px] font-mono text-[rgba(255,255,255,0.6)] hover:text-[#00EF8B]"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(0,255,65,0.06)] hover:border-[rgba(0,255,65,0.25)] transition-all text-[11px] font-mono text-[rgba(255,255,255,0.6)] hover:text-[#00FF41]"
               >
                 <span className="text-[13px] leading-none">+</span>
                 <span className="tracking-wider">Deposit</span>
               </button>
             <button
               onClick={() => setShowSlippageSettings(!showSlippageSettings)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(0,239,139,0.06)] hover:border-[rgba(0,239,139,0.25)] transition-all text-[10px] font-mono text-[rgba(255,255,255,0.5)] hover:text-[#00EF8B]"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(0,255,65,0.06)] hover:border-[rgba(0,255,65,0.25)] transition-all text-[10px] font-mono text-[rgba(255,255,255,0.5)] hover:text-[#00FF41]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3" /><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
@@ -477,7 +477,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                     onClick={() => handleSlippageChange(opt.bps)}
                     className={`flex-1 py-1.5 rounded-sm text-[11px] font-bold font-mono transition-all ${
                       slippageBps === opt.bps && !customSlippage
-                        ? "bg-[rgba(0,239,139,0.12)] border border-[rgba(0,239,139,0.3)] text-[#00EF8B]"
+                        ? "bg-[rgba(0,255,65,0.12)] border border-[rgba(0,255,65,0.3)] text-[#00FF41]"
                         : "bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(255,255,255,0.15)]"
                     }`}
                   >
@@ -493,9 +493,9 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                     placeholder="Custom"
                     className={`w-full py-1.5 px-2 rounded-sm text-[11px] font-bold font-mono text-center bg-[rgba(255,255,255,0.03)] border outline-none transition-all ${
                       customSlippage
-                        ? "border-[rgba(0,239,139,0.3)] text-[#00EF8B]"
+                        ? "border-[rgba(0,255,65,0.3)] text-[#00FF41]"
                         : "border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.5)]"
-                    } placeholder-[rgba(255,255,255,0.2)] focus:border-[rgba(0,239,139,0.4)]`}
+                    } placeholder-[rgba(255,255,255,0.2)] focus:border-[rgba(0,255,65,0.4)]`}
                   />
                   {customSlippage && (
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">%</span>
@@ -551,8 +551,8 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
           )}
           {isConnected && swapSupported && hasKeys && (
             <div className="mb-4 flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
-              <span className="text-[10px] font-mono text-[#00EF8B]">V2 keys active</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
+              <span className="text-[10px] font-mono text-[#00FF41]">V2 keys active</span>
             </div>
           )}
 
@@ -586,7 +586,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
               </span>
             </div>
 
-            <div className="rounded-sm p-3.5 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] focus-within:border-[rgba(0,239,139,0.3)] transition-all">
+            <div className="rounded-sm p-3.5 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] focus-within:border-[rgba(0,255,65,0.3)] transition-all">
               <div className="flex items-center gap-3">
                 {/* Token selector */}
                 <div className="relative shrink-0">
@@ -596,13 +596,13 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                     disabled={isProcessing}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-sm border transition-all ${
                       showFromTokenDropdown
-                        ? "bg-[rgba(0,239,139,0.08)] border-[rgba(0,239,139,0.3)]"
-                        : "bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,239,139,0.25)] hover:bg-[rgba(0,239,139,0.05)]"
+                        ? "bg-[rgba(0,255,65,0.08)] border-[rgba(0,255,65,0.3)]"
+                        : "bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,65,0.25)] hover:bg-[rgba(0,255,65,0.05)]"
                     } ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <TokenIcon symbol={fromToken.symbol} size={24} />
                     <span className="text-[13px] font-bold font-mono text-white">{fromToken.symbol}</span>
-                    <ChevronDownIcon className={`w-3 h-3 text-[rgba(255,255,255,0.35)] transition-transform duration-150 ${showFromTokenDropdown ? "rotate-180 !text-[#00EF8B]" : ""}`} />
+                    <ChevronDownIcon className={`w-3 h-3 text-[rgba(255,255,255,0.35)] transition-transform duration-150 ${showFromTokenDropdown ? "rotate-180 !text-[#00FF41]" : ""}`} />
                   </button>
 
                   {showFromTokenDropdown && (
@@ -618,14 +618,14 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                               setAmountStr("");
                               setShowFromTokenDropdown(false);
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-[rgba(0,239,139,0.05)] border-b border-[rgba(255,255,255,0.04)] last:border-0 ${
-                              fromToken.symbol === t.symbol ? "bg-[rgba(0,239,139,0.04)]" : ""
+                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-[rgba(0,255,65,0.05)] border-b border-[rgba(255,255,255,0.04)] last:border-0 ${
+                              fromToken.symbol === t.symbol ? "bg-[rgba(0,255,65,0.04)]" : ""
                             }`}
                           >
                             <TokenIcon symbol={t.symbol} size={24} />
                             <span className="text-[12px] font-bold font-mono text-white">{t.symbol}</span>
                             {fromToken.symbol === t.symbol && (
-                              <span className="ml-auto text-[#00EF8B] text-xs">&#10003;</span>
+                              <span className="ml-auto text-[#00FF41] text-xs">&#10003;</span>
                             )}
                           </button>
                         ))}
@@ -659,7 +659,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                         const trimmed = parseFloat(formatted).toFixed(maxDecimals).replace(/\.?0+$/, '');
                         setAmountStr(trimmed || '0');
                       }}
-                      className="flex-1 px-2 py-[5px] rounded-sm text-[10px] font-bold font-mono bg-[rgba(0,239,139,0.06)] text-[#00EF8B] border border-[rgba(0,239,139,0.12)] cursor-pointer transition-all text-center hover:bg-[rgba(0,239,139,0.12)] hover:border-[rgba(0,239,139,0.25)]"
+                      className="flex-1 px-2 py-[5px] rounded-sm text-[10px] font-bold font-mono bg-[rgba(0,255,65,0.06)] text-[#00FF41] border border-[rgba(0,255,65,0.12)] cursor-pointer transition-all text-center hover:bg-[rgba(0,255,65,0.12)] hover:border-[rgba(0,255,65,0.25)]"
                     >
                       {pct}%
                     </button>
@@ -667,7 +667,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                   <button
                     type="button"
                     onClick={handleMaxClick}
-                    className="flex-1 px-2 py-[5px] rounded-sm text-[10px] font-bold font-mono bg-[rgba(0,239,139,0.06)] text-[#00EF8B] border border-[rgba(0,239,139,0.12)] cursor-pointer transition-all text-center hover:bg-[rgba(0,239,139,0.12)] hover:border-[rgba(0,239,139,0.25)]"
+                    className="flex-1 px-2 py-[5px] rounded-sm text-[10px] font-bold font-mono bg-[rgba(0,255,65,0.06)] text-[#00FF41] border border-[rgba(0,255,65,0.12)] cursor-pointer transition-all text-center hover:bg-[rgba(0,255,65,0.12)] hover:border-[rgba(0,255,65,0.25)]"
                   >
                     MAX
                   </button>
@@ -682,9 +682,9 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
               type="button"
               onClick={handleFlipTokens}
               disabled={isProcessing}
-              className="p-2 rounded-sm bg-[#06080F] border border-[rgba(0,239,139,0.2)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.06)] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-2 rounded-sm bg-[#06080F] border border-[rgba(0,255,65,0.2)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.06)] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <polyline points="19 12 12 19 5 12" />
               </svg>
@@ -702,12 +702,12 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
               <div className="flex flex-col items-end">
                 {isQuoteLoading && amountValid ? (
-                  <div className="w-4 h-4 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
                     <span className={`text-2xl font-bold font-mono leading-none ${
                       toAmountFormatted
-                        ? "text-[#00EF8B]"
+                        ? "text-[#00FF41]"
                         : amountValid && quoteError
                         ? "text-[rgba(239,68,68,0.5)]"
                         : "text-[rgba(255,255,255,0.12)]"
@@ -736,7 +736,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
             <div className="mt-4 p-3 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)]">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <ShieldIcon size={12} color={useDenomSwap ? "#00EF8B" : "rgba(255,255,255,0.35)"} />
+                  <ShieldIcon size={12} color={useDenomSwap ? "#00FF41" : "rgba(255,255,255,0.35)"} />
                   <span className="text-[10px] text-[rgba(255,255,255,0.5)] uppercase tracking-widest font-mono">
                     DENOM_PRIVACY
                   </span>
@@ -745,13 +745,13 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                   onClick={() => setUseDenomSwap(!useDenomSwap)}
                   className={`relative w-8 h-4 rounded-full transition-all ${
                     useDenomSwap
-                      ? "bg-[rgba(0,239,139,0.25)] border border-[rgba(0,239,139,0.4)]"
+                      ? "bg-[rgba(0,255,65,0.25)] border border-[rgba(0,255,65,0.4)]"
                       : "bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)]"
                   }`}
                 >
                   <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${
                     useDenomSwap
-                      ? "left-[calc(100%-14px)] bg-[#00EF8B]"
+                      ? "left-[calc(100%-14px)] bg-[#00FF41]"
                       : "left-0.5 bg-[rgba(255,255,255,0.4)]"
                   }`} />
                 </button>
@@ -763,7 +763,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                     {denomChunksFormatted.map((chunk, i) => (
                       <span
                         key={i}
-                        className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.12)] text-[10px] font-mono text-[#00EF8B]"
+                        className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.12)] text-[10px] font-mono text-[#00FF41]"
                       >
                         {chunk} {fromToken.symbol}
                       </span>
@@ -783,7 +783,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                           <button
                             key={i}
                             onClick={() => setAmountStr(s.formatted)}
-                            className="px-2 py-0.5 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,239,139,0.25)] hover:bg-[rgba(0,239,139,0.04)] text-[10px] font-mono text-[rgba(255,255,255,0.5)] hover:text-[#00EF8B] transition-all"
+                            className="px-2 py-0.5 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,65,0.25)] hover:bg-[rgba(0,255,65,0.04)] text-[10px] font-mono text-[rgba(255,255,255,0.5)] hover:text-[#00FF41] transition-all"
                           >
                             {s.formatted} {fromToken.symbol} ({s.chunks} chunk{s.chunks > 1 ? "s" : ""})
                           </button>
@@ -856,20 +856,20 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
           {/* ── Processing Steps ──────────────────────────────── */}
           {isProcessing && (
-            <div className="mt-4 p-3 rounded-sm bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.1)]">
+            <div className="mt-4 p-3 rounded-sm bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)]">
               {shouldUseDenomSwap && denomProgress.total > 0 && (
                 <div className="mb-2.5">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[9px] text-[rgba(255,255,255,0.4)] uppercase tracking-widest font-mono">
                       PROGRESS
                     </span>
-                    <span className="text-[10px] text-[#00EF8B] font-mono font-bold">
+                    <span className="text-[10px] text-[#00FF41] font-mono font-bold">
                       {denomProgress.current}/{denomProgress.total}
                     </span>
                   </div>
                   <div className="h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#00EF8B] rounded-full transition-all duration-300"
+                      className="h-full bg-[#00FF41] rounded-full transition-all duration-300"
                       style={{ width: `${(denomProgress.current / denomProgress.total) * 100}%` }}
                     />
                   </div>
@@ -886,7 +886,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                         isComplete
                           ? "bg-[rgba(34,197,94,0.15)] border-[rgba(34,197,94,0.3)]"
                           : isActive
-                          ? "bg-[rgba(0,239,139,0.15)] border-[rgba(0,239,139,0.3)]"
+                          ? "bg-[rgba(0,255,65,0.15)] border-[rgba(0,255,65,0.3)]"
                           : "bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.06)]"
                       }`}>
                         {isComplete ? (
@@ -894,7 +894,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                         ) : isActive ? (
-                          <div className="w-2.5 h-2.5 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                          <div className="w-2.5 h-2.5 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <div className="w-1.5 h-1.5 rounded-full bg-[rgba(255,255,255,0.2)]" />
                         )}
@@ -955,7 +955,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                   href={`${explorerBase}/tx/${activeTxHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-[11px] font-mono text-[#00EF8B] hover:underline"
+                  className="flex items-center gap-1 text-[11px] font-mono text-[#00FF41] hover:underline"
                 >
                   View transaction: {activeTxHash.slice(0, 10)}...{activeTxHash.slice(-8)}
                   {denomTxHashes.length > 1 && ` (+${denomTxHashes.length - 1} more)`}
@@ -997,7 +997,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                   <span className="text-[9px] text-[rgba(239,68,68,0.8)] font-mono">
                     Insufficient {fromToken.symbol}.{" "}
                     <button
-                      className="text-[#00EF8B] underline font-bold hover:opacity-80 transition-opacity"
+                      className="text-[#00FF41] underline font-bold hover:opacity-80 transition-opacity"
                       onClick={() => setShowDepositModal(true)}
                     >
                       Deposit
@@ -1037,12 +1037,12 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
                 ? "bg-[rgba(34,197,94,0.1)] border border-[rgba(34,197,94,0.2)] text-[#22C55E] hover:bg-[rgba(34,197,94,0.15)] cursor-pointer"
                 : activeStatus !== "error" && buttonDisabled
                 ? "bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.25)] cursor-not-allowed opacity-50"
-                : "bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] text-[#00EF8B] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] cursor-pointer"
+                : "bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] text-[#00FF41] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] cursor-pointer"
             }`}
           >
             <div className="flex items-center justify-center gap-2">
               {isProcessing && (
-                <div className="w-4 h-4 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
               )}
               <span>{getButtonContent()}</span>
             </div>

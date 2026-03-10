@@ -19,7 +19,7 @@ export function LinksCreateSnippet() {
             <span className="text-xs text-[rgba(255,255,255,0.5)]">Coffee payment</span>
           </div>
         </div>
-        <button className="shrink-0 self-end px-4 py-1.5 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] text-[11px] font-bold text-[#00EF8B] tracking-wider cursor-default">
+        <button className="shrink-0 self-end px-4 py-1.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] text-[11px] font-bold text-[#00FF41] tracking-wider cursor-default">
           Create Link
         </button>
       </div>
@@ -36,7 +36,7 @@ export function LinksGeneratedSnippet() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.4)] mb-1">Generated Link</div>
-          <span className="text-[11px] text-[#00EF8B] truncate block">dust.app/pay/alice/abc123</span>
+          <span className="text-[11px] text-[#00FF41] truncate block">dust.app/pay/alice/abc123</span>
         </div>
         <button className="shrink-0 p-1.5 rounded-sm border border-[rgba(255,255,255,0.1)]">
           <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" className="w-3.5 h-3.5">
@@ -55,7 +55,7 @@ export function LinksClaimSnippet() {
       <div className="bg-[#06080F] px-4 py-3 font-mono">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
             <span className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.45)]">PAY dust.alice</span>
@@ -64,7 +64,7 @@ export function LinksClaimSnippet() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold text-white">0.1 ETH</span>
-          <button className="ml-auto px-4 py-1.5 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] text-[11px] font-bold text-[#00EF8B] tracking-wider cursor-default">
+          <button className="ml-auto px-4 py-1.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] text-[11px] font-bold text-[#00FF41] tracking-wider cursor-default">
             Pay 0.1 ETH
           </button>
         </div>
@@ -74,7 +74,7 @@ export function LinksClaimSnippet() {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  paid: "text-[#00EF8B] border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.06)]",
+  paid: "text-[#00FF41] border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.06)]",
   pending: "text-[rgba(255,255,255,0.5)] border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)]",
 };
 

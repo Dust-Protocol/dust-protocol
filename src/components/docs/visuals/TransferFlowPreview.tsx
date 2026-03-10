@@ -17,7 +17,7 @@ export function TransferRecipientSnippet() {
           Recipient
         </div>
         <div className="flex items-center gap-2 p-2.5 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)]">
-          <span className="text-xs text-[#00EF8B]">@</span>
+          <span className="text-xs text-[#00FF41]">@</span>
           <span className="text-xs text-white">{MOCK.recipient}</span>
           <span className="ml-auto text-[10px] text-[rgba(255,255,255,0.3)]">{MOCK.recipientKey}</span>
         </div>
@@ -43,9 +43,9 @@ export function TransferNoteSnippet() {
           </div>
           <Arrow />
           <div className="flex-1 flex flex-col gap-1.5">
-            <div className="p-2 rounded-sm border border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.04)] text-center">
-              <div className="text-[9px] text-[rgba(0,239,139,0.6)] mb-0.5">TO RECIPIENT</div>
-              <div className="text-[#00EF8B]">{MOCK.outputNote}</div>
+            <div className="p-2 rounded-sm border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.04)] text-center">
+              <div className="text-[9px] text-[rgba(0,255,65,0.6)] mb-0.5">TO RECIPIENT</div>
+              <div className="text-[#00FF41]">{MOCK.outputNote}</div>
             </div>
             <div className="p-2 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] text-center">
               <div className="text-[9px] text-[rgba(255,255,255,0.35)] mb-0.5">CHANGE</div>
@@ -80,16 +80,16 @@ export function TransferComparisonSnippet() {
       <div className={snippetInner}>
         <div className="flex items-center gap-4">
           {/* Transfer */}
-          <div className="flex-1 p-2.5 rounded-sm border border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.04)] text-center">
-            <div className="text-[9px] uppercase tracking-wider text-[rgba(0,239,139,0.6)] mb-1">Transfer</div>
+          <div className="flex-1 p-2.5 rounded-sm border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.04)] text-center">
+            <div className="text-[9px] uppercase tracking-wider text-[rgba(0,255,65,0.6)] mb-1">Transfer</div>
             <div className="flex items-center justify-center gap-1.5 text-[11px]">
-              <span className="text-[#00EF8B]">Pool</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <span className="text-[#00FF41]">Pool</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span className="text-[#00EF8B]">Pool</span>
+              <span className="text-[#00FF41]">Pool</span>
             </div>
-            <div className="text-[9px] text-[rgba(0,239,139,0.5)] mt-1">Stays shielded</div>
+            <div className="text-[9px] text-[rgba(0,255,65,0.5)] mt-1">Stays shielded</div>
           </div>
           {/* Withdraw */}
           <div className="flex-1 p-2.5 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] text-center">
@@ -113,16 +113,16 @@ function Step({ label, done, active }: { label: string; done?: boolean; active?:
   return (
     <div className="flex items-center gap-1.5">
       {done && (
-        <div className="w-3.5 h-3.5 rounded-full border border-[#00EF8B] flex items-center justify-center">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <div className="w-3.5 h-3.5 rounded-full border border-[#00FF41] flex items-center justify-center">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
       )}
       {active && (
-        <div className="w-3.5 h-3.5 rounded-full border border-[#00EF8B] bg-[rgba(0,239,139,0.15)]" />
+        <div className="w-3.5 h-3.5 rounded-full border border-[#00FF41] bg-[rgba(0,255,65,0.15)]" />
       )}
-      <span className={`text-[11px] ${done ? "text-[#00EF8B]" : active ? "text-white" : "text-[rgba(255,255,255,0.3)]"}`}>
+      <span className={`text-[11px] ${done ? "text-[#00FF41]" : active ? "text-white" : "text-[rgba(255,255,255,0.3)]"}`}>
         {label}
       </span>
     </div>

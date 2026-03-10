@@ -27,7 +27,7 @@ export default async function Image() {
                 width: "48px",
                 height: "48px",
                 borderRadius: "8px",
-                backgroundColor: "#00EF8B",
+                backgroundColor: "#00FF41",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -71,7 +71,7 @@ export default async function Image() {
               style={{
                 fontSize: "52px",
                 fontWeight: 700,
-                color: "#00EF8B",
+                color: "#00FF41",
                 lineHeight: 1.15,
               }}
             >
@@ -102,10 +102,10 @@ export default async function Image() {
                 key={tag}
                 style={{
                   padding: "6px 14px",
-                  border: "1px solid rgba(0,239,139,0.25)",
+                  border: "1px solid rgba(0,255,65,0.25)",
                   borderRadius: "4px",
                   fontSize: "13px",
-                  color: "#00EF8B",
+                  color: "#00FF41",
                 }}
               >
                 {tag}

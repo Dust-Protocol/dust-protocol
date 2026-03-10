@@ -12,7 +12,7 @@ export function DepositAmountSnippet() {
           <span className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.45)]">
             Amount (ETH)
           </span>
-          <span className="text-[10px] text-[#00EF8B]">
+          <span className="text-[10px] text-[#00FF41]">
             BAL: 4.2500 ETH
           </span>
         </div>
@@ -20,7 +20,7 @@ export function DepositAmountSnippet() {
           <div className="flex-1 p-2.5 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] text-white text-sm">
             1.5
           </div>
-          <button className="px-3 py-2.5 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] text-xs font-bold text-[#00EF8B] tracking-wider cursor-default">
+          <button className="px-3 py-2.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] text-xs font-bold text-[#00FF41] tracking-wider cursor-default">
             MAX
           </button>
         </div>
@@ -36,7 +36,7 @@ export function DepositCommitmentSnippet() {
         <div className="text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.45)] mb-1.5">
           Poseidon Commitment
         </div>
-        <p className="text-[11px] text-[#00EF8B] break-all leading-relaxed">
+        <p className="text-[11px] text-[#00FF41] break-all leading-relaxed">
           {MOCK_COMMITMENT.slice(0, 22)}...{MOCK_COMMITMENT.slice(-8)}
         </p>
         <p className="text-[10px] text-[rgba(255,255,255,0.3)] mt-1">
@@ -66,13 +66,13 @@ export function DepositSuccessSnippet() {
     <div className={snippetWrap}>
       <div className={`${snippetInner} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
           <span className="text-xs text-white font-semibold">Deposit Successful</span>
           <span className="text-[10px] text-[rgba(255,255,255,0.4)]">1.5 ETH</span>
         </div>
-        <span className="text-[11px] text-[#00EF8B]">{MOCK_TX}</span>
+        <span className="text-[11px] text-[#00FF41]">{MOCK_TX}</span>
       </div>
     </div>
   );
@@ -82,16 +82,16 @@ function Step({ label, done, active }: { label: string; done?: boolean; active?:
   return (
     <div className="flex items-center gap-1.5">
       {done && (
-        <div className="w-3.5 h-3.5 rounded-full border border-[#00EF8B] flex items-center justify-center">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <div className="w-3.5 h-3.5 rounded-full border border-[#00FF41] flex items-center justify-center">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
       )}
       {active && (
-        <div className="w-3.5 h-3.5 rounded-full border border-[#00EF8B] bg-[rgba(0,239,139,0.15)]" />
+        <div className="w-3.5 h-3.5 rounded-full border border-[#00FF41] bg-[rgba(0,255,65,0.15)]" />
       )}
-      <span className={`text-[11px] ${done ? "text-[#00EF8B]" : active ? "text-white" : "text-[rgba(255,255,255,0.3)]"}`}>
+      <span className={`text-[11px] ${done ? "text-[#00FF41]" : active ? "text-white" : "text-[rgba(255,255,255,0.3)]"}`}>
         {label}
       </span>
     </div>

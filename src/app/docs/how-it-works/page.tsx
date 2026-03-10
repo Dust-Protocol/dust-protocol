@@ -237,7 +237,7 @@ export default function HowItWorksPage() {
                 ["View Keys", "Selective disclosure for compliance and auditing"],
               ].map(([std, role]) => (
                 <tr key={std} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-                  <td className="py-2.5 pr-6 text-[#00EF8B]">{std}</td>
+                  <td className="py-2.5 pr-6 text-[#00FF41]">{std}</td>
                   <td className="py-2.5 text-[rgba(255,255,255,0.55)]">{role}</td>
                 </tr>
               ))}

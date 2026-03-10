@@ -10,23 +10,23 @@ const config: Config = {
     extend: {
       colors: {
         'bg-page': '#06080F',
-        'green-neon': '#00EF8B',
+        'green-neon': '#00FF41',
         'amber-neon': '#FFB000',
         dust: {
           bg: '#06080F',
-          green: '#00EF8B',
+          green: '#00FF41',
           amber: '#FFB000',
           text: 'rgba(255,255,255,0.9)',
           muted: 'rgba(255,255,255,0.4)',
           border: 'rgba(255,255,255,0.06)',
-          'border-active': 'rgba(0,239,139,0.15)',
+          'border-active': 'rgba(0,255,65,0.15)',
         },
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'glow-green': '0 0 12px rgba(0,239,139,0.2)',
+        'glow-green': '0 0 12px rgba(0,255,65,0.2)',
       },
       backgroundImage: {
         'grid-pattern':

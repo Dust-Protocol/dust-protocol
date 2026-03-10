@@ -76,7 +76,7 @@ export default function WalletPage() {
         <div className="p-4 rounded-sm border border-[rgba(129,140,248,0.3)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="opacity-70 text-[#00EF8B]">
+              <div className="opacity-70 text-[#00FF41]">
                 <ShieldIcon size={18} />
               </div>
               <div>
@@ -91,7 +91,7 @@ export default function WalletPage() {
                 {parseFloat(dustPool.poolBalance).toFixed(4)} {nativeSymbol}
               </p>
               <button
-                className="px-3 py-1.5 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] transition-all text-xs font-bold text-[#00EF8B] font-mono cursor-pointer"
+                className="px-3 py-1.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] transition-all text-xs font-bold text-[#00FF41] font-mono cursor-pointer"
                 onClick={() => setShowConsolidateModal(true)}
               >
                 Withdraw

@@ -50,7 +50,7 @@ viewKey          =  ikm[32:64] (mod secp256k1 order)`}
       <section className="mb-10">
         <h2 className="text-sm font-mono font-semibold text-white tracking-wider mb-4 uppercase">The Two Keys</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-4 border border-[rgba(0,239,139,0.12)] rounded-sm">
+          <div className="p-4 border border-[rgba(0,255,65,0.12)] rounded-sm">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[12px] font-mono font-semibold text-white">Spend Key</p>
               <DocsBadge variant="green">HIGH SENSITIVITY</DocsBadge>
@@ -100,7 +100,7 @@ ownerPubKey      =  Poseidon(spendingKey)`}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-4 border border-[rgba(0,239,139,0.12)] rounded-sm">
+          <div className="p-4 border border-[rgba(0,255,65,0.12)] rounded-sm">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[12px] font-mono font-semibold text-white">Spending Key</p>
               <DocsBadge variant="green">HIGH SENSITIVITY</DocsBadge>
@@ -253,7 +253,7 @@ Verification:
             "View keys allow selective disclosure. Share them only with trusted parties — they reveal your full transaction graph.",
           ].map((tip, i) => (
             <li key={i} className="flex gap-3 text-sm text-[rgba(255,255,255,0.6)]">
-              <span className="shrink-0 text-[#00EF8B] font-mono text-xs mt-1">→</span>
+              <span className="shrink-0 text-[#00FF41] font-mono text-xs mt-1">→</span>
               {tip}
             </li>
           ))}

@@ -108,12 +108,12 @@ export function AddressBreakdownCard({ claimAddresses, unclaimedPayments }: Addr
                         href={`${explorerBase}/address/${addr.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] font-mono text-[rgba(255,255,255,0.4)] hover:text-[#00EF8B] transition-colors no-underline"
+                        className="text-[10px] font-mono text-[rgba(255,255,255,0.4)] hover:text-[#00FF41] transition-colors no-underline"
                       >
                         {truncateAddress(addr.address)}
                       </a>
                     </div>
-                    <span className="text-xs font-medium text-[#00EF8B] font-mono flex items-center gap-1">
+                    <span className="text-xs font-medium text-[#00FF41] font-mono flex items-center gap-1">
                       {parseFloat(addr.balance || "0").toFixed(4)} <TokenIcon symbol={symbol} size={12} /> {symbol}
                     </span>
                   </div>
@@ -156,7 +156,7 @@ export function AddressBreakdownCard({ claimAddresses, unclaimedPayments }: Addr
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-medium text-[#00EF8B] font-mono flex items-center gap-1">
+                    <span className="text-xs font-medium text-[#00FF41] font-mono flex items-center gap-1">
                       {parseFloat(p.balance || "0").toFixed(4)} <TokenIcon symbol={symbol} size={12} /> {symbol}
                     </span>
                   </div>

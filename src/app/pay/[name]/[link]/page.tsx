@@ -126,7 +126,7 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
               </span>
             </div>
           </Link>
-          <div style={{ padding: "5px 12px", backgroundColor: "rgba(0,239,139,0.12)", border: "1px solid rgba(0,239,139,0.2)", borderRadius: radius.full }}>
+          <div style={{ padding: "5px 12px", backgroundColor: "rgba(0,255,65,0.12)", border: "1px solid rgba(0,255,65,0.2)", borderRadius: radius.full }}>
             <span style={{ fontSize: "11px", color: colors.accent.indigoBright, fontWeight: 600, letterSpacing: "0.02em", fontFamily: typography.fontFamily.heading }}>Payment</span>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
             <div style={{ width: "100%", position: "relative" }}>
               <div style={{
                 position: "absolute", inset: "-2px", borderRadius: "26px",
-                background: "linear-gradient(135deg, #00EF8B, #7C3AED, #00EF8B)",
+                background: "linear-gradient(135deg, #00FF41, #7C3AED, #00FF41)",
                 opacity: isSuccess ? 0.8 : 0.15,
                 transition: "opacity 0.6s ease",
               }} />
@@ -176,7 +176,7 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                         flex: 1, padding: "14px", textAlign: "center", cursor: "pointer",
                         background: "none", border: "none",
                         borderBottomWidth: "2px", borderBottomStyle: "solid",
-                        borderBottomColor: activeTab === "wallet" ? "#00EF8B" : "transparent",
+                        borderBottomColor: activeTab === "wallet" ? "#00FF41" : "transparent",
                         transition: "all 0.2s ease",
                       }}
                       onClick={() => setActiveTab("wallet")}
@@ -191,7 +191,7 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                         flex: 1, padding: "14px", textAlign: "center", cursor: "pointer",
                         background: "none", border: "none",
                         borderBottomWidth: "2px", borderBottomStyle: "solid",
-                        borderBottomColor: activeTab === "qr" ? "#00EF8B" : "transparent",
+                        borderBottomColor: activeTab === "qr" ? "#00FF41" : "transparent",
                         transition: "all 0.2s ease",
                       }}
                       onClick={() => setActiveTab("qr")}
@@ -209,7 +209,7 @@ export default function LinkPayPage({ params }: { params: { name: string; link: 
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", paddingTop: "8px", paddingBottom: "8px" }}>
                       <div style={{ position: "relative", width: "80px", height: "80px" }}>
                         {[
-                          { color: "#00EF8B", x: -20, y: -10, delay: "0s", size: 6 },
+                          { color: "#00FF41", x: -20, y: -10, delay: "0s", size: 6 },
                           { color: "#7C3AED", x: 25, y: -15, delay: "0.1s", size: 5 },
                           { color: "#22C55E", x: -30, y: 5, delay: "0.2s", size: 7 },
                           { color: "#D97706", x: 30, y: 0, delay: "0.15s", size: 4 },

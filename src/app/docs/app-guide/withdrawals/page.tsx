@@ -142,7 +142,7 @@ export default function WithdrawalsPage() {
           {["10", "5", "3", "2", "1", "0.5", "0.3", "0.2", "0.1", "0.05", "0.03", "0.02", "0.01"].map((d) => (
             <span
               key={d}
-              className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.12)] text-[10px] font-mono text-[#00EF8B]"
+              className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.12)] text-[10px] font-mono text-[#00FF41]"
             >
               {d} ETH
             </span>

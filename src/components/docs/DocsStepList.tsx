@@ -19,7 +19,7 @@ export function DocsStepList({ steps }: DocsStepListProps) {
             <div className="absolute left-[19px] top-10 bottom-0 w-px bg-[rgba(255,255,255,0.06)]" />
           )}
           {/* number bubble */}
-          <div className="shrink-0 w-10 h-10 rounded-sm border border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.04)] flex items-center justify-center text-[11px] font-mono text-[#00EF8B] mt-0.5">
+          <div className="shrink-0 w-10 h-10 rounded-sm border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.04)] flex items-center justify-center text-[11px] font-mono text-[#00FF41] mt-0.5">
             {String(i + 1).padStart(2, "0")}
           </div>
           <div className="flex-1 min-w-0 pt-1.5">

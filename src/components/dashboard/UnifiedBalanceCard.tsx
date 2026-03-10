@@ -42,7 +42,7 @@ export function UnifiedBalanceCard({
           <motion.div
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-1.5 h-1.5 rounded-full bg-[#00EF8B] shadow-[0_0_4px_#00EF8B]"
+            className="w-1.5 h-1.5 rounded-full bg-[#00FF41] shadow-[0_0_4px_#00FF41]"
           />
           <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
             BALANCE_OVERVIEW
@@ -50,7 +50,7 @@ export function UnifiedBalanceCard({
         </div>
         <button
           onClick={onRefresh}
-          className="text-[rgba(255,255,255,0.4)] hover:text-[#00EF8B] transition-colors"
+          className="text-[rgba(255,255,255,0.4)] hover:text-[#00FF41] transition-colors"
         >
           <RefreshCwIcon className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
         </button>

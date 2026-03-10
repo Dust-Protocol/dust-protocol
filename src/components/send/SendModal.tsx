@@ -135,7 +135,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
             {sendStep !== "success" && (
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
-                  <SendIcon size={16} color="#00EF8B" />
+                  <SendIcon size={16} color="#00FF41" />
                   <span className="text-sm font-bold text-white font-mono tracking-wider">
                     [ SEND ]
                   </span>
@@ -165,23 +165,23 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                       onChange={(e: ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
                       className={[
                         "w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border text-white font-mono text-sm",
-                        "focus:outline-none focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]",
+                        "focus:outline-none focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]",
                         resolvedAddress
-                          ? "border-[#00EF8B]"
+                          ? "border-[#00FF41]"
                           : resolveError
                           ? "border-red-500"
-                          : "border-[rgba(255,255,255,0.1)] focus:border-[#00EF8B]",
+                          : "border-[rgba(255,255,255,0.1)] focus:border-[#00FF41]",
                       ].join(" ")}
                     />
                     {/* Status indicator inside input */}
                     {!isResolving && resolvedAddress && !recipient.startsWith("st:") && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <CheckCircleIcon size={18} color="#00EF8B" />
+                        <CheckCircleIcon size={18} color="#00FF41" />
                       </span>
                     )}
                     {isResolving && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <span className="inline-block w-4 h-4 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                        <span className="inline-block w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                       </span>
                     )}
                   </div>
@@ -192,7 +192,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                       </p>
                     )}
                     {!isResolving && resolvedAddress && !recipient.startsWith("st:") && (
-                      <p className="text-[11px] text-[#00EF8B] font-mono font-semibold">
+                      <p className="text-[11px] text-[#00FF41] font-mono font-semibold">
                         {recipient.startsWith("0x") ? "Address resolved" : "Name resolved"}
                       </p>
                     )}
@@ -220,7 +220,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                         const v = e.target.value;
                         if (v === "" || /^\d*\.?\d*$/.test(v)) setAmount(v);
                       }}
-                      className="w-full p-3 pr-16 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-2xl font-bold focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 pr-16 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-2xl font-bold focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[rgba(255,255,255,0.5)] font-mono flex items-center gap-1">
                       <ETHIcon size={14} />
@@ -234,7 +234,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                 <button
                   onClick={handlePreview}
                   disabled={(!resolvedAddress && !recipient.startsWith("st:")) || !amount || isLoading || isResolving}
-                  className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   [ PREVIEW_PAYMENT ]
                 </button>
@@ -269,8 +269,8 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-[rgba(255,255,255,0.5)] font-mono">Privacy</span>
                     <div className="flex items-center gap-1">
-                      <LockIcon size={12} color="#00EF8B" />
-                      <span className="text-xs font-semibold text-[#00EF8B] font-mono">Stealth</span>
+                      <LockIcon size={12} color="#00FF41" />
+                      <span className="text-xs font-semibold text-[#00FF41] font-mono">Stealth</span>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
@@ -290,16 +290,16 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                   <button
                     onClick={handleSend}
                     disabled={isLoading}
-                    className="flex-[2] py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-[2] py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-2">
-                        <span className="inline-block w-4 h-4 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
+                        <span className="inline-block w-4 h-4 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                         <span>Sending...</span>
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2">
-                        <SendIcon size={15} color="#00EF8B" />
+                        <SendIcon size={15} color="#00FF41" />
                         [ CONFIRM_SEND ]
                       </span>
                     )}
@@ -321,7 +321,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                         width: `${4 + Math.random() * 6}px`,
                         height: `${4 + Math.random() * 6}px`,
                         borderRadius: i % 3 === 0 ? "1px" : "9999px",
-                        backgroundColor: ["#00EF8B", "#00EF8B", "#7C3AED", "#F59E0B", "#10B981", "#EC4899", "#06B6D4"][i % 7],
+                        backgroundColor: ["#00FF41", "#00FF41", "#7C3AED", "#F59E0B", "#10B981", "#EC4899", "#06B6D4"][i % 7],
                         left: `${5 + (i * 5.2) % 90}%`,
                         top: "-10px",
                         opacity: 0,
@@ -364,9 +364,9 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                     className="flex justify-center pt-4 pb-6"
                     style={{ animation: "successSlideUp 0.5s ease-out 0.25s both" }}
                   >
-                    <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[rgba(0,239,139,0.06)] rounded-full border border-[rgba(0,239,139,0.15)]">
-                      <LockIcon size={12} color="#00EF8B" />
-                      <span className="text-xs font-semibold text-[#00EF8B] font-mono">
+                    <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[rgba(0,255,65,0.06)] rounded-full border border-[rgba(0,255,65,0.15)]">
+                      <LockIcon size={12} color="#00FF41" />
+                      <span className="text-xs font-semibold text-[#00FF41] font-mono">
                         Private · Stealth · Gas Free
                       </span>
                     </div>
@@ -390,7 +390,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                     )}
                     <button
                       onClick={handleClose}
-                      className="w-full py-3.5 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider"
+                      className="w-full py-3.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider"
                     >
                       [ DONE ]
                     </button>
