@@ -22,7 +22,12 @@ import type { V2Keys } from '@/lib/dustpool/v2/types'
 const RECEIPT_TIMEOUT_MS = 30_000
 const MAX_SPLIT_OUTPUTS = 8
 
-export function useV2Split(keysRef: RefObject<V2Keys | null>, chainIdOverride?: number) {
+export function useV2Split(
+  keysRef: RefObject<V2Keys | null>,
+  chainIdOverride?: number,
+  backupNote?: (note: StoredNoteV2) => Promise<void>,
+  backupSpent?: (commitment: string) => Promise<void>,
+) {
   const { address, isConnected } = useAccount()
   const wagmiChainId = useChainId()
   const chainId = chainIdOverride ?? wagmiChainId
@@ -144,7 +149,7 @@ export function useV2Split(keysRef: RefObject<V2Keys | null>, chainIdOverride?: 
         const errMsg = submitErr instanceof Error ? submitErr.message : ''
         const errBody = (submitErr as { body?: string }).body ?? ''
         const combined = `${errMsg} ${errBody}`.toLowerCase()
-        if (combined.includes('unknown merkle root') || combined.includes('unknown root')) {
+        if (combined.includes('unknown merkle root') || combined.includes('unknown root') || combined.includes('invalid or expired merkle root')) {
           splitSubmission = await generateAndSubmitSplit(true)
         } else {
           throw submitErr
@@ -183,6 +188,8 @@ export function useV2Split(keysRef: RefObject<V2Keys | null>, chainIdOverride?: 
         complianceStatus: 'inherited' as const,
       }))
       await markSpentAndSaveMultiple(db, inputStored.id, outputStored, encKey)
+      backupSpent?.(inputStored.id).catch(() => {})
+      for (const out of outputStored) { backupNote?.(out).catch(() => {}) }
 
       // Separate denomination notes (to withdraw) from change note (stays in pool)
       const denomNotes = splitSubmission.splitResult.outputNotes.slice(0, chunks.length)
@@ -266,6 +273,7 @@ export function useV2Split(keysRef: RefObject<V2Keys | null>, chainIdOverride?: 
       for (let i = 0; i < denomNotes.length; i++) {
         if (!failedIndices.has(i)) {
           await markNoteSpent(db, bigintToHex(denomNotes[i].commitment))
+          backupSpent?.(bigintToHex(denomNotes[i].commitment)).catch(() => {})
         }
       }
 

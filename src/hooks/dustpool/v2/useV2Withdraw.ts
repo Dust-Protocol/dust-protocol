@@ -17,7 +17,12 @@ import type { V2Keys } from '@/lib/dustpool/v2/types'
 
 const RECEIPT_TIMEOUT_MS = 30_000
 
-export function useV2Withdraw(keysRef: RefObject<V2Keys | null>, chainIdOverride?: number) {
+export function useV2Withdraw(
+  keysRef: RefObject<V2Keys | null>,
+  chainIdOverride?: number,
+  backupNote?: (note: StoredNoteV2) => Promise<void>,
+  backupSpent?: (commitment: string) => Promise<void>,
+) {
   const { address, isConnected } = useAccount()
   const wagmiChainId = useChainId()
   const chainId = chainIdOverride ?? wagmiChainId
@@ -112,7 +117,7 @@ export function useV2Withdraw(keysRef: RefObject<V2Keys | null>, chainIdOverride
         const errBody = (submitErr as { body?: string }).body ?? ''
         const combined = `${errMsg} ${errBody}`.toLowerCase()
         // Stale root: relayer rejected because tree changed during proof generation
-        if (combined.includes('unknown merkle root') || combined.includes('unknown root')) {
+        if (combined.includes('unknown merkle root') || combined.includes('unknown root') || combined.includes('invalid or expired merkle root')) {
           submission = await generateAndSubmit(true)
         } else {
           throw submitErr
@@ -154,11 +159,14 @@ export function useV2Withdraw(keysRef: RefObject<V2Keys | null>, chainIdOverride
           blinding: bigintToHex(proofInputs.outBlinding[0]),
           leafIndex: -1,
           spent: false,
+          status: 'pending',
           createdAt: Date.now(),
           complianceStatus: 'inherited',
         }
       }
       await markSpentAndSaveChange(db, inputStored.id, changeStored, encKey)
+      backupSpent?.(inputStored.id).catch(() => {})
+      if (changeStored) backupNote?.(changeStored).catch(() => {})
     } catch (e) {
       setError(extractRelayerError(e, 'Withdrawal failed'))
     } finally {

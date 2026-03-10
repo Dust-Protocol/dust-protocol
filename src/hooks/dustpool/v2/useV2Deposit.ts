@@ -15,7 +15,11 @@ import type { StoredNoteV2 } from '@/lib/dustpool/v2/storage'
 const DEPOSIT_POLL_INTERVAL_MS = 3000
 const DEPOSIT_POLL_MAX_ATTEMPTS = 10
 
-export function useV2Deposit(keysRef: RefObject<V2Keys | null>, chainIdOverride?: number) {
+export function useV2Deposit(
+  keysRef: RefObject<V2Keys | null>,
+  chainIdOverride?: number,
+  backupNote?: (note: StoredNoteV2) => Promise<void>,
+) {
   const { address, isConnected } = useAccount()
   const wagmiChainId = useChainId()
   const chainId = chainIdOverride ?? wagmiChainId
@@ -116,6 +120,7 @@ export function useV2Deposit(keysRef: RefObject<V2Keys | null>, chainIdOverride?
         blinding: bigintToHex(note.blinding),
         leafIndex,
         spent: false,
+        status: leafIndex >= 0 ? 'confirmed' : 'pending',
         createdAt: Date.now(),
         complianceStatus: 'unverified',
         blockNumber: Number(receipt.blockNumber),
@@ -124,6 +129,7 @@ export function useV2Deposit(keysRef: RefObject<V2Keys | null>, chainIdOverride?
       const db = await openV2Database()
       const encKey = await deriveStorageKey(keys.spendingKey)
       await saveNoteV2(db, address, stored, encKey)
+      backupNote?.(stored).catch(() => {})
 
       if (leafIndex === -1) {
         // Note is saved — background sync (useV2Notes) will resolve leafIndex later
