@@ -8,11 +8,11 @@ export const TWITTER_HANDLE = "@DustProtocolApp";
 export const ROOT_METADATA: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Dust Protocol — Private Transfers & Stealth Addresses on Ethereum",
+    default: "Dust Protocol — Private Transfers on Flow",
     template: "%s | Dust Protocol",
   },
   description:
-    "Send and receive crypto privately using stealth addresses (ERC-5564) and zero-knowledge proofs. Non-custodial privacy for Ethereum payments, swaps, and DeFi. Gasless claims, .dust usernames, and private token swaps via Uniswap V4.",
+    "Send and receive crypto privately on Flow using stealth addresses (ERC-5564) and zero-knowledge proofs. Non-custodial privacy for Flow EVM payments, swaps, and DeFi. Gasless claims, .dust usernames, and private token swaps.",
   keywords: [
     "stealth address",
     "stealth address Ethereum",
@@ -28,8 +28,11 @@ export const ROOT_METADATA: Metadata = {
     "private token swap",
     "anonymous token swap",
     "private DEX swap",
-    "Ethereum privacy",
-    "Ethereum privacy protocol",
+    "Flow",
+    "Flow EVM",
+    "Flow blockchain",
+    "Flow privacy",
+    "Flow privacy protocol",
     "private DeFi",
     "ZK-UTXO",
     "Dust Protocol",
@@ -40,7 +43,7 @@ export const ROOT_METADATA: Metadata = {
     "Poseidon hash",
     "Groth16 proof",
     "FFLONK proof",
-    "private Ethereum payment",
+    "private Flow payment",
     "untraceable crypto transfer",
     "blockchain privacy tool",
     "non-custodial privacy",
@@ -56,9 +59,9 @@ export const ROOT_METADATA: Metadata = {
   classification: "Privacy Protocol",
   openGraph: {
     type: "website",
-    title: "Dust Protocol — Private Transfers & Stealth Addresses on Ethereum",
+    title: "Dust Protocol — Private Transfers on Flow",
     description:
-      "Send and receive crypto privately with stealth addresses and zero-knowledge proofs. Non-custodial privacy for Ethereum payments, swaps, and DeFi.",
+      "Send and receive crypto privately on Flow with stealth addresses and zero-knowledge proofs. Non-custodial privacy for Flow EVM payments, swaps, and DeFi.",
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "en_US",
@@ -68,15 +71,15 @@ export const ROOT_METADATA: Metadata = {
         width: 1200,
         height: 630,
         type: "image/png",
-        alt: "Dust Protocol — Private Transfers & Stealth Addresses on Ethereum",
+        alt: "Dust Protocol — Private Transfers on Flow",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dust Protocol — Private Transfers & Stealth Addresses on Ethereum",
+    title: "Dust Protocol — Private Transfers on Flow",
     description:
-      "Send and receive crypto privately with stealth addresses and zero-knowledge proofs. Non-custodial privacy for Ethereum payments, swaps, and DeFi.",
+      "Send and receive crypto privately on Flow with stealth addresses and zero-knowledge proofs. Non-custodial privacy for Flow EVM payments, swaps, and DeFi.",
     images: [`${SITE_URL}/opengraph-image`],
     site: TWITTER_HANDLE,
     creator: TWITTER_HANDLE,

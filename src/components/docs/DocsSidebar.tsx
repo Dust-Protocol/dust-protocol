@@ -23,7 +23,7 @@ export function DocsSidebar() {
                     href={item.href}
                     className={`flex items-center px-3 py-2 text-[11px] font-mono tracking-wide rounded-sm transition-all border-l-2 ${
                       active
-                        ? "text-[#00FF41] bg-[rgba(0,255,65,0.05)] border-[#00FF41]"
+                        ? "text-[#00EF8B] bg-[rgba(0,239,139,0.05)] border-[#00EF8B]"
                         : "text-[rgba(255,255,255,0.45)] hover:text-white border-transparent hover:bg-[rgba(255,255,255,0.03)]"
                     }`}
                   >

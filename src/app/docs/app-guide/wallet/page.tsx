@@ -113,7 +113,7 @@ export default function WalletGuidePage() {
             "On confirmation, ETH is sent to the stealth address and an ERC-5564 announcement is emitted.",
           ].map((item, i) => (
             <li key={i} className="flex gap-3 text-sm text-[rgba(255,255,255,0.6)]">
-              <span className="shrink-0 text-[#00FF41] mt-0.5">—</span>
+              <span className="shrink-0 text-[#00EF8B] mt-0.5">—</span>
               {item}
             </li>
           ))}
@@ -137,7 +137,7 @@ export default function WalletGuidePage() {
             "Dust-amount payments (below gas threshold for EOA claims) are flagged but can still be claimed via sponsored wallet types.",
           ].map((item, i) => (
             <li key={i} className="flex gap-3 text-sm text-[rgba(255,255,255,0.6)]">
-              <span className="shrink-0 text-[#00FF41] mt-0.5">—</span>
+              <span className="shrink-0 text-[#00EF8B] mt-0.5">—</span>
               {item}
             </li>
           ))}

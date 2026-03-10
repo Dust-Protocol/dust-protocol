@@ -67,10 +67,10 @@ describe('getUSDCAddress', () => {
     expect(addr).toBe(USDC_ADDRESS_SEPOLIA)
   })
 
-  it('returns valid address with default chain', () => {
-    // #given no chainId (defaults to DEFAULT_CHAIN_ID = 11155111)
+  it('returns valid address for Eth Sepolia (explicit)', () => {
+    // #given chainId 11155111
     // #when requesting USDC address
-    const addr = getUSDCAddress()
+    const addr = getUSDCAddress(11155111)
     // #then returns the Sepolia address
     expect(addr).toBe(USDC_ADDRESS_SEPOLIA)
   })

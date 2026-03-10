@@ -86,7 +86,7 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
             {/* Header */}
             <div className="flex justify-between items-center mb-5">
               <div className="flex items-center gap-2">
-                <DustLogo size={14} color="#00FF41" />
+                <DustLogo size={14} color="#00EF8B" />
                 <span className="text-xs font-bold text-white/70 font-mono tracking-wider">
                   RECEIVE
                 </span>
@@ -103,7 +103,7 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
               <div className="flex flex-col gap-5">
                 {/* .dust name */}
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-[#00FF41] font-mono">{dustName}</p>
+                  <p className="text-2xl font-bold text-[#00EF8B] font-mono">{dustName}</p>
                   <p className="text-[11px] text-white/30 font-mono mt-1">
                     Share this link to receive private payments
                   </p>
@@ -119,14 +119,14 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
                 {/* Link row — clickable */}
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-2 w-full px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:border-[#00FF41]/30 hover:bg-[#00FF41]/[0.03] transition-all group"
+                  className="flex items-center gap-2 w-full px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:border-[#00EF8B]/30 hover:bg-[#00EF8B]/[0.03] transition-all group"
                 >
                   <span className="flex-1 text-[12px] text-white/40 font-mono truncate text-left group-hover:text-white/60 transition-colors">
                     {fullUrl}
                   </span>
-                  <span className="flex-shrink-0 text-white/30 group-hover:text-[#00FF41] transition-colors">
+                  <span className="flex-shrink-0 text-white/30 group-hover:text-[#00EF8B] transition-colors">
                     {copied
-                      ? <CheckIcon size={14} color="#00FF41" />
+                      ? <CheckIcon size={14} color="#00EF8B" />
                       : <CopyIcon size={14} color="currentColor" />
                     }
                   </span>
@@ -138,13 +138,13 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
                     onClick={handleCopy}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-sm border border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06] transition-all text-xs font-mono text-white/70 hover:text-white"
                   >
-                    {copied ? <CheckIcon size={13} color="#00FF41" /> : <CopyIcon size={13} color="currentColor" />}
+                    {copied ? <CheckIcon size={13} color="#00EF8B" /> : <CopyIcon size={13} color="currentColor" />}
                     {copied ? "Copied!" : "Copy Link"}
                   </button>
                   {canShare ? (
                     <button
                       onClick={handleShare}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-sm bg-[#00FF41] hover:bg-[#00FF41]/85 transition-all text-xs font-mono font-bold text-black"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-sm bg-[#00EF8B] hover:bg-[#00EF8B]/85 transition-all text-xs font-mono font-bold text-black"
                     >
                       <Share2 size={13} />
                       Share
@@ -154,7 +154,7 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
                       href={fullUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-sm bg-[#00FF41] hover:bg-[#00FF41]/85 transition-all text-xs font-mono font-bold text-black"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-sm bg-[#00EF8B] hover:bg-[#00EF8B]/85 transition-all text-xs font-mono font-bold text-black"
                     >
                       <ExternalLink size={13} />
                       Open Link

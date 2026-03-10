@@ -507,7 +507,13 @@ const CHAIN_CONFIGS: Record<number, ChainConfig> = {
   // Base Mainnet (8453) excluded until contracts are deployed
 };
 
-export const DEFAULT_CHAIN_ID = 11155111;
+// Hackathon: Flow is the default chain
+export const DEFAULT_CHAIN_ID = 545;
+
+export function getVisibleChains(): ChainConfig[] {
+  // Hackathon: only show Flow in the UI
+  return Object.values(CHAIN_CONFIGS).filter(c => c.id === 545);
+}
 
 export function getChainConfig(chainId?: number): ChainConfig {
   const id = chainId ?? DEFAULT_CHAIN_ID;

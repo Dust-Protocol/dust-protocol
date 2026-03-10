@@ -72,7 +72,7 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
         </div>
         <Link
           href="/activities"
-          className="flex items-center gap-1 text-[9px] text-[rgba(255,255,255,0.4)] hover:text-[#00FF41] transition-colors font-mono"
+          className="flex items-center gap-1 text-[9px] text-[rgba(255,255,255,0.4)] hover:text-[#00EF8B] transition-colors font-mono"
         >
           View All <ExternalLinkIcon className="w-2.5 h-2.5" />
         </Link>
@@ -86,7 +86,7 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
             onClick={() => setFilter(f)}
             className={`px-3 py-1 rounded-full text-[9px] font-mono uppercase tracking-wide border transition-colors ${
               filter === f
-                ? "bg-[rgba(0,255,65,0.1)] border-[rgba(0,255,65,0.2)] text-[#00FF41]"
+                ? "bg-[rgba(0,239,139,0.1)] border-[rgba(0,239,139,0.2)] text-[#00EF8B]"
                 : "bg-transparent border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] hover:text-[rgba(255,255,255,0.6)] hover:border-[rgba(255,255,255,0.1)]"
             }`}
           >
@@ -141,7 +141,7 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
               : "completed";
             const statusClass =
               statusLabel === "claimed" || statusLabel === "completed"
-                ? "bg-[rgba(0,255,65,0.05)] border-[rgba(0,255,65,0.1)] text-[#00FF41]"
+                ? "bg-[rgba(0,239,139,0.05)] border-[rgba(0,239,139,0.1)] text-[#00EF8B]"
                 : statusLabel === "unclaimed"
                 ? "bg-[rgba(255,176,0,0.05)] border-[rgba(255,176,0,0.1)] text-[#FFB000]"
                 : "bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.4)]";
@@ -156,7 +156,7 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
                   <div
                     className={`p-1.5 rounded-full ${
                       isIncoming
-                        ? "bg-[rgba(0,255,65,0.1)] text-[#00FF41]"
+                        ? "bg-[rgba(0,239,139,0.1)] text-[#00EF8B]"
                         : "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.6)]"
                     }`}
                   >

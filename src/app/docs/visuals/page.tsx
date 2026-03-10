@@ -99,7 +99,7 @@ export default function DocsVisualsPage() {
                                     onClick={() => setCurrentScreen(item.id)}
                                     className={`
                     w-full text-left px-6 py-3 text-[11px] uppercase tracking-wider transition-all duration-150 border-l-2
-                    ${isActive ? 'border-dust-green bg-[rgba(0,255,65,0.06)] text-dust-green' : 'border-transparent text-dust-muted hover:text-white hover:bg-[rgba(255,255,255,0.02)]'}
+                    ${isActive ? 'border-dust-green bg-[rgba(0,239,139,0.06)] text-dust-green' : 'border-transparent text-dust-muted hover:text-white hover:bg-[rgba(255,255,255,0.02)]'}
                   `}
                                 >
                                     {item.label}

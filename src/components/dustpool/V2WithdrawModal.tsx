@@ -348,7 +348,7 @@ export function V2WithdrawModal({
                             onClick={() => handleAssetSelect(idx)}
                             className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-sm border font-mono text-xs transition-all ${
                               isSelected
-                                ? "border-[#00FF41] bg-[rgba(0,255,65,0.08)] text-[#00FF41]"
+                                ? "border-[#00EF8B] bg-[rgba(0,239,139,0.08)] text-[#00EF8B]"
                                 : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(255,255,255,0.2)] hover:text-white"
                             }`}
                           >
@@ -385,7 +385,7 @@ export function V2WithdrawModal({
                       </label>
                       <button
                         onClick={handleMaxClick}
-                        className="text-[10px] text-[#00FF41] font-mono hover:underline"
+                        className="text-[10px] text-[#00EF8B] font-mono hover:underline"
                       >
                         MAX
                       </button>
@@ -399,7 +399,7 @@ export function V2WithdrawModal({
                         setAmount(e.target.value.replace(/[^0-9.]/g, ""));
                       }}
                       placeholder="0.0"
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {exceedsBalance && (
                       <p className="text-[11px] text-red-400 font-mono">Amount exceeds shielded balance</p>
@@ -421,7 +421,7 @@ export function V2WithdrawModal({
                       {changeAmount !== null && changeAmount > 0n && (
                         <div className="flex justify-between items-center">
                           <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Change returned</span>
-                          <span className="text-[11px] font-semibold text-[#00FF41] font-mono flex items-center gap-1">
+                          <span className="text-[11px] font-semibold text-[#00EF8B] font-mono flex items-center gap-1">
                             {parseFloat(formatAmount(changeAmount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
                           </span>
                         </div>
@@ -431,7 +431,7 @@ export function V2WithdrawModal({
 
                   {/* Denomination chunk preview */}
                   {parsedAmount && chunks.length > 1 && !exceedsBalance && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.1)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
                         Privacy Split &mdash; {chunks.length} chunks
                       </p>
@@ -439,7 +439,7 @@ export function V2WithdrawModal({
                         {formattedChunkValues.map((val, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.15)] text-[10px] font-mono text-[#00FF41] inline-flex items-center gap-1"
+                            className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.08)] border border-[rgba(0,239,139,0.15)] text-[10px] font-mono text-[#00EF8B] inline-flex items-center gap-1"
                           >
                             <TokenIcon symbol={tokenSymbol} size={10} />{val} {tokenSymbol}
                           </span>
@@ -458,7 +458,7 @@ export function V2WithdrawModal({
                               <button
                                 key={i}
                                 onClick={() => setAmount(s.formatted)}
-                                className="px-2 py-0.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] text-[10px] font-mono text-[rgba(255,255,255,0.6)] hover:text-[#00FF41] transition-colors"
+                                className="px-2 py-0.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] text-[10px] font-mono text-[rgba(255,255,255,0.6)] hover:text-[#00EF8B] transition-colors"
                               >
                                 {s.formatted} {tokenSymbol} ({s.chunks} chunk{s.chunks !== 1 ? "s" : ""})
                               </button>
@@ -480,7 +480,7 @@ export function V2WithdrawModal({
                       placeholder="0x..."
                       value={recipient}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {recipient && !isValidRecipient && (
                       <p className="text-[11px] text-red-400 font-mono">Invalid address</p>
@@ -529,7 +529,7 @@ export function V2WithdrawModal({
                     data-testid="withdraw-submit"
                     onClick={handleWithdraw}
                     disabled={!canWithdraw}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {parsedAmount
                       ? useSplitFlow
@@ -543,27 +543,27 @@ export function V2WithdrawModal({
               {/* Processing */}
               {activePending && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">
                     {activeStatus || (useSplitFlow ? "Generating denomination split proof..." : "Generating ZK proof...")}
                   </p>
                   {useSplitFlow ? (
                     <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
-                      <span className="text-[#00FF41]">proof</span>
+                      <span className="text-[#00EF8B]">proof</span>
                       <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Verifying") ? "text-[#00FF41]" : ""}>verify</span>
+                      <span className={activeStatus?.includes("Verifying") ? "text-[#00EF8B]" : ""}>verify</span>
                       <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Submitting") ? "text-[#00FF41]" : ""}>submit</span>
+                      <span className={activeStatus?.includes("Submitting") ? "text-[#00EF8B]" : ""}>submit</span>
                       <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>confirm</span>
+                      <span className={activeStatus?.includes("Confirming") ? "text-[#00EF8B]" : ""}>confirm</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
-                      <span className="text-[#00FF41]">proof</span>
+                      <span className="text-[#00EF8B]">proof</span>
                       <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Submitting") || activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>submit</span>
+                      <span className={activeStatus?.includes("Submitting") || activeStatus?.includes("Confirming") ? "text-[#00EF8B]" : ""}>submit</span>
                       <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>confirm</span>
+                      <span className={activeStatus?.includes("Confirming") ? "text-[#00EF8B]" : ""}>confirm</span>
                     </div>
                   )}
                 </div>
@@ -574,7 +574,7 @@ export function V2WithdrawModal({
                 <div className="flex flex-col gap-4">
                   <div className="text-center py-2">
                     <div className="inline-flex mb-3">
-                      <ShieldCheckIcon size={40} color="#00FF41" />
+                      <ShieldCheckIcon size={40} color="#00EF8B" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">
                       {useSplitFlow ? "Denomination Split Successful" : "Withdrawal Successful"}
@@ -583,7 +583,7 @@ export function V2WithdrawModal({
                   </div>
 
                   {useSplitFlow && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
                         {chunks.length} denomination notes created
                       </p>
@@ -591,7 +591,7 @@ export function V2WithdrawModal({
                         {formattedChunkValues.map((val, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.15)] text-[10px] font-mono text-[#00FF41]"
+                            className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.08)] border border-[rgba(0,239,139,0.15)] text-[10px] font-mono text-[#00EF8B]"
                           >
                             {val} {tokenSymbol}
                           </span>
@@ -601,9 +601,9 @@ export function V2WithdrawModal({
                   )}
 
                   {txHash && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
                       <p className="text-[11px] text-[rgba(255,255,255,0.4)] mb-1 font-mono">Transaction</p>
-                      <p className="text-xs font-mono text-[#00FF41] break-all">{txHash}</p>
+                      <p className="text-xs font-mono text-[#00EF8B] break-all">{txHash}</p>
                     </div>
                   )}
 
@@ -623,7 +623,7 @@ export function V2WithdrawModal({
 
                   <button
                     onClick={handleClose}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider"
                   >
                     Done
                   </button>
@@ -652,7 +652,7 @@ export function V2WithdrawModal({
                     </button>
                     <button
                       onClick={() => { activeClearError(); setAmount(""); }}
-                      className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
+                      className="flex-1 py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono tracking-wider transition-all"
                     >
                       Try Again
                     </button>

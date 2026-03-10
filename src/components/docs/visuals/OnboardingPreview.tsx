@@ -51,7 +51,7 @@ export function OnboardingUsernameSnippet() {
             </svg>
             <span className="text-[10px] text-[rgba(34,197,94,0.8)] font-mono hidden sm:block">available</span>
           </div>
-          <button className="h-7 px-3 rounded-sm text-[10px] font-bold font-mono tracking-wider bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] text-[#00FF41] shrink-0">
+          <button className="h-7 px-3 rounded-sm text-[10px] font-bold font-mono tracking-wider bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] text-[#00EF8B] shrink-0">
             Register
           </button>
         </div>
@@ -74,7 +74,7 @@ export function OnboardingActivateSnippet() {
         <div className="flex gap-4 text-[10px] font-mono">
           <div className="flex items-center gap-1.5">
             <span className="text-[rgba(255,255,255,0.4)] uppercase tracking-wider">User</span>
-            <span className="text-[rgba(0,255,65,0.9)]">alice.dust</span>
+            <span className="text-[rgba(0,239,139,0.9)]">alice.dust</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-[rgba(255,255,255,0.4)] uppercase tracking-wider">PIN</span>

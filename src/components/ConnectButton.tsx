@@ -29,7 +29,7 @@ export function ConnectButton() {
 
   return (
     <button
-      className="px-5 py-2.5 bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] rounded-sm cursor-pointer hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:-translate-y-px active:translate-y-0 transition-all duration-150 text-sm font-bold text-[#00FF41] font-mono"
+      className="px-5 py-2.5 bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] rounded-sm cursor-pointer hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:-translate-y-px active:translate-y-0 transition-all duration-150 text-sm font-bold text-[#00EF8B] font-mono"
       onClick={() => connect({ connector: injected() })}
     >
       Connect Wallet

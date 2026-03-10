@@ -37,7 +37,7 @@ export function WithdrawNoteSelectionSnippet() {
         </div>
         <div className="flex justify-between items-center pt-1.5 border-t border-[rgba(255,255,255,0.06)]">
           <span className="text-[11px] text-[rgba(255,255,255,0.4)]">Change returned</span>
-          <span className="text-[11px] font-semibold text-[#00FF41]">1.000000 ETH</span>
+          <span className="text-[11px] font-semibold text-[#00EF8B]">1.000000 ETH</span>
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ export function WithdrawDenomSnippet() {
           {CHUNKS.map((val, i) => (
             <span
               key={i}
-              className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.15)] text-[10px] text-[#00FF41]"
+              className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.08)] border border-[rgba(0,239,139,0.15)] text-[10px] text-[#00EF8B]"
             >
               {val} ETH
             </span>
@@ -103,7 +103,7 @@ export function WithdrawProcessingSnippet() {
           {STEPS.map((s, i) => (
             <span key={s} className="flex items-center gap-2">
               {i > 0 && <span className="text-[rgba(255,255,255,0.2)]">&rarr;</span>}
-              <span className="text-[#00FF41]">{s}</span>
+              <span className="text-[#00EF8B]">{s}</span>
             </span>
           ))}
         </div>

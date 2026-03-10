@@ -28,7 +28,7 @@ export function StealthBalanceCard({ payments, isScanning, scan }: StealthBalanc
     <div
       className="p-[3px] rounded-[18px]"
       style={{
-        background: "linear-gradient(135deg, #00FF41 0%, #00FF41 50%, #00FF41 100%)",
+        background: "linear-gradient(135deg, #00EF8B 0%, #00EF8B 50%, #00EF8B 100%)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
       }}
     >
@@ -94,7 +94,7 @@ export function StealthBalanceCard({ payments, isScanning, scan }: StealthBalanc
           )}
 
           {/* Footer */}
-          <div className="px-4 py-3 bg-[rgba(0,255,65,0.04)] rounded-sm text-center">
+          <div className="px-4 py-3 bg-[rgba(0,239,139,0.04)] rounded-sm text-center">
             <span className="text-sm text-[#7c7fff] font-semibold">
               {validPayments.length === 0
                 ? "No payments yet"

@@ -40,15 +40,15 @@ export default function Eip7702Page() {
                 handled by the DustPaymaster sponsorship.
               </p>
               <div className="flex gap-3 text-xs font-mono">
-                <span className="text-[rgba(0,255,65,0.7)]">✓ Universally compatible</span>
+                <span className="text-[rgba(0,239,139,0.7)]">✓ Universally compatible</span>
                 <span className="text-[rgba(255,255,255,0.3)]">· Needs relayer for gas</span>
               </div>
             </div>
           </div>
 
           {/* ERC-4337 */}
-          <div className="border border-[rgba(0,255,65,0.12)] rounded-sm overflow-hidden">
-            <div className="px-4 py-3 bg-[rgba(0,255,65,0.03)] flex items-center justify-between">
+          <div className="border border-[rgba(0,239,139,0.12)] rounded-sm overflow-hidden">
+            <div className="px-4 py-3 bg-[rgba(0,239,139,0.03)] flex items-center justify-between">
               <p className="text-[12px] font-mono font-semibold text-white">ERC-4337 Smart Account</p>
               <DocsBadge variant="green">Account Abstraction</DocsBadge>
             </div>
@@ -61,9 +61,9 @@ export default function Eip7702Page() {
                 recipient.
               </p>
               <div className="flex flex-wrap gap-3 text-xs font-mono">
-                <span className="text-[rgba(0,255,65,0.7)]">✓ Gasless</span>
-                <span className="text-[rgba(0,255,65,0.7)]">✓ Atomic deploy + drain</span>
-                <span className="text-[rgba(0,255,65,0.7)]">✓ Default for Dust</span>
+                <span className="text-[rgba(0,239,139,0.7)]">✓ Gasless</span>
+                <span className="text-[rgba(0,239,139,0.7)]">✓ Atomic deploy + drain</span>
+                <span className="text-[rgba(0,239,139,0.7)]">✓ Default for Dust</span>
               </div>
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function Eip7702Page() {
                 wallet exists on-chain, and deployment + drain happen in one sponsored transaction.
               </p>
               <div className="flex gap-3 text-xs font-mono">
-                <span className="text-[rgba(0,255,65,0.7)]">✓ Deterministic address</span>
+                <span className="text-[rgba(0,239,139,0.7)]">✓ Deterministic address</span>
                 <span className="text-[rgba(255,255,255,0.3)]">· Requires sponsor</span>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function Eip7702Page() {
                 <tr key={type} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                   <td className="py-2.5 pr-4 text-white">{type}</td>
                   {rest.map((v, i) => (
-                    <td key={i} className={`py-2.5 pr-4 ${v.startsWith("✓") ? "text-[#00FF41]" : v === "✗" ? "text-[rgba(255,255,255,0.25)]" : "text-[rgba(255,255,255,0.5)]"}`}>{v}</td>
+                    <td key={i} className={`py-2.5 pr-4 ${v.startsWith("✓") ? "text-[#00EF8B]" : v === "✗" ? "text-[rgba(255,255,255,0.25)]" : "text-[rgba(255,255,255,0.5)]"}`}>{v}</td>
                   ))}
                 </tr>
               ))}

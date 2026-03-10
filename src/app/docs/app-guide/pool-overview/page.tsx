@@ -69,7 +69,7 @@ export default function PoolOverviewAppGuidePage() {
         </p>
         <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed">
           The badge next to the &ldquo;Oracle&rdquo; label indicates which source is active —{" "}
-          <span className="text-[#00FF41]">CHAINLINK</span> (green) or POOL (dim). The current pool
+          <span className="text-[#00EF8B]">CHAINLINK</span> (green) or POOL (dim). The current pool
           tick is shown below the price for reference.
         </p>
         <PoolOracleSnippet />

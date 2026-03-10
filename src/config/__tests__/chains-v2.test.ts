@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getChainConfig, getSupportedChains, isChainSupported, type ChainContracts, type ChainIconFamily } from '../chains'
+import { getChainConfig, getSupportedChains, getVisibleChains, isChainSupported, type ChainContracts, type ChainIconFamily } from '../chains'
 
 describe('Chain config: V1 fields removed', () => {
   it('ChainContracts type does not have V1 swap fields', () => {
@@ -78,6 +78,16 @@ describe('Chain config: core functions work', () => {
     expect(isChainSupported(545)).toBe(true)
     expect(isChainSupported(8453)).toBe(false)
     expect(isChainSupported(1)).toBe(false)
+  })
+
+  it('getVisibleChains returns only Flow for hackathon', () => {
+    // #given hackathon branch is Flow-only
+    // #when fetching visible chains for UI
+    // #then only Flow EVM Testnet (545) is returned
+    const visible = getVisibleChains()
+    expect(visible).toHaveLength(1)
+    expect(visible[0].id).toBe(545)
+    expect(visible[0].name).toBe('Flow EVM Testnet')
   })
 })
 

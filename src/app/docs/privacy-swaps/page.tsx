@@ -179,7 +179,7 @@ export default function PrivacySwapsPage() {
             },
           ].map(({ label, desc }) => (
             <div key={label} className="flex gap-4 p-3 border border-[rgba(255,255,255,0.05)] rounded-sm">
-              <div className="shrink-0 w-1 rounded-full bg-[rgba(0,255,65,0.3)]" />
+              <div className="shrink-0 w-1 rounded-full bg-[rgba(0,239,139,0.3)]" />
               <div>
                 <p className="text-xs font-mono font-semibold text-white mb-1">{label}</p>
                 <p className="text-xs text-[rgba(255,255,255,0.5)] leading-relaxed">{desc}</p>

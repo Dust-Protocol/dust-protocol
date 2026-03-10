@@ -14,7 +14,7 @@ interface QRModalProps {
   accentColor?: string;
 }
 
-export function QRModal({ isOpen, onClose, url, title, displayName, accentColor = "#00FF41" }: QRModalProps) {
+export function QRModal({ isOpen, onClose, url, title, displayName, accentColor = "#00EF8B" }: QRModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
 

@@ -48,8 +48,8 @@ function PayChainSelector({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-sm border text-xs font-mono transition-all w-full ${
           open
-            ? "border-[#00FF41] bg-[rgba(0,255,65,0.02)]"
-            : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(0,255,65,0.2)]"
+            ? "border-[#00EF8B] bg-[rgba(0,239,139,0.02)]"
+            : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(0,239,139,0.2)]"
         }`}
       >
         <ChainIcon size={18} chainId={selectedChainId} />
@@ -75,14 +75,14 @@ function PayChainSelector({
                 onClick={() => { onChange(c.id); setOpen(false); }}
                 className={`w-full text-left px-3 py-2.5 text-[11px] font-mono transition-all flex items-center gap-2.5 ${
                   active
-                    ? "text-[#00FF41] bg-[rgba(0,255,65,0.05)]"
-                    : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,255,65,0.05)] hover:text-[#00FF41]"
+                    ? "text-[#00EF8B] bg-[rgba(0,239,139,0.05)]"
+                    : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,239,139,0.05)] hover:text-[#00EF8B]"
                 }`}
               >
                 <ChainIcon size={16} chainId={c.id} />
                 <span className="flex-1">{c.name}</span>
                 <span className="text-[rgba(255,255,255,0.3)] text-[10px]">{c.nativeCurrency.symbol}</span>
-                {active && <span className="text-[#00FF41] text-xs">&#10003;</span>}
+                {active && <span className="text-[#00EF8B] text-xs">&#10003;</span>}
               </button>
             );
           })}
@@ -145,8 +145,8 @@ function PayTokenSelector({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 px-2.5 py-2.5 rounded-sm border text-[11px] font-mono font-bold transition-all ${
           open
-            ? "border-[#00FF41] bg-[rgba(0,255,65,0.1)] text-[#00FF41]"
-            : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] text-white hover:border-[rgba(0,255,65,0.2)]"
+            ? "border-[#00EF8B] bg-[rgba(0,239,139,0.1)] text-[#00EF8B]"
+            : "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] text-white hover:border-[rgba(0,239,139,0.2)]"
         }`}
       >
         <TokenIcon symbol={selected.symbol} size={14} />
@@ -171,14 +171,14 @@ function PayTokenSelector({
                 onClick={() => { onChange(t.address); setOpen(false); }}
                 className={`w-full text-left px-3 py-2.5 text-[11px] font-mono transition-all flex items-center gap-2.5 ${
                   active
-                    ? "text-[#00FF41] bg-[rgba(0,255,65,0.05)]"
-                    : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,255,65,0.05)] hover:text-[#00FF41]"
+                    ? "text-[#00EF8B] bg-[rgba(0,239,139,0.05)]"
+                    : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,239,139,0.05)] hover:text-[#00EF8B]"
                 }`}
               >
                 <TokenIcon symbol={t.symbol} size={16} />
                 <span className="flex-1 font-medium">{t.symbol}</span>
                 <span className="text-[rgba(255,255,255,0.25)] text-[10px] font-normal">{t.name}</span>
-                {active && <span className="text-[#00FF41] text-xs ml-1">&#10003;</span>}
+                {active && <span className="text-[#00EF8B] text-xs ml-1">&#10003;</span>}
               </button>
             );
           })}
@@ -317,12 +317,12 @@ export default function PayPageClient({ name }: { name: string }) {
         <div className="flex justify-between items-center max-w-[480px] mx-auto px-5 py-3.5">
           <Link href="/" className="no-underline">
             <div className="flex gap-2 items-center cursor-pointer">
-              <DustLogo size={20} color="#00FF41" />
+              <DustLogo size={20} color="#00EF8B" />
               <span className="text-[16px] font-bold text-white tracking-tight">Dust</span>
             </div>
           </Link>
-          <div className="px-2.5 py-1 bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.15)] rounded-sm">
-            <span className="text-[9px] text-[#00FF41] font-mono font-semibold tracking-wider uppercase">Payment</span>
+          <div className="px-2.5 py-1 bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.15)] rounded-sm">
+            <span className="text-[9px] text-[#00EF8B] font-mono font-semibold tracking-wider uppercase">Payment</span>
           </div>
         </div>
       </header>
@@ -354,13 +354,13 @@ export default function PayPageClient({ name }: { name: string }) {
                 }`}>
                   <div className="flex flex-col items-center gap-3">
                     <div className={`p-3 rounded-sm transition-colors duration-300 ${
-                      isSuccess ? "bg-[rgba(34,197,94,0.08)]" : "bg-[rgba(0,255,65,0.04)]"
+                      isSuccess ? "bg-[rgba(34,197,94,0.08)]" : "bg-[rgba(0,239,139,0.04)]"
                     }`}>
-                      <DustLogo size={28} color={isSuccess ? "#22c55e" : "#00FF41"} />
+                      <DustLogo size={28} color={isSuccess ? "#22c55e" : "#00EF8B"} />
                     </div>
                     <div className="flex flex-col items-center gap-1">
                       <span className={`text-xl font-bold font-mono tracking-tight transition-colors duration-300 ${
-                        isSuccess ? "text-green-400" : "text-[#00FF41]"
+                        isSuccess ? "text-green-400" : "text-[#00EF8B]"
                       }`}>
                         {fullName}
                       </span>
@@ -385,11 +385,11 @@ export default function PayPageClient({ name }: { name: string }) {
                           onClick={() => setActiveTab(tab as "wallet" | "qr")}
                           className={`flex-1 py-3 flex items-center justify-center gap-1.5 border-b-2 transition-all font-mono text-[10px] tracking-wider ${
                             active
-                              ? "text-[#00FF41] border-[#00FF41]"
+                              ? "text-[#00EF8B] border-[#00EF8B]"
                               : "text-[rgba(255,255,255,0.35)] border-transparent hover:text-[rgba(255,255,255,0.5)]"
                           }`}
                         >
-                          <Icon size={12} color={active ? "#00FF41" : "rgba(255,255,255,0.35)"} />
+                          <Icon size={12} color={active ? "#00EF8B" : "rgba(255,255,255,0.35)"} />
                           <span>{label}</span>
                         </button>
                       );
@@ -412,7 +412,7 @@ export default function PayPageClient({ name }: { name: string }) {
                     <>
                       {metaResolving ? (
                         <div className="flex flex-col items-center gap-3 py-8">
-                          <div className="w-5 h-5 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
                           <span className="text-[11px] text-[rgba(255,255,255,0.35)] font-mono">Preparing payment...</span>
                         </div>
                       ) : resolveError ? (
@@ -421,7 +421,7 @@ export default function PayPageClient({ name }: { name: string }) {
                           <span className="text-xs text-[#ef4444] font-mono">Could not resolve {fullName}</span>
                           <button
                             onClick={() => doResolve(true)}
-                            className="text-[11px] text-[#00FF41] font-mono underline cursor-pointer bg-transparent border-none"
+                            className="text-[11px] text-[#00EF8B] font-mono underline cursor-pointer bg-transparent border-none"
                           >
                             Retry
                           </button>
@@ -436,16 +436,16 @@ export default function PayPageClient({ name }: { name: string }) {
                           </div>
                           <button
                             onClick={() => connect({ connector: injected() })}
-                            className="w-full py-3 rounded-sm border border-[#00FF41]/30 bg-[#00FF41]/[0.05] text-[#00FF41] font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 cursor-pointer hover:border-[#00FF41] hover:bg-[#00FF41]/[0.1] transition-all"
-                            style={{ boxShadow: "0 0 12px rgba(0,255,65,0.05)" }}
+                            className="w-full py-3 rounded-sm border border-[#00EF8B]/30 bg-[#00EF8B]/[0.05] text-[#00EF8B] font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 cursor-pointer hover:border-[#00EF8B] hover:bg-[#00EF8B]/[0.1] transition-all"
+                            style={{ boxShadow: "0 0 12px rgba(0,239,139,0.05)" }}
                           >
-                            <WalletIcon size={14} color="#00FF41" />
+                            <WalletIcon size={14} color="#00EF8B" />
                             CONNECT WALLET
                           </button>
                           <span className="text-[10px] text-[rgba(255,255,255,0.25)] font-mono text-center">
                             Or switch to{" "}
                             <span
-                              className="text-[#00FF41] cursor-pointer hover:underline"
+                              className="text-[#00EF8B] cursor-pointer hover:underline"
                               onClick={() => setActiveTab("qr")}
                             >
                               QR / Address
@@ -483,7 +483,7 @@ export default function PayPageClient({ name }: { name: string }) {
                                   const v = e.target.value;
                                   if (v === "" || parseFloat(v) >= 0) setAmount(v);
                                 }}
-                                className="flex-1 py-2.5 px-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm font-semibold focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] placeholder-[rgba(255,255,255,0.2)] transition-all"
+                                className="flex-1 py-2.5 px-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm font-semibold focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] placeholder-[rgba(255,255,255,0.2)] transition-all"
                               />
                               <PayTokenSelector
                                   chainId={selectedChainId}
@@ -499,7 +499,7 @@ export default function PayPageClient({ name }: { name: string }) {
                             disabled={!amount || !resolvedMeta}
                             className={`w-full py-3 rounded-sm font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all ${
                               amount && resolvedMeta
-                                ? "border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.1)] text-[#00FF41] cursor-pointer hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)]"
+                                ? "border border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.1)] text-[#00EF8B] cursor-pointer hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)]"
                                 : "border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] text-[rgba(255,255,255,0.3)] cursor-not-allowed"
                             }`}
                           >
@@ -575,7 +575,7 @@ function ConfirmView({
           <div className="h-px bg-[rgba(255,255,255,0.06)]" />
           <div className="flex justify-between items-center">
             <span className="text-[10px] text-[rgba(255,255,255,0.4)] font-mono uppercase tracking-wider">To</span>
-            <span className="text-sm font-semibold text-[#00FF41] font-mono">{fullName}</span>
+            <span className="text-sm font-semibold text-[#00EF8B] font-mono">{fullName}</span>
           </div>
           <div className="h-px bg-[rgba(255,255,255,0.06)]" />
           <div className="flex justify-between items-center">
@@ -596,8 +596,8 @@ function ConfirmView({
       </div>
 
       {/* Privacy note */}
-      <div className="flex gap-2 items-center p-3 rounded-sm bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.08)]">
-        <LockIcon size={12} color="#00FF41" />
+      <div className="flex gap-2 items-center p-3 rounded-sm bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.08)]">
+        <LockIcon size={12} color="#00EF8B" />
         <span className="text-[10px] text-[rgba(255,255,255,0.35)] font-mono">
           Stealth address — cannot be linked to {fullName}
         </span>
@@ -619,13 +619,13 @@ function ConfirmView({
               ? "border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] text-[rgba(255,255,255,0.3)] cursor-wait"
               : chainMismatch
                 ? "border border-[rgba(255,200,0,0.3)] bg-[rgba(255,200,0,0.06)] text-[#FFC800] cursor-pointer hover:bg-[rgba(255,200,0,0.1)] hover:border-[#FFC800]"
-                : "border border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.1)] text-[#00FF41] cursor-pointer hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)]"
+                : "border border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.1)] text-[#00EF8B] cursor-pointer hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)]"
           }`}
         >
           {isLoading || isSwitching ? (
             <>
               <div className={`w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin ${
-                isSwitching ? "border-[#FFC800]" : "border-[#00FF41]"
+                isSwitching ? "border-[#FFC800]" : "border-[#00EF8B]"
               }`} />
               <span>{isSwitching ? "SWITCHING..." : "SENDING..."}</span>
             </>
@@ -633,7 +633,7 @@ function ConfirmView({
             <span>SWITCH TO {chainName.toUpperCase()}</span>
           ) : (
             <>
-              <SendIcon size={13} color="#00FF41" />
+              <SendIcon size={13} color="#00EF8B" />
               <span>SEND PAYMENT</span>
             </>
           )}
@@ -670,7 +670,7 @@ function SuccessView({
           <span className="text-base font-medium text-[rgba(255,255,255,0.4)]">{symbol}</span>
         </div>
         <span className="text-xs text-[rgba(255,255,255,0.4)] font-mono">
-          sent to <span className="text-[#00FF41] font-semibold">{fullName}</span>
+          sent to <span className="text-[#00EF8B] font-semibold">{fullName}</span>
         </span>
         <div className="flex items-center gap-1.5 mt-0.5">
           <ChainIcon size={11} chainId={chainId} />
@@ -686,9 +686,9 @@ function SuccessView({
           rel="noopener noreferrer"
           className="no-underline"
         >
-          <div className="flex gap-1.5 items-center px-3 py-2 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(0,255,65,0.2)] transition-all cursor-pointer">
-            <ArrowUpRightIcon size={11} color="#00FF41" />
-            <span className="text-[11px] text-[#00FF41] font-mono font-medium">View on Explorer</span>
+          <div className="flex gap-1.5 items-center px-3 py-2 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(0,239,139,0.2)] transition-all cursor-pointer">
+            <ArrowUpRightIcon size={11} color="#00EF8B" />
+            <span className="text-[11px] text-[#00EF8B] font-mono font-medium">View on Explorer</span>
           </div>
         </a>
       )}

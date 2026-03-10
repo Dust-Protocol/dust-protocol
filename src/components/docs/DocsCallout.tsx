@@ -8,10 +8,10 @@ interface DocsCalloutProps {
 
 const styles = {
   info: {
-    border: "border-[rgba(0,255,65,0.2)]",
-    bg: "bg-[rgba(0,255,65,0.04)]",
-    title: "text-[#00FF41]",
-    dot: "bg-[#00FF41]",
+    border: "border-[rgba(0,239,139,0.2)]",
+    bg: "bg-[rgba(0,239,139,0.04)]",
+    title: "text-[#00EF8B]",
+    dot: "bg-[#00EF8B]",
   },
   warning: {
     border: "border-[rgba(255,176,0,0.25)]",

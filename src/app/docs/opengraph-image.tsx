@@ -27,7 +27,7 @@ export default async function Image() {
                 width: "44px",
                 height: "44px",
                 borderRadius: "8px",
-                backgroundColor: "#00FF41",
+                backgroundColor: "#00EF8B",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -82,7 +82,7 @@ export default async function Image() {
               style={{
                 fontSize: "48px",
                 fontWeight: 700,
-                color: "#00FF41",
+                color: "#00EF8B",
                 lineHeight: 1.15,
               }}
             >

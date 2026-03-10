@@ -33,7 +33,7 @@ input[type="number"] {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,255,65,0.3); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,239,139,0.3); }
 
 /* Docs prose */
 .prose-docs h3 {
@@ -63,11 +63,11 @@ input[type="number"] {
   border-radius: 2px;
 }
 .prose-docs a {
-  color: rgba(0,255,65,0.75);
+  color: rgba(0,239,139,0.75);
   text-decoration: none;
 }
 .prose-docs a:hover {
-  color: #00FF41;
+  color: #00EF8B;
 }
 .prose-docs ul, .prose-docs ol {
   margin-bottom: 1rem;

@@ -50,7 +50,7 @@ export function PersonalLinkCard({ ownedNames, metaAddress, isNamesSettled = tru
         {dustName ? (
           <div className="flex justify-between items-end">
             <div>
-              <h3 className="text-xl font-bold text-[#00FF41] font-mono mb-1">
+              <h3 className="text-xl font-bold text-[#00EF8B] font-mono mb-1">
                 {dustName}
               </h3>
               <span className="text-xs text-[rgba(255,255,255,0.4)] font-mono">
@@ -60,10 +60,10 @@ export function PersonalLinkCard({ ownedNames, metaAddress, isNamesSettled = tru
             <div className="flex items-center gap-1">
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all group"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all group"
               >
                 {copied
-                  ? <CheckIcon size={12} color="#00FF41" />
+                  ? <CheckIcon size={12} color="#00EF8B" />
                   : <CopyIcon size={12} color="rgba(255,255,255,0.5)" />
                 }
                 <span className="text-[10px] font-mono text-[rgba(255,255,255,0.6)] group-hover:text-white">
@@ -72,13 +72,13 @@ export function PersonalLinkCard({ ownedNames, metaAddress, isNamesSettled = tru
               </button>
               <button
                 onClick={() => setShowQR(true)}
-                className="p-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all"
+                className="p-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all"
               >
                 <QRIcon size={12} color="rgba(255,255,255,0.5)" />
               </button>
               <button
                 onClick={() => window.open(payPath, "_blank")}
-                className="p-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all"
+                className="p-2 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all"
               >
                 <ExternalLinkIcon size={12} color="rgba(255,255,255,0.5)" />
               </button>
@@ -86,7 +86,7 @@ export function PersonalLinkCard({ ownedNames, metaAddress, isNamesSettled = tru
           </div>
         ) : !isNamesSettled ? (
           <div className="flex items-center gap-2 py-3">
-            <div className="w-4 h-4 border-2 border-[rgba(0,255,65,0.4)] border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-[rgba(0,239,139,0.4)] border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-[rgba(255,255,255,0.4)] font-mono">Resolving identity...</span>
           </div>
         ) : metaAddress ? (

@@ -482,7 +482,7 @@ export default function CreateLinkPage() {
         <button
           style={{
             width: "100%", padding: "16px",
-            background: name.trim() ? "linear-gradient(135deg, #00FF41 0%, #00FF41 100%)" : colors.bg.elevated,
+            background: name.trim() ? "linear-gradient(135deg, #00EF8B 0%, #00EF8B 100%)" : colors.bg.elevated,
             borderRadius: radius.full,
             cursor: name.trim() ? "pointer" : "not-allowed",
             boxShadow: name.trim() ? "0 4px 16px rgba(43, 90, 226, 0.35)" : "none",

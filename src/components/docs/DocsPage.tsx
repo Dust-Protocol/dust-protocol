@@ -24,7 +24,7 @@ export function DocsPage({ title, subtitle, badge, children, currentHref }: Docs
       {/* Header */}
       <header className="mb-8">
         {badge && (
-          <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono tracking-widest border border-[rgba(0,255,65,0.2)] text-[rgba(0,255,65,0.7)] bg-[rgba(0,255,65,0.04)] rounded-sm mb-4">
+          <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-mono tracking-widest border border-[rgba(0,239,139,0.2)] text-[rgba(0,239,139,0.7)] bg-[rgba(0,239,139,0.04)] rounded-sm mb-4">
             {badge}
           </span>
         )}
@@ -46,7 +46,7 @@ export function DocsPage({ title, subtitle, badge, children, currentHref }: Docs
               href={prev.href}
               className="flex items-center gap-2 text-[11px] font-mono text-[rgba(255,255,255,0.4)] hover:text-white transition-colors group"
             >
-              <ArrowLeftIcon className="w-3.5 h-3.5 group-hover:text-[#00FF41] transition-colors" />
+              <ArrowLeftIcon className="w-3.5 h-3.5 group-hover:text-[#00EF8B] transition-colors" />
               <span>{prev.label}</span>
             </Link>
           ) : (
@@ -58,7 +58,7 @@ export function DocsPage({ title, subtitle, badge, children, currentHref }: Docs
               className="flex items-center gap-2 text-[11px] font-mono text-[rgba(255,255,255,0.4)] hover:text-white transition-colors group"
             >
               <span>{next.label}</span>
-              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:text-[#00FF41] transition-colors" />
+              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:text-[#00EF8B] transition-colors" />
             </Link>
           ) : (
             <div />

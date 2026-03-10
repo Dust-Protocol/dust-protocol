@@ -30,7 +30,7 @@ export function ChainSelector({ compact = false }: { compact?: boolean }) {
 
   const triggerClass = compact
     ? "flex items-center gap-1.5 text-[10px] font-mono text-[rgba(255,255,255,0.7)] hover:text-white transition-all bg-transparent border-none outline-none"
-    : "flex items-center gap-1.5 px-2.5 py-1 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] text-[10px] font-mono text-[rgba(255,255,255,0.7)] hover:border-[rgba(0,255,65,0.2)] transition-all";
+    : "flex items-center gap-1.5 px-2.5 py-1 rounded-sm border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] text-[10px] font-mono text-[rgba(255,255,255,0.7)] hover:border-[rgba(0,239,139,0.2)] transition-all";
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -61,15 +61,15 @@ export function ChainSelector({ compact = false }: { compact?: boolean }) {
                 }}
                 className={`w-full text-left px-3 py-2 text-[10px] font-mono transition-all flex items-center gap-2 ${
                   isActive
-                    ? 'text-[#00FF41] bg-[rgba(0,255,65,0.05)]'
-                    : 'text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,255,65,0.05)] hover:text-[#00FF41]'
+                    ? 'text-[#00EF8B] bg-[rgba(0,239,139,0.05)]'
+                    : 'text-[rgba(255,255,255,0.6)] hover:bg-[rgba(0,239,139,0.05)] hover:text-[#00EF8B]'
                 }`}
               >
                 <ChainIcon chain={chain} />
                 <span className="flex-1">{chain.name}</span>
                 <span className="text-[rgba(255,255,255,0.3)]">{chain.nativeCurrency.symbol}</span>
                 {isActive && (
-                  <span className="text-[#00FF41] font-bold">•</span>
+                  <span className="text-[#00EF8B] font-bold">•</span>
                 )}
               </button>
             );

@@ -32,20 +32,20 @@ export function PrivacyPoolCard({
     >
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
-          <ShieldIcon className="w-3.5 h-3.5 text-[#00FF41]" />
+          <ShieldIcon className="w-3.5 h-3.5 text-[#00EF8B]" />
           <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">PRIVACY_POOL</span>
           <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(255,255,255,0.08)] text-[9px] text-[rgba(255,255,255,0.4)] font-mono">Legacy</span>
         </div>
         <button
           onClick={onToggle}
-          className={`w-10 h-5 rounded-full relative transition-colors ${claimToPool ? 'bg-[rgba(0,255,65,0.3)]' : 'bg-[rgba(255,255,255,0.1)]'}`}
+          className={`w-10 h-5 rounded-full relative transition-colors ${claimToPool ? 'bg-[rgba(0,239,139,0.3)]' : 'bg-[rgba(255,255,255,0.1)]'}`}
         >
           <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${claimToPool ? 'left-5' : 'left-0.5'}`} />
         </button>
       </div>
 
       {claimToPool && (
-        <div className="mb-4 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00FF41] pl-2">
+        <div className="mb-4 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00EF8B] pl-2">
           Auto-routing enabled — payments held for batch deposit
         </div>
       )}
@@ -55,7 +55,7 @@ export function PrivacyPoolCard({
           <span className="text-2xl font-bold text-white font-mono tracking-tight">
             {parseFloat(poolBalance).toFixed(4)} {symbol}
           </span>
-          <span className="text-[10px] text-[#00FF41] font-mono">
+          <span className="text-[10px] text-[#00EF8B] font-mono">
             {depositCount} deposit{depositCount !== 1 ? 's' : ''} ready
           </span>
         </div>
@@ -63,11 +63,11 @@ export function PrivacyPoolCard({
 
       {isDepositing && (
         <div className="mb-4">
-          <p className="text-[11px] text-[#00FF41] font-mono mb-2">{depositProgress.message || 'Depositing...'}</p>
+          <p className="text-[11px] text-[#00EF8B] font-mono mb-2">{depositProgress.message || 'Depositing...'}</p>
           {depositProgress.total > 0 && (
             <div className="h-1 bg-[rgba(255,255,255,0.05)] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#00FF41] rounded-full transition-all duration-500"
+                className="h-full bg-[#00EF8B] rounded-full transition-all duration-500"
                 style={{ width: `${Math.max(5, (depositProgress.done / depositProgress.total) * 100)}%` }}
               />
             </div>
@@ -79,7 +79,7 @@ export function PrivacyPoolCard({
         {hasPoolBalance && (
           <button
             onClick={onWithdraw}
-            className="py-2 px-3 rounded-sm border border-[rgba(0,255,65,0.2)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.08)] transition-all text-xs font-bold text-[#00FF41] font-mono"
+            className="py-2 px-3 rounded-sm border border-[rgba(0,239,139,0.2)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.08)] transition-all text-xs font-bold text-[#00EF8B] font-mono"
           >
             [ WITHDRAW ]
           </button>
@@ -87,7 +87,7 @@ export function PrivacyPoolCard({
         {claimToPool && poolEligibleCount > 0 && !isDepositing && (
           <button
             onClick={onDepositAll}
-            className="py-2 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.05)] transition-all text-xs font-bold text-white hover:text-[#00FF41] font-mono"
+            className="py-2 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.05)] transition-all text-xs font-bold text-white hover:text-[#00EF8B] font-mono"
           >
             [ DEPOSIT {poolEligibleCount} ]
           </button>

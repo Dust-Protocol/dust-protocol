@@ -146,7 +146,7 @@ export function NoOptInPayment({
   if (status === "deposit_detected") {
     return (
       <div className="flex flex-col items-center gap-5 py-6">
-        <div className="p-4 bg-[rgba(0,255,65,0.08)] rounded-full">
+        <div className="p-4 bg-[rgba(0,239,139,0.08)] rounded-full">
           <CheckCircleIcon size={36} color="#7c7fff" />
         </div>
         <div className="flex flex-col items-center gap-1.5">
@@ -172,8 +172,8 @@ export function NoOptInPayment({
       <div
         className="flex items-center gap-2 px-3.5 py-2 rounded-full"
         style={{
-          background: "rgba(0,255,65,0.06)",
-          border: "1px solid rgba(0,255,65,0.12)",
+          background: "rgba(0,239,139,0.06)",
+          border: "1px solid rgba(0,239,139,0.12)",
         }}
       >
         <div
@@ -198,8 +198,8 @@ export function NoOptInPayment({
         <div
           className="flex items-center gap-2 p-3 rounded-sm w-full"
           style={{
-            background: "rgba(0,255,65,0.04)",
-            border: "1px solid rgba(0,255,65,0.1)",
+            background: "rgba(0,239,139,0.04)",
+            border: "1px solid rgba(0,239,139,0.1)",
           }}
         >
           <div className="shrink-0">

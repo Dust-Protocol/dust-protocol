@@ -36,7 +36,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
     <div className="w-full md:w-[180px] md:h-full">
       <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm flex flex-col md:h-full">
         <div className="flex items-center gap-1.5 mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00EF8B] animate-pulse" />
           <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">
             Pool
           </span>
@@ -45,7 +45,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
         <div className="hidden md:flex flex-1 flex-col items-center gap-2">
           <div className="relative w-7 flex-1 min-h-[100px] rounded-full overflow-hidden bg-[rgba(255,255,255,0.05)] flex flex-col-reverse">
             <div
-              className="w-full bg-[#00FF41] opacity-60 transition-all duration-700 ease-out"
+              className="w-full bg-[#00EF8B] opacity-60 transition-all duration-700 ease-out"
               style={{ height: `${ethPct}%` }}
             />
             <div className="w-full h-[2px] bg-[#06080F] z-10 shrink-0" />
@@ -59,7 +59,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
         <div className="md:hidden flex flex-col gap-2 w-full">
           <div className="flex gap-0.5 h-2.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.05)]">
             <div
-              className="bg-[#00FF41] opacity-60 transition-all duration-700 ease-out rounded-l-full"
+              className="bg-[#00EF8B] opacity-60 transition-all duration-700 ease-out rounded-l-full"
               style={{ width: `${ethPct}%` }}
             />
             <div
@@ -71,7 +71,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
 
         <div className="flex md:flex-col gap-3 md:gap-2 mt-3 font-mono w-full">
           <div className="flex items-center gap-1.5 w-full">
-            <span className="w-3 h-2 rounded-[2px] bg-[#00FF41] opacity-60 shrink-0" />
+            <span className="w-3 h-2 rounded-[2px] bg-[#00EF8B] opacity-60 shrink-0" />
             <ETHIcon size={14} />
             <span className="text-[13px] text-white font-bold">
               {formatReserve(totalEth, false)}

@@ -119,7 +119,7 @@ export default function OverviewPage() {
             <span className="text-[rgba(255,255,255,0.25)] ml-1">testnet</span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
             Thanos Sepolia
             <span className="text-[rgba(255,255,255,0.25)] ml-1">Tokamak Network</span>
           </span>
@@ -138,12 +138,12 @@ export default function OverviewPage() {
             <Link
               key={f.href + f.title}
               href={f.href}
-              className="group flex flex-col gap-2 p-4 border border-[rgba(255,255,255,0.06)] rounded-sm hover:border-[rgba(0,255,65,0.15)] hover:bg-[rgba(0,255,65,0.02)] transition-all"
+              className="group flex flex-col gap-2 p-4 border border-[rgba(255,255,255,0.06)] rounded-sm hover:border-[rgba(0,239,139,0.15)] hover:bg-[rgba(0,239,139,0.02)] transition-all"
             >
               <div className="flex items-center justify-between">
                 <DocsBadge variant={f.color as never}>{f.badge}</DocsBadge>
               </div>
-              <p className="text-[13px] font-mono font-semibold text-white group-hover:text-[#00FF41] transition-colors">
+              <p className="text-[13px] font-mono font-semibold text-white group-hover:text-[#00EF8B] transition-colors">
                 {f.title}
               </p>
               <p className="text-xs text-[rgba(255,255,255,0.45)] leading-relaxed">{f.desc}</p>
@@ -164,7 +164,7 @@ export default function OverviewPage() {
             "Optionally deposit claimed funds to the Privacy Pool to consolidate without creating a traceable link.",
           ].map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="shrink-0 w-5 h-5 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.15)] flex items-center justify-center text-[9px] font-mono text-[#00FF41] mt-0.5">
+              <span className="shrink-0 w-5 h-5 rounded-sm bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.15)] flex items-center justify-center text-[9px] font-mono text-[#00EF8B] mt-0.5">
                 {i + 1}
               </span>
               {step}
@@ -174,7 +174,7 @@ export default function OverviewPage() {
         <div className="mt-6">
           <Link
             href="/docs/how-it-works"
-            className="inline-flex items-center gap-2 text-[12px] font-mono text-[#00FF41] hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-[12px] font-mono text-[#00EF8B] hover:text-white transition-colors"
           >
             Read: How It Works →
           </Link>

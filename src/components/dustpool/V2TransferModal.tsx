@@ -116,7 +116,7 @@ export function V2TransferModal({
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
-                <SendIcon size={16} color="#00FF41" />
+                <SendIcon size={16} color="#00EF8B" />
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
                   [ TRANSFER_V2 ]
                 </span>
@@ -133,7 +133,7 @@ export function V2TransferModal({
               {!isPending && !error && !isSuccess && (
                 <>
                   {/* Info */}
-                  <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
+                  <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
                     <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
                       Transfer shielded funds to another user&apos;s V2 public key. Both input and output remain private within the pool.
                     </p>
@@ -158,7 +158,7 @@ export function V2TransferModal({
                         setAmount(e.target.value.replace(/[^0-9.]/g, ""));
                       }}
                       placeholder="0.0"
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-sm focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {exceedsBalance && (
                       <p className="text-[11px] text-red-400 font-mono">Amount exceeds shielded balance</p>
@@ -176,7 +176,7 @@ export function V2TransferModal({
                       placeholder="0x... (recipient's V2 owner key)"
                       value={recipientPubKey}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipientPubKey(e.target.value)}
-                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-xs focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-xs focus:outline-none focus:border-[#00EF8B] focus:bg-[rgba(0,239,139,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
                     {recipientPubKey && !parsedPubKey && (
                       <p className="text-[11px] text-red-400 font-mono">Invalid public key (hex format expected)</p>
@@ -191,7 +191,7 @@ export function V2TransferModal({
                     data-testid="transfer-submit"
                     onClick={handleTransfer}
                     disabled={!canTransfer}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.15)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {parsedAmount ? `Transfer ${amount} ${nativeSymbol}` : "Enter Amount"}
                   </button>
@@ -201,14 +201,14 @@ export function V2TransferModal({
               {/* Processing */}
               {isPending && (
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">{status || "Generating ZK proof..."}</p>
                   <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
-                    <span className="text-[#00FF41]">proof</span>
+                    <span className="text-[#00EF8B]">proof</span>
                     <span>&rarr;</span>
-                    <span className={status?.includes("Submitting") || status?.includes("Confirming") ? "text-[#00FF41]" : ""}>submit</span>
+                    <span className={status?.includes("Submitting") || status?.includes("Confirming") ? "text-[#00EF8B]" : ""}>submit</span>
                     <span>&rarr;</span>
-                    <span className={status?.includes("Confirming") ? "text-[#00FF41]" : ""}>confirm</span>
+                    <span className={status?.includes("Confirming") ? "text-[#00EF8B]" : ""}>confirm</span>
                   </div>
                 </div>
               )}
@@ -218,16 +218,16 @@ export function V2TransferModal({
                 <div className="flex flex-col gap-4">
                   <div className="text-center py-2">
                     <div className="inline-flex mb-3">
-                      <ShieldCheckIcon size={40} color="#00FF41" />
+                      <ShieldCheckIcon size={40} color="#00EF8B" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">Transfer Successful</p>
                     <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {nativeSymbol} transferred privately</p>
                   </div>
 
                   {txHash && (
-                    <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
+                    <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.15)]">
                       <p className="text-[11px] text-[rgba(255,255,255,0.4)] mb-1 font-mono">Transaction</p>
-                      <p className="text-xs font-mono text-[#00FF41] break-all">{txHash}</p>
+                      <p className="text-xs font-mono text-[#00EF8B] break-all">{txHash}</p>
                     </div>
                   )}
 
@@ -240,7 +240,7 @@ export function V2TransferModal({
 
                   <button
                     onClick={handleClose}
-                    className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider"
+                    className="w-full py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider"
                   >
                     Done
                   </button>
@@ -267,7 +267,7 @@ export function V2TransferModal({
                     </button>
                     <button
                       onClick={() => { clearError(); setAmount(""); setRecipientPubKey(""); }}
-                      className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
+                      className="flex-1 py-3 rounded-sm bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-sm font-bold text-[#00EF8B] font-mono tracking-wider transition-all"
                     >
                       Try Again
                     </button>

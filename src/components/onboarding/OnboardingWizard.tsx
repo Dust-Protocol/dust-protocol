@@ -150,7 +150,7 @@ export function OnboardingWizard() {
               style={{
                 backgroundColor:
                   i < currentIndex
-                    ? "rgba(0,255,65,0.5)"
+                    ? "rgba(0,239,139,0.5)"
                     : i === currentIndex
                     ? "rgba(255,255,255,0.8)"
                     : "rgba(255,255,255,0.1)",
@@ -161,8 +161,8 @@ export function OnboardingWizard() {
 
         {/* Re-activation banner */}
         {(isReactivation || isReclaiming) && step !== "activating" && (
-          <div className="mx-7 md:mx-9 mt-5 px-3 py-2.5 rounded-sm bg-[rgba(0,255,65,0.05)] border border-[rgba(0,255,65,0.15)] flex flex-col gap-0.5">
-            <p className="text-[11px] font-mono text-[rgba(0,255,65,0.7)] uppercase tracking-widest">Welcome back</p>
+          <div className="mx-7 md:mx-9 mt-5 px-3 py-2.5 rounded-sm bg-[rgba(0,239,139,0.05)] border border-[rgba(0,239,139,0.15)] flex flex-col gap-0.5">
+            <p className="text-[11px] font-mono text-[rgba(0,239,139,0.7)] uppercase tracking-widest">Welcome back</p>
             {existingName && <p className="text-[13px] text-white font-semibold">{existingName}</p>}
             <p className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono mt-0.5">
               Enter your PIN to re-activate your private wallet.
@@ -202,7 +202,7 @@ export function OnboardingWizard() {
                 <div className="flex items-center gap-2 justify-center py-8">
                   {/* Spinner */}
                   <svg
-                    className="animate-spin w-4 h-4 text-[rgba(0,255,65,0.8)]"
+                    className="animate-spin w-4 h-4 text-[rgba(0,239,139,0.8)]"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"

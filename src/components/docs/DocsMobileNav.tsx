@@ -45,7 +45,7 @@ export function DocsMobileNav() {
                     onClick={() => setOpen(false)}
                     className={`flex px-8 py-2.5 text-[11px] font-mono tracking-wide transition-all ${
                       active
-                        ? "text-[#00FF41] bg-[rgba(0,255,65,0.04)]"
+                        ? "text-[#00EF8B] bg-[rgba(0,239,139,0.04)]"
                         : "text-[rgba(255,255,255,0.45)] hover:text-white"
                     }`}
                   >

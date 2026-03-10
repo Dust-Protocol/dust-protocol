@@ -121,11 +121,11 @@ export default function FaqPage() {
           {faqs.map((item, i) => (
             <details
               key={i}
-              className="group border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden open:border-[rgba(0,255,65,0.1)]"
+              className="group border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden open:border-[rgba(0,239,139,0.1)]"
             >
               <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                 <span className="text-[13px] font-mono text-white">{item.q}</span>
-                <span className="shrink-0 text-[rgba(255,255,255,0.3)] group-open:text-[#00FF41] font-mono text-lg leading-none transition-colors select-none">
+                <span className="shrink-0 text-[rgba(255,255,255,0.3)] group-open:text-[#00EF8B] font-mono text-lg leading-none transition-colors select-none">
                   +
                 </span>
               </summary>

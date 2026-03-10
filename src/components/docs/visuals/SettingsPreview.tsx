@@ -14,7 +14,7 @@ function Row({ label, children, last }: { label: string; children: React.ReactNo
 function SettingsButton({ children, variant = "default" }: { children: React.ReactNode; variant?: "default" | "green" | "red" }) {
   const styles = {
     default: "bg-[rgba(255,255,255,0.03)] text-[rgba(255,255,255,0.6)]",
-    green: "bg-[rgba(0,255,65,0.06)] text-[#00FF41] border-[rgba(0,255,65,0.15)]",
+    green: "bg-[rgba(0,239,139,0.06)] text-[#00EF8B] border-[rgba(0,239,139,0.15)]",
     red: "bg-[rgba(239,68,68,0.06)] text-[#ef4444]",
   };
   return (
@@ -92,17 +92,17 @@ export function SettingsClaimSnippet() {
             key={opt.label}
             className={`flex items-center justify-between px-3 py-1.5 rounded-sm border ${
               opt.active
-                ? "border-[rgba(0,255,65,0.2)] bg-[rgba(0,255,65,0.04)]"
+                ? "border-[rgba(0,239,139,0.2)] bg-[rgba(0,239,139,0.04)]"
                 : "border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]"
             }`}
           >
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${opt.active ? "bg-[#00FF41] shadow-[0_0_4px_#00FF41]" : "bg-[rgba(255,255,255,0.1)]"}`} />
-              <span className={`text-[11px] font-mono font-medium ${opt.active ? "text-[#00FF41]" : "text-[rgba(255,255,255,0.5)]"}`}>
+              <div className={`w-2 h-2 rounded-full ${opt.active ? "bg-[#00EF8B] shadow-[0_0_4px_#00EF8B]" : "bg-[rgba(255,255,255,0.1)]"}`} />
+              <span className={`text-[11px] font-mono font-medium ${opt.active ? "text-[#00EF8B]" : "text-[rgba(255,255,255,0.5)]"}`}>
                 {opt.label}
               </span>
             </div>
-            <span className={`text-[9px] font-mono ${opt.active ? "text-[rgba(0,255,65,0.6)]" : "text-[rgba(255,255,255,0.3)]"}`}>
+            <span className={`text-[9px] font-mono ${opt.active ? "text-[rgba(0,239,139,0.6)]" : "text-[rgba(255,255,255,0.3)]"}`}>
               {opt.desc}
             </span>
           </div>

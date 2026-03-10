@@ -18,7 +18,7 @@ export default function PoolsPageClient() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.12)]">
+          <div className="p-3 rounded-sm bg-[rgba(0,239,139,0.04)] border border-[rgba(0,239,139,0.12)]">
             <p className="text-[12px] text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
               Deposit any amount of {nativeSymbol} into a single global pool. Transfer privately between users with hidden amounts,
               or withdraw to a fresh address with no link to the depositor. All operations use ZK proofs (FFLONK).

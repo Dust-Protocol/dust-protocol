@@ -29,7 +29,7 @@ function formatTVL(weiStr: string): string {
 
 function SkeletonCard() {
   return (
-    <div className="flex flex-col gap-2 p-4 bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)] rounded-sm animate-pulse">
+    <div className="flex flex-col gap-2 p-4 bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.1)] rounded-sm animate-pulse">
       <div className="h-3 w-20 bg-white/5 rounded-sm" />
       <div className="h-6 w-14 bg-white/10 rounded-sm" />
     </div>
@@ -46,7 +46,7 @@ function StatCard({
   suffix?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 p-4 bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)] rounded-sm">
+    <div className="flex flex-col gap-1 p-4 bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.1)] rounded-sm">
       <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
         {label}
       </span>
@@ -89,7 +89,7 @@ export function ProtocolMetrics() {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#00FF41]/30 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-[#00EF8B]/30 animate-pulse" />
           <span className="text-[11px] font-mono text-white/30">
             Loading protocol metrics...
           </span>

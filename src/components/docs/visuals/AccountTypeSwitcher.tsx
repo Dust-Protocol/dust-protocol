@@ -36,7 +36,7 @@ export function AccountTypeSwitcher() {
                         onClick={() => setActiveTab(tab.id)}
                         className={`
               flex-1 py-3 text-[11px] font-mono transition-all duration-200 border-b
-              ${activeTab === tab.id ? 'border-dust-green text-dust-green bg-[rgba(0,255,65,0.08)]' : 'border-transparent text-dust-muted hover:text-white hover:bg-[rgba(255,255,255,0.02)]'}
+              ${activeTab === tab.id ? 'border-dust-green text-dust-green bg-[rgba(0,239,139,0.08)]' : 'border-transparent text-dust-muted hover:text-white hover:bg-[rgba(255,255,255,0.02)]'}
             `}
                     >
                         {tab.label}

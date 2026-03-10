@@ -28,8 +28,8 @@ describe('V1→V2 migration: isSwapSupported', () => {
     expect(isSwapSupported(999999)).toBe(false)
   })
 
-  it('returns true with default chain (Eth Sepolia)', () => {
-    expect(isSwapSupported()).toBe(true)
+  it('returns true for Eth Sepolia (explicit)', () => {
+    expect(isSwapSupported(11155111)).toBe(true)
   })
 })
 

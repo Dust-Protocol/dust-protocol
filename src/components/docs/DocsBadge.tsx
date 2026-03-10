@@ -4,7 +4,7 @@ interface DocsBadgeProps {
 }
 
 const variantStyles = {
-  green: "text-[#00FF41] bg-[rgba(0,255,65,0.08)] border-[rgba(0,255,65,0.2)]",
+  green: "text-[#00EF8B] bg-[rgba(0,239,139,0.08)] border-[rgba(0,239,139,0.2)]",
   amber: "text-[#FFB000] bg-[rgba(255,176,0,0.08)] border-[rgba(255,176,0,0.2)]",
   blue: "text-[rgba(100,160,255,0.9)] bg-[rgba(100,160,255,0.08)] border-[rgba(100,160,255,0.2)]",
   muted: "text-[rgba(255,255,255,0.45)] bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]",

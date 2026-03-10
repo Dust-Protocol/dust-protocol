@@ -120,7 +120,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
   return (
     <>
       <div className="w-full" data-testid="v2-pool-card">
-        <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(0,255,65,0.08)] rounded-sm backdrop-blur-sm relative overflow-hidden">
+        <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(0,239,139,0.08)] rounded-sm backdrop-blur-sm relative overflow-hidden">
           <CornerAccents />
           <div className="p-6 sm:p-8">
             <V2Header isLoading={isLoading} />
@@ -130,13 +130,13 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
               <div className="flex flex-col justify-between">
                 <div>
                   {/* Shielded Balance */}
-                  <div className="mb-5 p-4 rounded-sm bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)]">
+                  <div className="mb-5 p-4 rounded-sm bg-[rgba(0,239,139,0.03)] border border-[rgba(0,239,139,0.1)]">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
                         Shielded Balance
                       </span>
                       {unspentCount > 0 && (
-                        <span className="text-[10px] text-[#00FF41] font-mono">
+                        <span className="text-[10px] text-[#00EF8B] font-mono">
                           {unspentCount} note{unspentCount !== 1 ? "s" : ""}
                         </span>
                       )}
@@ -210,8 +210,8 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                   {hasKeys && (
                     <div className="mb-5 flex flex-col gap-2">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
-                        <span className="text-[10px] text-[#00FF41] font-mono">V2 keys active</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
+                        <span className="text-[10px] text-[#00EF8B] font-mono">V2 keys active</span>
                       </div>
                       {v2PubKey && (
                         <div className="flex items-center gap-2 p-2 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
@@ -226,7 +226,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                                 setTimeout(() => setPubKeyCopied(false), 2000);
                               }).catch(() => { });
                             }}
-                            className="shrink-0 px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold transition-all bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.15)] hover:bg-[rgba(0,255,65,0.15)] text-[#00FF41] cursor-pointer"
+                            className="shrink-0 px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold transition-all bg-[rgba(0,239,139,0.08)] border border-[rgba(0,239,139,0.15)] hover:bg-[rgba(0,239,139,0.15)] text-[#00EF8B] cursor-pointer"
                           >
                             {pubKeyCopied ? "COPIED" : "COPY"}
                           </button>
@@ -242,7 +242,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                     data-testid="v2-deposit-btn"
                     onClick={() => setActiveModal("deposit")}
                     disabled={!hasKeys}
-                    className="py-3 px-3 rounded-sm bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.14)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.12)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="py-3 px-3 rounded-sm bg-[rgba(0,239,139,0.08)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.14)] hover:border-[#00EF8B] hover:shadow-[0_0_15px_rgba(0,239,139,0.12)] transition-all text-sm font-bold text-[#00EF8B] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     DEPOSIT
                   </button>
@@ -250,7 +250,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                     data-testid="v2-withdraw-btn"
                     onClick={() => setActiveModal("withdraw")}
                     disabled={!hasKeys || totalEthBalance === 0n}
-                    className="py-3 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.06)] hover:shadow-[0_0_15px_rgba(0,255,65,0.08)] transition-all text-sm font-bold text-white hover:text-[#00FF41] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="py-3 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.06)] hover:shadow-[0_0_15px_rgba(0,239,139,0.08)] transition-all text-sm font-bold text-white hover:text-[#00EF8B] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     WITHDRAW
                   </button>
@@ -258,7 +258,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                     data-testid="v2-transfer-btn"
                     onClick={() => setActiveModal("transfer")}
                     disabled={!hasKeys || totalEthBalance === 0n}
-                    className="py-3 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00FF41] hover:bg-[rgba(0,255,65,0.06)] hover:shadow-[0_0_15px_rgba(0,255,65,0.08)] transition-all text-sm font-bold text-white hover:text-[#00FF41] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="py-3 px-3 rounded-sm border border-[rgba(255,255,255,0.1)] hover:border-[#00EF8B] hover:bg-[rgba(0,239,139,0.06)] hover:shadow-[0_0_15px_rgba(0,239,139,0.08)] transition-all text-sm font-bold text-white hover:text-[#00EF8B] font-mono tracking-wider disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     TRANSFER
                   </button>
@@ -268,7 +268,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
               {/* Right Column: Information */}
               <div className="flex flex-col">
                 {/* V2 feature highlight */}
-                <div className="mb-5 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00FF41] pl-2">
+                <div className="mb-5 text-[10px] text-[rgba(255,255,255,0.4)] font-mono border-l-2 border-[#00EF8B] pl-2">
                   Arbitrary amounts &middot; UTXO model &middot; FFLONK proofs
                 </div>
 
@@ -279,15 +279,15 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                   </p>
                   <div className="flex flex-col gap-3 text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00FF41] font-bold">1</span>
+                      <span className="text-[#00EF8B] font-bold">1</span>
                       <p>Deposit any amount of {nativeSymbol} into the shielded pool quietly</p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00FF41] font-bold">2</span>
+                      <span className="text-[#00EF8B] font-bold">2</span>
                       <p>Withdraw any amount to a fresh address — no link to depositor</p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-[#00FF41] font-bold">3</span>
+                      <span className="text-[#00EF8B] font-bold">3</span>
                       <p>Transfer shielded funds to another user fully privately</p>
                     </div>
                   </div>
@@ -332,16 +332,16 @@ function V2Header({ isLoading }: { isLoading?: boolean }) {
   return (
     <div className="flex items-center justify-between mb-5">
       <div className="flex items-center gap-2.5">
-        <ShieldIcon size={14} color="#00FF41" />
+        <ShieldIcon size={14} color="#00EF8B" />
         <span className="text-xs font-bold font-mono text-white tracking-widest uppercase">
           PRIVACY_POOL
         </span>
-        <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,255,65,0.15)] text-[9px] text-[#00FF41] font-mono font-bold">
+        <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,239,139,0.15)] text-[9px] text-[#00EF8B] font-mono font-bold">
           V2
         </span>
       </div>
       {isLoading && (
-        <div className="w-3 h-3 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
+        <div className="w-3 h-3 border-2 border-[#00EF8B] border-t-transparent rounded-full animate-spin" />
       )}
     </div>
   );

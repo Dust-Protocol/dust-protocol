@@ -20,7 +20,7 @@ const USDC_ICON = (
 );
 
 const SHIELD_ICON = (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00FF41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00EF8B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
@@ -44,7 +44,7 @@ export function SwapTokenPairSnippet() {
           {/* Arrow */}
           <div className="px-2">
             <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
-              <path d="M0 6H18M18 6L13 1M18 6L13 11" stroke="#00FF41" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M0 6H18M18 6L13 1M18 6L13 11" stroke="#00EF8B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
 
@@ -55,7 +55,7 @@ export function SwapTokenPairSnippet() {
               {USDC_ICON}
               <span className="text-xs font-bold text-white">USDC</span>
             </div>
-            <span className="text-sm font-bold text-[#00FF41]">5,012.00</span>
+            <span className="text-sm font-bold text-[#00EF8B]">5,012.00</span>
           </div>
         </div>
       </div>
@@ -75,8 +75,8 @@ export function SwapDenomSnippet() {
               DENOM_PRIVACY
             </span>
           </div>
-          <div className="relative w-8 h-4 rounded-full bg-[rgba(0,255,65,0.25)] border border-[rgba(0,255,65,0.4)]">
-            <div className="absolute top-0.5 w-3 h-3 rounded-full bg-[#00FF41] left-[calc(100%-14px)]" />
+          <div className="relative w-8 h-4 rounded-full bg-[rgba(0,239,139,0.25)] border border-[rgba(0,239,139,0.4)]">
+            <div className="absolute top-0.5 w-3 h-3 rounded-full bg-[#00EF8B] left-[calc(100%-14px)]" />
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export function SwapDenomSnippet() {
           {["1", "0.5", "0.3", "0.2"].map((chunk) => (
             <span
               key={chunk}
-              className="px-2 py-0.5 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.12)] text-[10px] text-[#00FF41]"
+              className="px-2 py-0.5 rounded-sm bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.12)] text-[10px] text-[#00EF8B]"
             >
               {chunk} ETH
             </span>
@@ -141,7 +141,7 @@ export function SwapFlowDiagramSnippet() {
               <div className="flex flex-col items-center gap-0.5 min-w-0">
                 <div className="px-2 py-1.5 rounded-sm border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] text-center whitespace-nowrap">
                   <span className="text-[10px] text-white font-bold block leading-tight">{s.label}</span>
-                  <span className="text-[8px] text-[#00FF41] uppercase tracking-wider">{s.sub}</span>
+                  <span className="text-[8px] text-[#00EF8B] uppercase tracking-wider">{s.sub}</span>
                 </div>
               </div>
               {i < steps.length - 1 && (
@@ -170,7 +170,7 @@ export function SwapProcessingSnippet() {
         <div className="flex items-center gap-1.5">
           {stages.map((s, i) => (
             <div key={s} className="contents">
-              <div className="px-2 py-1 rounded-sm bg-[rgba(0,255,65,0.06)] border border-[rgba(0,255,65,0.12)] text-[10px] text-[#00FF41] whitespace-nowrap">
+              <div className="px-2 py-1 rounded-sm bg-[rgba(0,239,139,0.06)] border border-[rgba(0,239,139,0.12)] text-[10px] text-[#00EF8B] whitespace-nowrap">
                 {s}
               </div>
               {i < stages.length - 1 && (

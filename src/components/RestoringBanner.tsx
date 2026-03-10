@@ -43,18 +43,18 @@ export function RestoringBanner({ isScanning, progress, onDismiss }: Props) {
   if (!visible) return null;
 
   return (
-    <div className="w-full mb-4 px-4 py-3 rounded-sm border border-[rgba(0,255,65,0.18)] bg-[rgba(0,255,65,0.04)] flex items-start gap-3">
+    <div className="w-full mb-4 px-4 py-3 rounded-sm border border-[rgba(0,239,139,0.18)] bg-[rgba(0,239,139,0.04)] flex items-start gap-3">
       {/* Animated dot */}
       <div className="mt-[3px] flex-shrink-0">
         {justFinished ? (
-          <div className="w-2 h-2 rounded-full bg-[rgba(0,255,65,0.8)]" />
+          <div className="w-2 h-2 rounded-full bg-[rgba(0,239,139,0.8)]" />
         ) : (
-          <div className="w-2 h-2 rounded-full bg-[rgba(0,255,65,0.6)] animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-[rgba(0,239,139,0.6)] animate-pulse" />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-mono text-[rgba(0,255,65,0.8)] uppercase tracking-widest leading-none mb-1">
+        <p className="text-[12px] font-mono text-[rgba(0,239,139,0.8)] uppercase tracking-widest leading-none mb-1">
           {justFinished ? "History restored" : "Restoring history"}
         </p>
         <p className="text-[12px] text-[rgba(255,255,255,0.45)]">
@@ -68,12 +68,12 @@ export function RestoringBanner({ isScanning, progress, onDismiss }: Props) {
           <div className="mt-2 h-[2px] w-full bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
             {progress !== undefined ? (
               <div
-                className="h-full bg-[rgba(0,255,65,0.5)] transition-all duration-500"
+                className="h-full bg-[rgba(0,239,139,0.5)] transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             ) : (
               /* Indeterminate pulse */
-              <div className="h-full w-1/3 bg-[rgba(0,255,65,0.5)] rounded-full animate-pulse" />
+              <div className="h-full w-1/3 bg-[rgba(0,239,139,0.5)] rounded-full animate-pulse" />
             )}
           </div>
         )}

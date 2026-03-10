@@ -20,7 +20,7 @@ export function PaymentLinkCard() {
                     <span className="text-dust-muted">dustprotocol.app</span>
                     <span className="text-dust-green">/pay/alice/freelance</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[rgba(0,255,65,0.06)] border border-dust-green/20 rounded-full">
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[rgba(0,239,139,0.06)] border border-dust-green/20 rounded-full">
                     <motion.div
                         animate={{ opacity: [0.4, 1, 0.4] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
@@ -39,7 +39,7 @@ export function PaymentLinkCard() {
                     </span>
                     <motion.span
                         key={payments}
-                        initial={{ color: '#00FF41' }}
+                        initial={{ color: '#00EF8B' }}
                         animate={{ color: '#ffffff' }}
                         transition={{ duration: 0.8 }}
                         className="block text-lg font-bold font-mono"

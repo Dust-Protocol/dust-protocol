@@ -58,7 +58,7 @@ function PinInput({ value, onChange }: { value: string; onChange: (v: string) =>
           className={[
             "w-11 h-[52px] text-center text-[20px] font-semibold rounded-sm font-mono",
             "bg-[rgba(255,255,255,0.03)] text-white",
-            "border transition-all focus:outline-none focus:border-[#00FF41]",
+            "border transition-all focus:outline-none focus:border-[#00EF8B]",
             value[i]
               ? "border-[rgba(255,255,255,0.15)]"
               : "border-[rgba(255,255,255,0.1)]",
@@ -159,7 +159,7 @@ export function PinStep({ onNext }: PinStepProps) {
             "h-11 rounded-sm text-[14px] font-bold font-mono tracking-wider transition-all",
             step === "confirm" ? "flex-[2]" : "w-full",
             isReady
-              ? "py-3 px-4 bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-[#00FF41]"
+              ? "py-3 px-4 bg-[rgba(0,239,139,0.1)] border border-[rgba(0,239,139,0.2)] hover:bg-[rgba(0,239,139,0.15)] hover:border-[#00EF8B] text-[#00EF8B]"
               : "bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.3)] cursor-not-allowed",
           ].join(" ")}
         >

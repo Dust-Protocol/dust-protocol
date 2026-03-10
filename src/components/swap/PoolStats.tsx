@@ -61,7 +61,7 @@ export function PoolStats({
       <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm flex flex-col gap-3 md:h-full">
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-1.5">
-            <DollarSignIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <DollarSignIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">TVL</span>
           </div>
           <span className="text-sm font-bold text-white font-mono tracking-tight">
@@ -73,12 +73,12 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1.5 group">
           <div className="flex items-center gap-1.5">
-            <ShieldIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <ShieldIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Shielded</span>
           </div>
           <div className="flex gap-0.5 h-1.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.08)]">
             <div
-              className="bg-[#00FF41] opacity-60 transition-all duration-500"
+              className="bg-[#00EF8B] opacity-60 transition-all duration-500"
               style={{ width: `${ethPercent.toFixed(1)}%` }}
             />
             <div
@@ -99,10 +99,10 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1 group">
           <div className="flex items-center gap-1.5">
-            <BarChart3Icon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <BarChart3Icon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Oracle</span>
             {priceSource && (
-              <span className={`text-[8px] font-mono px-1 py-px rounded-sm leading-tight ${priceSource === 'chainlink' ? 'text-[#00FF41] bg-[rgba(0,255,65,0.08)]' : 'text-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.04)]'}`}>
+              <span className={`text-[8px] font-mono px-1 py-px rounded-sm leading-tight ${priceSource === 'chainlink' ? 'text-[#00EF8B] bg-[rgba(0,239,139,0.08)]' : 'text-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.04)]'}`}>
                 {priceSource === 'chainlink' ? 'CHAINLINK' : 'POOL'}
               </span>
             )}
@@ -125,7 +125,7 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1.5 group">
           <div className="flex items-center gap-1.5">
-            <DatabaseIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <DatabaseIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Pool Info</span>
           </div>
           <div className="flex flex-col gap-0.5">
@@ -152,12 +152,12 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1.5 group">
           <div className="flex items-center gap-1.5">
-            <LayersIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <LayersIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Capacity</span>
           </div>
           <div className="flex gap-0.5 h-1 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.08)]">
             <div
-              className="bg-[#00FF41] opacity-60 transition-all duration-500"
+              className="bg-[#00EF8B] opacity-60 transition-all duration-500"
               style={{ width: `${Math.max((noteCount / 1_048_576) * 100, 0.1)}%` }}
             />
           </div>
@@ -170,7 +170,7 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1 group">
           <div className="flex items-center gap-1.5">
-            <ActivityIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <ActivityIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Liquidity</span>
           </div>
           <span className="text-xs font-bold text-white font-mono">
@@ -182,12 +182,12 @@ export function PoolStats({
 
         <div className="flex flex-col gap-1.5 group">
           <div className="flex items-center gap-1.5">
-            <GlobeIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00FF41] transition-colors" />
+            <GlobeIcon className="w-3.5 h-3.5 text-[rgba(255,255,255,0.35)] group-hover:text-[#00EF8B] transition-colors" />
             <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">Networks</span>
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#00EF8B]" />
               <span className="text-[10px] text-[rgba(255,255,255,0.6)] font-mono">Eth Sepolia</span>
             </div>
             <div className="flex items-center gap-1.5">
