@@ -19,10 +19,13 @@ import { storageKey } from '@/lib/storageKey';
 const LEGACY_STORAGE_KEY = 'tokamak_stealth_keys_';
 function stealthKeysKey(addr: string): string { return storageKey('stealthkeys', addr); }
 
-// Full validation: tries formatStealthMetaAddress + parseStealthMetaAddress round-trip
+function getMetaPrefix(chainId?: number): string {
+  try { return getChainConfig(chainId).iconFamily; } catch { return 'eth'; }
+}
+
 function areKeysValid(keys: StealthKeyPair): boolean {
   try {
-    const meta = formatStealthMetaAddress(keys, 'thanos');
+    const meta = formatStealthMetaAddress(keys, 'eth');
     parseStealthMetaAddress(meta);
     return true;
   } catch {
@@ -63,7 +66,7 @@ export function useStealthAddress(activeChainId?: number) {
   const autoRestoringRef = useRef(false);
 
   // Derived values — safe because stealthKeys are fully validated before being set
-  const metaAddress = hasStealthKeys && stealthKeysRef.current ? formatStealthMetaAddress(stealthKeysRef.current, 'thanos') : null;
+  const metaAddress = hasStealthKeys && stealthKeysRef.current ? formatStealthMetaAddress(stealthKeysRef.current, getMetaPrefix(activeChainId)) : null;
   const parsedMetaAddress: StealthMetaAddress | null = (() => {
     try { return metaAddress ? parseStealthMetaAddress(metaAddress) : null; }
     catch { return null; }
@@ -147,7 +150,7 @@ export function useStealthAddress(activeChainId?: number) {
 
       // Compute metaAddress synchronously (cheap string concat) so callers
       // don't need to wait for a React re-render or re-derive keys
-      const derivedMetaAddress = formatStealthMetaAddress(newKeys, 'thanos');
+      const derivedMetaAddress = formatStealthMetaAddress(newKeys, getMetaPrefix(activeChainId));
 
       // Derive claim addresses — PIN-based if PIN provided
       const stored = loadClaimAddressesFromStorage(address);

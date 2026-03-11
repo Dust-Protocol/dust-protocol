@@ -72,7 +72,7 @@ export function BackupRestore({ chainId }: BackupRestoreProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard API can fail in non-secure contexts
+      console.warn("Clipboard API unavailable");
     }
   };
 

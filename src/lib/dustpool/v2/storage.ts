@@ -441,6 +441,7 @@ export function updateNoteLeafIndex(
       }
 
       note.leafIndex = leafIndex
+      note.status = 'confirmed'
       const putRequest = store.put(note)
       putRequest.onsuccess = () => resolve()
       putRequest.onerror = () => reject(putRequest.error)

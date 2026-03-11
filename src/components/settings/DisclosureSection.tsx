@@ -46,9 +46,13 @@ export function DisclosureSection({ keysRef, chainId }: DisclosureSectionProps) 
 
   const handleCopy = useCallback(async () => {
     if (!viewKeyString) return;
-    await navigator.clipboard.writeText(viewKeyString);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(viewKeyString);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   }, [viewKeyString]);
 
   const handleExport = useCallback((format: "csv" | "json") => {
@@ -84,7 +88,10 @@ export function DisclosureSection({ keysRef, chainId }: DisclosureSectionProps) 
           <div className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.03)] flex items-center justify-center flex-shrink-0">
             <EyeIcon size={16} color="rgba(255,255,255,0.5)" />
           </div>
-          <span className="text-[15px] text-white font-semibold">Disclosure</span>
+          <div className="flex flex-col">
+            <span className="text-[15px] text-white font-semibold">Audit & Compliance</span>
+            <span className="text-[11px] text-[rgba(255,255,255,0.4)]">Generate reports for auditors and compliance</span>
+          </div>
         </div>
 
         {/* View Key Section */}

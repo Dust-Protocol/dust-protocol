@@ -18,6 +18,7 @@ import { getChainConfig } from "@/config/chains";
 interface V2TransferModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   keysRef: RefObject<V2Keys | null>;
   chainId?: number;
   shieldedBalance: bigint;
@@ -26,6 +27,7 @@ interface V2TransferModalProps {
 export function V2TransferModal({
   isOpen,
   onClose,
+  onSuccess,
   keysRef,
   chainId,
   shieldedBalance,
@@ -88,6 +90,12 @@ export function V2TransferModal({
   const formattedMax = parseFloat(formatEther(shieldedBalance)).toFixed(4);
   const isSuccess = txHash !== null && !isPending && !error;
 
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(() => { onSuccess?.(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, onSuccess]);
+
   const truncatedPubKey = recipientPubKey
     ? recipientPubKey.length > 16
       ? `${recipientPubKey.slice(0, 10)}...${recipientPubKey.slice(-6)}`
@@ -111,14 +119,14 @@ export function V2TransferModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <SendIcon size={16} color="#00FF41" />
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
-                  [ TRANSFER_V2 ]
+                  [ PRIVATE SEND ]
                 </span>
               </div>
               {!isPending && (
@@ -135,7 +143,7 @@ export function V2TransferModal({
                   {/* Info */}
                   <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
                     <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
-                      Transfer shielded funds to another user&apos;s V2 public key. Both input and output remain private within the pool.
+                      Send shielded funds to another user&apos;s public key. Both sender and recipient stay fully private within the pool.
                     </p>
                   </div>
 
@@ -173,7 +181,7 @@ export function V2TransferModal({
                     <input
                       data-testid="transfer-recipient"
                       type="text"
-                      placeholder="0x... (recipient's V2 owner key)"
+                      placeholder="0x... (recipient's private key)"
                       value={recipientPubKey}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipientPubKey(e.target.value)}
                       className="w-full p-3 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-xs focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
@@ -182,7 +190,7 @@ export function V2TransferModal({
                       <p className="text-[11px] text-red-400 font-mono">Invalid public key (hex format expected)</p>
                     )}
                     <p className="text-[11px] text-[rgba(255,255,255,0.3)] font-mono">
-                      The recipient&apos;s V2 spending public key (Poseidon hash of their spending key)
+                      The recipient&apos;s spending public key (Poseidon hash of their spending key)
                     </p>
                   </div>
 
@@ -266,10 +274,10 @@ export function V2TransferModal({
                       Cancel
                     </button>
                     <button
-                      onClick={() => { clearError(); setAmount(""); setRecipientPubKey(""); }}
+                      onClick={() => { clearError(); }}
                       className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
                     >
-                      Try Again
+                      [ TRY AGAIN ]
                     </button>
                   </div>
                 </div>

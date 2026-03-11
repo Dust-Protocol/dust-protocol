@@ -105,9 +105,10 @@ export function Navbar() {
 
   function copyAddress() {
     if (!address) return;
-    navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    navigator.clipboard.writeText(address).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => console.warn("Clipboard API unavailable"));
   }
 
   function selectChain(chainId: number) {

@@ -12,9 +12,13 @@ export function SecuritySection({ metaAddress, viewingPublicKey }: SecuritySecti
   const [copied, setCopied] = useState<string | null>(null);
 
   const handleCopy = async (text: string, key: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(key);
-    setTimeout(() => setCopied(null), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
 
   return (
@@ -29,10 +33,10 @@ export function SecuritySection({ metaAddress, viewingPublicKey }: SecuritySecti
 
         {metaAddress && (
           <div className="flex flex-col gap-3">
-            <span className="text-[13px] text-[rgba(255,255,255,0.5)] font-medium">Stealth Meta-Address</span>
+            <span className="text-[13px] text-[rgba(255,255,255,0.5)] font-medium">Private Address</span>
             <div className="px-4 py-3.5 bg-[rgba(255,255,255,0.03)] rounded-sm">
               <span className="text-[11px] text-[rgba(255,255,255,0.35)] font-mono break-all leading-relaxed">
-                {metaAddress}
+                {metaAddress.slice(0, 10)}...{metaAddress.slice(-8)}
               </span>
             </div>
             <button

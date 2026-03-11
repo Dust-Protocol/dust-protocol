@@ -16,7 +16,7 @@ const BLOCK_RANGE_BY_CHAIN: Record<number, number> = {
   421614: 100_000,     // Arbitrum Sepolia (~0.25s blocks)
   11155420: 50_000,    // OP Sepolia (2s blocks)
   84532: 50_000,       // Base Sepolia (2s blocks)
-  545: 50_000,         // Flow EVM Testnet (~1s blocks)
+  545: 9_999,          // Flow EVM Testnet (10k block limit on eth_getLogs)
 };
 const DEFAULT_BLOCK_RANGE = 9_999;
 

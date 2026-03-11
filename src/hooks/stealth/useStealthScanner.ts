@@ -15,6 +15,15 @@ import {
   loadDeposits,
   type StoredDeposit,
 } from '@/lib/dustpool';
+import {
+  computeOwnerPubKey,
+  computeAssetId,
+  computeNoteCommitment,
+} from '@/lib/dustpool/v2/commitment';
+import { createNote } from '@/lib/dustpool/v2/note';
+import { openV2Database, saveNoteV2, markNoteSpent, bigintToHex, type StoredNoteV2 } from '@/lib/dustpool/v2/storage';
+import { getDustPoolV2Address } from '@/lib/dustpool/v2/contracts';
+import type { V2Keys } from '@/lib/dustpool/v2/types';
 import { getChainConfig, DEFAULT_CHAIN_ID, getMinClaimableBalance } from '@/config/chains';
 import { getTokensForChain } from '@/config/tokens';
 import { getChainProvider, getChainBatchProvider, rotateBatchProvider } from '@/lib/providers';
@@ -581,10 +590,140 @@ async function claimToPoolDeposit(
   }
 }
 
+/**
+ * Deposit stealth payment into DustPoolV2 as a single commitment.
+ * Uses single deposit() instead of batchDeposit to avoid the contract bug
+ * where msg.value is divided equally across commitments (wrong for unequal chunks).
+ * Denomination splitting happens later via the split-withdraw circuit.
+ */
+async function claimToPoolV2Deposit(
+  payment: ScanResult,
+  userAddress: string,
+  chainId: number,
+  v2Keys: V2Keys,
+): Promise<{ txHash: string; notes: StoredNoteV2[] } | null> {
+  try {
+    const config = getChainConfig(chainId);
+    const dustPoolV2 = getDustPoolV2Address(chainId);
+    if (!dustPoolV2) {
+      console.warn('[PoolV2] DustPoolV2 not deployed on chain', chainId);
+      return null;
+    }
+
+    const wt = payment.walletType;
+    if (wt !== 'account') {
+      console.warn('[PoolV2] Only account type supported for V2 pool deposit, got:', wt);
+      return null;
+    }
+
+    const provider = getChainProvider(chainId);
+    const balance = await provider.getBalance(payment.announcement.stealthAddress);
+    if (balance.isZero()) return null;
+
+    // Single deposit with full balance — split into denominations later via split-withdraw
+    const ownerPubKey = await computeOwnerPubKey(v2Keys.spendingKey);
+    const assetId = await computeAssetId(chainId, '0x0000000000000000000000000000000000000000');
+    const note = createNote(ownerPubKey, balance.toBigInt(), assetId, chainId);
+    const commitment = await computeNoteCommitment(note);
+    const commitmentHex = '0x' + commitment.toString(16).padStart(64, '0');
+
+    // Build deposit(bytes32) calldata
+    const depositIface = new ethers.utils.Interface([
+      'function deposit(bytes32 commitment) payable',
+    ]);
+    const depositCalldata = depositIface.encodeFunctionData('deposit', [commitmentHex]);
+
+    const ownerEOA = getAddressFromPrivateKey(payment.stealthPrivateKey);
+    const accountAddress = payment.announcement.stealthAddress;
+
+    const code = await provider.getCode(accountAddress);
+    const isDeployed = code !== '0x';
+
+    let initCode = '0x';
+    if (!isDeployed) {
+      const iface = new ethers.utils.Interface(STEALTH_ACCOUNT_FACTORY_ABI);
+      const createData = iface.encodeFunctionData('createAccount', [ownerEOA, 0]);
+      initCode = ethers.utils.hexConcat([config.contracts.accountFactory, createData]);
+    }
+
+    const EXECUTE_SELECTOR = '0xb61d27f6';
+    const callData = ethers.utils.hexConcat([
+      EXECUTE_SELECTOR,
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'uint256', 'bytes'],
+        [dustPoolV2, balance, depositCalldata]
+      ),
+    ]);
+
+    // Derive encryption key for secure note storage
+    const { deriveStorageKey } = await import('@/lib/dustpool/v2/storage-crypto');
+    const encKey = await deriveStorageKey(v2Keys.spendingKey);
+
+    // Save note BEFORE submitting tx — crash between tx and save would lose the blinding factor
+    const db = await openV2Database();
+    const stored: StoredNoteV2 = {
+      id: bigintToHex(commitment),
+      walletAddress: userAddress.toLowerCase(),
+      chainId,
+      commitment: bigintToHex(commitment),
+      owner: bigintToHex(note.owner),
+      amount: bigintToHex(note.amount),
+      asset: bigintToHex(note.asset),
+      blinding: bigintToHex(note.blinding),
+      leafIndex: -1,
+      spent: false,
+      createdAt: Date.now(),
+      status: 'pending',
+    };
+    await saveNoteV2(db, userAddress, stored, encKey);
+
+    // Bundle prep → sign → submit
+    const prepRes = await fetch('/api/bundle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: accountAddress,
+        initCode,
+        callData,
+        chainId,
+        callGasLimit: '8000000',
+      }),
+    });
+    const prepData = await prepRes.json();
+    if (!prepRes.ok) {
+      console.warn('[PoolV2] Bundle prep failed:', prepData.error);
+      await markNoteSpent(db, stored.id).catch(() => {});
+      return null;
+    }
+
+    const { userOp, userOpHash } = prepData;
+    userOp.signature = await signUserOp(userOpHash, payment.stealthPrivateKey);
+
+    const submitRes = await fetch('/api/bundle/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userOp, chainId }),
+    });
+    const submitData = await submitRes.json();
+    if (!submitRes.ok) {
+      console.warn('[PoolV2] Bundle submit failed:', submitData.error);
+      await markNoteSpent(db, stored.id).catch(() => {});
+      return null;
+    }
+
+    console.log(`[PoolV2] Deposited full balance into V2 pool, tx: ${submitData.txHash}`);
+    return { txHash: submitData.txHash, notes: [stored] };
+  } catch (e) {
+    console.error('[PoolV2] Error:', e);
+    return null;
+  }
+}
+
 interface UseStealthScannerOptions {
   autoClaimRecipient?: string;
   claimToPool?: boolean;
   chainId?: number;
+  v2KeysRef?: React.RefObject<V2Keys | null>;
 }
 
 export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: UseStealthScannerOptions) {
@@ -599,12 +738,17 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
   const autoClaimCooldownRef = useRef<Map<string, number>>(new Map());
   // Private keys stored in ref (NOT in React state) to avoid DevTools exposure
   const privateKeysRef = useRef<Map<string, string>>(new Map());
+  // Signals that stored payments need auto-claim after key re-derivation
+  const pendingAutoClaimRef = useRef(false);
 
   const autoClaimRecipientRef = useRef(options?.autoClaimRecipient);
   autoClaimRecipientRef.current = options?.autoClaimRecipient;
 
   const claimToPoolRef = useRef(options?.claimToPool ?? false);
   claimToPoolRef.current = options?.claimToPool ?? false;
+
+  const v2KeysRef = useRef<React.RefObject<V2Keys | null> | undefined>(options?.v2KeysRef);
+  v2KeysRef.current = options?.v2KeysRef;
 
   // Helper: strip private key from payment before putting in state
   function stripKey(p: StealthPayment): StealthPayment {
@@ -669,8 +813,18 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
         // Skip payments where key derivation fails
       }
     }
-    if (rederived > 0 && process.env.NODE_ENV === 'development') {
-      console.log(`[Scanner] Re-derived ${rederived} private keys from stealth keys`);
+    if (rederived > 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Scanner] Re-derived ${rederived} private keys from stealth keys`);
+      }
+      // Clear keyMismatch and mark payments as needing auto-claim retry
+      setPayments(prev => prev.map(p =>
+        privateKeysRef.current.has(p.announcement.txHash) && p.keyMismatch
+          ? { ...p, keyMismatch: false }
+          : p
+      ));
+      // Flag that stored payments need auto-claim (handled by effect below tryAutoClaim)
+      pendingAutoClaimRef.current = true;
     }
   }, [stealthKeys, payments]);
 
@@ -688,28 +842,50 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
     // Use explicit recipient, or fall back to connected wallet address
     const recipient = explicitRecipient || address;
     // Need either a claim destination or pool mode enabled
-    if (!recipient && !poolMode) return;
+    if (!recipient && !poolMode) {
+      console.log('[AutoClaim] No recipient and no poolMode, skipping');
+      return;
+    }
 
     // Snapshot keys at start to prevent race condition if wallet switches mid-claim.
     // Without this, later loop iterations could read keys for a different wallet.
     const keysSnapshot = new Map(privateKeysRef.current);
 
+    console.log(`[AutoClaim] tryAutoClaim called with ${newPayments.length} payments, ${keysSnapshot.size} keys, recipient=${recipient}, poolMode=${poolMode}`);
+
     const now = Date.now();
     const claimable = newPayments.filter(p => {
       const txHash = p.announcement.txHash;
       const bal = parseFloat(p.balance || '0');
-      if (p.claimed || p.keyMismatch || bal <= 0) return false;
+      if (p.claimed || p.keyMismatch || bal <= 0) {
+        console.log(`[AutoClaim] SKIP ${txHash.slice(0,10)}: claimed=${p.claimed} keyMismatch=${p.keyMismatch} bal=${bal}`);
+        return false;
+      }
       // EOA wallets need enough balance to cover gas; sponsored types just need > 0
-      if ((!p.walletType || p.walletType === 'eoa') && bal < getMinClaimableBalance(chainId)) return false;
-      if (autoClaimingRef.current.has(txHash)) return false;
-      // Pool-eligible payments are NOT auto-claimed — user deposits manually via dashboard button
-      if (poolMode && (p.walletType === 'create2' || p.walletType === 'account' || p.walletType === 'eip7702')) return false;
+      if ((!p.walletType || p.walletType === 'eoa') && bal < getMinClaimableBalance(chainId)) {
+        console.log(`[AutoClaim] SKIP ${txHash.slice(0,10)}: EOA bal ${bal} below min`);
+        return false;
+      }
+      if (autoClaimingRef.current.has(txHash)) {
+        console.log(`[AutoClaim] SKIP ${txHash.slice(0,10)}: already claiming`);
+        return false;
+      }
+      // Pool mode: skip create2/eip7702 (V1 only), but allow account type through for V2 deposit
+      if (poolMode && (p.walletType === 'create2' || p.walletType === 'eip7702')) {
+        console.log(`[AutoClaim] SKIP ${txHash.slice(0,10)}: poolMode=${poolMode} walletType=${p.walletType} (V1 only)`);
+        return false;
+      }
       // 30-second cooldown after a failed attempt
       const lastAttempt = autoClaimCooldownRef.current.get(txHash);
-      if (lastAttempt && now - lastAttempt < 30_000) return false;
+      if (lastAttempt && now - lastAttempt < 30_000) {
+        console.log(`[AutoClaim] SKIP ${txHash.slice(0,10)}: cooldown (${Math.round((now - lastAttempt)/1000)}s ago)`);
+        return false;
+      }
+      console.log(`[AutoClaim] PASS ${txHash.slice(0,10)}: walletType=${p.walletType} bal=${bal}`);
       return true;
     });
 
+    console.log(`[AutoClaim] ${claimable.length} claimable out of ${newPayments.length}`);
     if (claimable.length === 0) return;
 
     for (const payment of claimable) {
@@ -746,7 +922,6 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
       let claimResult: { txHash: string } | null;
 
       if (!recipient) {
-        // No recipient and no connected address — skip
         autoClaimingRef.current.delete(txHash);
         setPayments(prev => prev.map(p =>
           p.announcement.txHash === txHash ? { ...p, autoClaiming: false } : p
@@ -754,7 +929,26 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
         continue;
       }
 
-      claimResult = await autoClaimPayment(paymentWithKey, recipient, chainId);
+      // Route: poolMode + account type + V2 contract → V2 pool deposit
+      const keys = v2KeysRef.current?.current;
+      const hasV2Pool = !!getDustPoolV2Address(chainId);
+      if (poolMode && payment.walletType === 'account' && hasV2Pool) {
+        if (!keys) {
+          // V2 keys not yet derived (user hasn't entered PIN) — defer, don't drain to wallet.
+          // No cooldown: next background scan (3-10s) will retry with live v2KeysRef read.
+          console.log(`[AutoClaim] DEFER ${txHash.slice(0,10)}: poolMode but V2 keys not available yet`);
+          autoClaimingRef.current.delete(txHash);
+          setPayments(prev => prev.map(p =>
+            p.announcement.txHash === txHash ? { ...p, autoClaiming: false } : p
+          ));
+          continue;
+        }
+        console.log(`[AutoClaim] Routing ${txHash.slice(0,10)} to V2 pool deposit`);
+        const v2Result = await claimToPoolV2Deposit(paymentWithKey, recipient, chainId, keys);
+        claimResult = v2Result ? { txHash: v2Result.txHash } : null;
+      } else {
+        claimResult = await autoClaimPayment(paymentWithKey, recipient, chainId);
+      }
 
       if (claimResult) {
         // Zeroize private key — no longer needed after successful drain
@@ -773,6 +967,23 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
       autoClaimingRef.current.delete(txHash);
     }
   }, [address, chainId]);
+
+  // Trigger auto-claim for stored unclaimed payments after key re-derivation.
+  // Stored payments from a previous session are loaded from localStorage but tryAutoClaim
+  // only fires for newly-scanned results. This effect bridges the gap.
+  useEffect(() => {
+    if (!pendingAutoClaimRef.current) return;
+    pendingAutoClaimRef.current = false;
+
+    const unclaimed = payments.filter(p =>
+      !p.claimed && !p.keyMismatch && parseFloat(p.balance || '0') > 0
+      && privateKeysRef.current.has(p.announcement.txHash)
+    );
+    if (unclaimed.length > 0) {
+      console.log(`[AutoClaim] Retrying ${unclaimed.length} stored unclaimed payments after key re-derivation`);
+      tryAutoClaim(unclaimed);
+    }
+  }, [payments, tryAutoClaim]);
 
   const isBgScanningRef = useRef(false);
   // H2: Track current scan ID to detect superseded scans
@@ -825,7 +1036,7 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
       if (process.env.NODE_ENV === 'development') console.log(`[Scanner] from=${startBlock}, latest=${latestBlock}`);
 
       if (!silent) {
-        const total = await getAnnouncementCount(provider, startBlock, latestBlock, config.contracts.announcer);
+        const total = await getAnnouncementCount(provider, startBlock, latestBlock, config.contracts.announcer, chainId);
         setProgress({ current: 0, total });
       }
 
@@ -1083,13 +1294,23 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null, options?: 
         continue;
       }
 
-      // Normal path: drain stealth wallet then deposit to pool
       const paymentWithKey = { ...payment, stealthPrivateKey: key };
       const amt = currentBal.toFixed(4);
       const symbol = getChainConfig(chainId).nativeCurrency.symbol;
       onProgress(deposited, total, `Depositing ${i + 1}/${total} (${amt} ${symbol})...`);
 
-      const result = await claimToPoolDeposit(paymentWithKey, address, chainId);
+      // V2 pool: only account (ERC-4337) type — create2/eip7702 need direct V1 deposit
+      const keys = v2KeysRef.current?.current;
+      let result: { txHash: string } | null;
+      if (!getChainConfig(chainId).contracts.dustPool && keys && getDustPoolV2Address(chainId) && payment.walletType === 'account') {
+        result = await claimToPoolV2Deposit(paymentWithKey, address, chainId, keys);
+      } else if (getChainConfig(chainId).contracts.dustPool) {
+        result = await claimToPoolDeposit(paymentWithKey, address, chainId);
+      } else {
+        skipped++;
+        onProgress(deposited, total, `Skipped ${i + 1}/${total} (no pool for ${payment.walletType})`);
+        continue;
+      }
 
       if (result) {
         deposited++;

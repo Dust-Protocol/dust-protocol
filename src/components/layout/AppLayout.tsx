@@ -63,8 +63,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // PinGate only shows as fallback when auto-restore fails (e.g. user rejected signature, wallet mismatch)
-  const needsPinUnlock = hasPin && !pinUnlocked && !stealthKeys && autoRestoreFailed;
+  // PinGate shows when: (a) auto-restore failed, or (b) no stored PIN but user is onboarded (cleared localStorage / new device)
+  const needsPinUnlock = !pinUnlocked && !stealthKeys && (
+    (hasPin && autoRestoreFailed) || (!hasPin && isOnboarded)
+  );
   // Brief spinner while auto-restore is in progress (silent for Privy, one popup for MetaMask)
   const isAutoRestoring = hasPin && !stealthKeys && !autoRestoreFailed && !pinUnlocked;
 

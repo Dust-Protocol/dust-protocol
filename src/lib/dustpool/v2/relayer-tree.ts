@@ -30,7 +30,7 @@ const EVENT_SCAN_CHUNK_BY_CHAIN: Record<number, number> = {
   84532: 50_000,        // Base Sepolia (2s blocks, native RPC)
   421614: 50_000,       // Arbitrum Sepolia (~0.25s blocks)
   11155420: 50_000,     // OP Sepolia (2s blocks)
-  545: 50_000,          // Flow EVM Testnet (~1s blocks)
+  545: 9_999,           // Flow EVM Testnet (10k block limit on eth_getLogs)
 }
 const DEFAULT_EVENT_SCAN_CHUNK = 10_000
 

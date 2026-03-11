@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getChainConfig } from "@/config/chains";
 import { getExplorerBase } from "@/lib/design/tokens";
 import type { StealthPayment, OutgoingPayment } from "@/lib/design/types";
+import { buildSortedActivities } from "@/lib/design/activity-sort";
 
 interface RecentActivityCardProps {
   payments: StealthPayment[];
@@ -22,31 +23,15 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
   const symbol = getChainConfig(activeChainId).nativeCurrency.symbol;
   const [filter, setFilter] = useState<Filter>("all");
 
-  const combined = useMemo(() => {
-    const incomingItems = payments.map((p) => ({
-      type: "incoming" as const,
-      data: p,
-    }));
-    const outgoingItems = outgoingPayments.map((p) => ({
-      type: "outgoing" as const,
-      data: p,
-    }));
-
-    // Sort incoming descending by block number
-    incomingItems.sort(
-      (a, b) => b.data.announcement.blockNumber - a.data.announcement.blockNumber
-    );
-    // Sort outgoing descending by timestamp
-    outgoingItems.sort((a, b) => b.data.timestamp - a.data.timestamp);
-
-    return { incoming: incomingItems, outgoing: outgoingItems };
-  }, [payments, outgoingPayments]);
+  const allActivities = useMemo(
+    () => buildSortedActivities(payments, outgoingPayments),
+    [payments, outgoingPayments],
+  );
 
   const displayed = useMemo(() => {
-    if (filter === "outgoing") return combined.outgoing;
-    if (filter === "incoming") return combined.incoming;
-    return [...combined.outgoing, ...combined.incoming];
-  }, [filter, combined]);
+    if (filter === "all") return allActivities;
+    return allActivities.filter((item) => item.type === filter);
+  }, [filter, allActivities]);
 
   const recent = displayed.slice(0, 5);
   const totalCount = payments.length + outgoingPayments.length;
@@ -109,36 +94,32 @@ export function RecentActivityCard({ payments, outgoingPayments = [] }: RecentAc
         <div className="flex flex-col">
           {recent.map((item, i) => {
             const isIncoming = item.type === "incoming";
+            const inPayment = isIncoming ? item.payment as StealthPayment : null;
+            const outPayment = !isIncoming ? item.payment as OutgoingPayment : null;
 
-            const txHash = isIncoming
-              ? (item.data as StealthPayment).announcement.txHash
-              : (item.data as OutgoingPayment).txHash;
+            const txHash = inPayment
+              ? inPayment.announcement.txHash
+              : outPayment!.txHash;
 
-            const amount = isIncoming
-              ? (item.data as StealthPayment).originalAmount ||
-                (item.data as StealthPayment).balance ||
-                "0"
-              : (item.data as OutgoingPayment).amount;
+            const amount = inPayment
+              ? inPayment.originalAmount || inPayment.balance || "0"
+              : outPayment!.amount;
 
-            const addressLabel = isIncoming
-              ? `from ${(item.data as StealthPayment).announcement.caller?.slice(0, 6)}...${(item.data as StealthPayment).announcement.caller?.slice(-4)}`
-              : `to ${(item.data as OutgoingPayment).to.slice(0, 6)}...${(item.data as OutgoingPayment).to.slice(-4)}`;
+            const addressLabel = inPayment
+              ? `from ${inPayment.announcement.caller?.slice(0, 6)}...${inPayment.announcement.caller?.slice(-4)}`
+              : `to ${outPayment!.to.slice(0, 6)}...${outPayment!.to.slice(-4)}`;
 
-            const timeLabel = isIncoming
-              ? `Block #${(item.data as StealthPayment).announcement.blockNumber}`
-              : new Date((item.data as OutgoingPayment).timestamp).toLocaleDateString();
+            const timeLabel = inPayment
+              ? `Block #${inPayment.announcement.blockNumber}`
+              : new Date(outPayment!.timestamp).toLocaleDateString();
 
-            // Determine status
-            const isClaimed =
-              isIncoming && (item.data as StealthPayment).claimed === true;
-            const isUnclaimed =
-              isIncoming && (item.data as StealthPayment).claimed !== true;
-            // outgoing are always "completed"
-            const statusLabel = isIncoming
-              ? isClaimed
-                ? "claimed"
-                : "unclaimed"
-              : "completed";
+            const isClaimed = inPayment?.claimed === true;
+            let statusLabel: string;
+            if (isIncoming) {
+              statusLabel = isClaimed ? "claimed" : "unclaimed";
+            } else {
+              statusLabel = "completed";
+            }
             const statusClass =
               statusLabel === "claimed" || statusLabel === "completed"
                 ? "bg-[rgba(0,255,65,0.05)] border-[rgba(0,255,65,0.1)] text-[#00FF41]"

@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { ChevronDownIcon } from "lucide-react";
 import { SUPPORTED_TOKENS, getSupportedTokens, type SwapToken, isSwapSupported, RELAYER_FEE_BPS, getUSDCAddress, ETH_ADDRESS } from "@/lib/swap/constants";
+import { getChainConfig } from "@/config/chains";
 import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
 import { useAuth } from "@/contexts/AuthContext";
-import { UnsupportedChainNotice } from "@/components/ui/UnsupportedChainNotice";
 import { useV2Keys, useV2Balance } from "@/hooks/dustpool/v2";
 import { useV2Swap, type SwapStatus } from "@/hooks/swap/v2/useV2Swap";
 import { useV2DenomSwap, type DenomSwapStatus } from "@/hooks/swap/v2/useV2DenomSwap";
@@ -367,8 +367,6 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
     setAmountStr(trimmed || '0');
   };
 
-  // UnsupportedChainNotice banner + disabled swap button handles unsupported chains.
-  // No auto-switch — let the user decide when to switch chains.
 
   useEffect(() => {
     if (activeStatus === "done") {
@@ -507,7 +505,14 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
           {/* Unsupported Chain Banner */}
           {!swapSupported && isConnected && (
-            <UnsupportedChainNotice feature="V2 Swap" />
+            <div className="mb-4 p-4 rounded-sm bg-[rgba(255,176,0,0.06)] border border-[rgba(255,176,0,0.2)]">
+              <div className="flex items-center gap-2">
+                <AlertCircleIcon size={14} color="#FFB000" />
+                <span className="text-[12px] text-[#FFB000] font-mono font-bold">
+                  Private swaps coming soon to {getChainConfig(activeChainId).name}
+                </span>
+              </div>
+            </div>
           )}
 
           {/* Keys status + inline PIN unlock */}
@@ -552,7 +557,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
           {isConnected && swapSupported && hasKeys && (
             <div className="mb-4 flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
-              <span className="text-[10px] font-mono text-[#00FF41]">V2 keys active</span>
+              <span className="text-[10px] font-mono text-[#00FF41]">Privacy keys active</span>
             </div>
           )}
 

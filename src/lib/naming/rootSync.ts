@@ -3,11 +3,8 @@
 // pushes them to all destination chain NameVerifier contracts.
 
 import { ethers } from 'ethers';
-import { getChainConfig, getSupportedChains } from '@/config/chains';
-import { getServerProvider, getServerSponsor } from '@/lib/server-provider';
-
-// Canonical chain is Ethereum Sepolia
-const CANONICAL_CHAIN_ID = 11155111;
+import { getChainConfig, getSupportedChains, getCanonicalNamingChain } from '@/config/chains';
+import { getServerProvider, getServerSponsor, getTxGasOverrides } from '@/lib/server-provider';
 
 const NAME_REGISTRY_MERKLE_ABI = [
   'function getLastRoot() view returns (bytes32)',
@@ -34,13 +31,15 @@ export async function syncRootToAllChains(): Promise<{
   synced: { chainId: number; txHash: string }[];
   errors: { chainId: number; error: string }[];
 }> {
-  const canonicalConfig = getChainConfig(CANONICAL_CHAIN_ID);
+  const canonicalChain = getCanonicalNamingChain();
+  const canonicalChainId = canonicalChain.id;
+  const canonicalConfig = getChainConfig(canonicalChainId);
   const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
   if (!canonicalConfig.contracts.nameRegistryMerkle || canonicalConfig.contracts.nameRegistryMerkle === ZERO_ADDRESS) {
-    return { root: ethers.constants.HashZero, synced: [], errors: [{ chainId: CANONICAL_CHAIN_ID, error: 'No nameRegistryMerkle configured' }] };
+    return { root: ethers.constants.HashZero, synced: [], errors: [{ chainId: canonicalChainId, error: 'No nameRegistryMerkle configured' }] };
   }
 
-  const canonicalProvider = getServerProvider(CANONICAL_CHAIN_ID);
+  const canonicalProvider = getServerProvider(canonicalChainId);
   const canonicalRegistry = new ethers.Contract(
     canonicalConfig.contracts.nameRegistryMerkle,
     NAME_REGISTRY_MERKLE_ABI,
@@ -60,7 +59,7 @@ export async function syncRootToAllChains(): Promise<{
   }
 
   const destinationChains = getSupportedChains().filter(
-    c => c.id !== CANONICAL_CHAIN_ID
+    c => c.id !== canonicalChainId
       && c.contracts.nameVerifier
       && c.contracts.nameVerifier !== ZERO_ADDRESS
   );
@@ -90,7 +89,8 @@ export async function syncRootToAllChains(): Promise<{
           return;
         }
 
-        const tx = await verifier.updateRoot(currentRoot);
+        const gasOverrides = await getTxGasOverrides(chain.id, 200_000);
+        const tx = await verifier.updateRoot(currentRoot, gasOverrides);
         const receipt = await tx.wait();
         synced.push({ chainId: chain.id, txHash: receipt.transactionHash });
         console.log(`[RootSync] Synced root to ${chain.name}: ${receipt.transactionHash}`);

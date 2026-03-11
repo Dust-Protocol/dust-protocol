@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerSponsor, parseChainId, getTxGasOverrides } from '@/lib/server-provider';
 import { canUseGelato, sponsoredRelay, waitForRelay } from '@/lib/relay/gelato';
 import { checkOrigin } from '@/lib/api-auth';
 
@@ -91,7 +91,8 @@ export async function POST(req: Request) {
     console.log('[SponsorAnnounce] Using sponsor wallet');
     const sponsor = getServerSponsor(chainId);
     const announcer = new ethers.Contract(announcerAddress, ANNOUNCER_ABI, sponsor);
-    const tx = await announcer.announce(1, stealthAddress, ephemeralPubKey, metadata);
+    const gasOverrides = await getTxGasOverrides(chainId, 200_000);
+    const tx = await announcer.announce(1, stealthAddress, ephemeralPubKey, metadata, gasOverrides);
     // Fire-and-forget wait — respond as soon as tx is submitted
     tx.wait()
       .then((receipt: ethers.ContractReceipt) => console.log('[SponsorAnnounce] sponsor wallet confirmed:', receipt.transactionHash))

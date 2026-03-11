@@ -11,6 +11,7 @@ export interface UnifiedBalance {
   total: number;
   stealthTotal: number;
   claimTotal: number;
+  shieldedTotal: number;
   unclaimedCount: number;
   claimAddresses: ClaimAddressInfo[];
   unclaimedPayments: StealthPayment[];
@@ -22,6 +23,7 @@ interface UseUnifiedBalanceArgs {
   claimAddresses: ClaimAddressInfo[];
   refreshClaimBalances: () => Promise<void>;
   claimAddressesInitialized: boolean;
+  shieldedTotal?: number;
 }
 
 export function useUnifiedBalance({
@@ -29,6 +31,7 @@ export function useUnifiedBalance({
   claimAddresses,
   refreshClaimBalances,
   claimAddressesInitialized,
+  shieldedTotal = 0,
 }: UseUnifiedBalanceArgs): UnifiedBalance {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -79,9 +82,10 @@ export function useUnifiedBalance({
   );
 
   return {
-    total: stealthTotal + claimTotal,
+    total: stealthTotal + claimTotal + shieldedTotal,
     stealthTotal,
     claimTotal,
+    shieldedTotal,
     unclaimedCount: unclaimedPayments.length,
     claimAddresses,
     unclaimedPayments,

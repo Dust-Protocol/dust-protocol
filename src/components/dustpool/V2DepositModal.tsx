@@ -34,6 +34,7 @@ type SelectedToken = "native" | "USDC";
 interface V2DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   keysRef: RefObject<V2Keys | null>;
   chainId?: number;
   hasKeys?: boolean;
@@ -46,9 +47,13 @@ interface V2DepositModalProps {
 function CopyButton({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
   return (
     <button
@@ -61,7 +66,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   );
 }
 
-export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: hasKeysProp, hasPin, onDeriveKeys, isDeriving, keyError }: V2DepositModalProps) {
+export function V2DepositModal({ isOpen, onClose, onSuccess, keysRef, chainId, hasKeys: hasKeysProp, hasPin, onDeriveKeys, isDeriving, keyError }: V2DepositModalProps) {
   const { address } = useAccount();
   const { data: walletBalance } = useBalance({ address });
   const publicClient = usePublicClient();
@@ -239,6 +244,12 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
   const isError = (depositMode === "self" && error && !isPending) ||
     (depositMode === "external" && ext.status === "error");
 
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(() => { onSuccess?.(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, onSuccess]);
+
   const switchTab = (mode: DepositMode) => {
     if (isBusy) return;
     setDepositMode(mode);
@@ -278,14 +289,14 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <ShieldIcon size={16} color="#00FF41" />
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
-                  [ DEPOSIT_V2 ]
+                  [ SHIELD ]
                 </span>
                 <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)]">
                   <ChainIcon size={14} chainId={chainId} />
@@ -339,7 +350,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                     <div className="flex items-start gap-2">
                       <div className="mt-0.5 shrink-0"><LockIcon size={14} color="#f59e0b" /></div>
                       <p className="text-xs text-[rgba(255,255,255,0.5)] leading-relaxed font-mono">
-                        Unlock your V2 keys to generate deposit commitments. {hasPin ? "Enter your PIN below." : "Set a 6-digit PIN to derive your keys."}
+                        Unlock your keys to shield funds. {hasPin ? "Enter your PIN below." : "Set a 6-digit PIN to derive your keys."}
                       </p>
                     </div>
                   </div>
@@ -416,7 +427,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                       <div className="flex items-start gap-2">
                         <div className="mt-0.5 shrink-0"><ShieldCheckIcon size={14} color="#00FF41" /></div>
                         <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
-                          Address cleared. V2 pool supports arbitrary deposit amounts. Note stored locally in IndexedDB.
+                          Address cleared. Arbitrary deposit amounts supported. Balance saved locally.
                         </p>
                       </div>
                     </div>
@@ -497,7 +508,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                     disabled={!canSelfDeposit}
                     className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {parsedAmount ? `Deposit ${amount} ${tokenSymbol}` : "Enter Amount"}
+                    {parsedAmount ? `Shield ${amount} ${tokenSymbol}` : "Enter Amount"}
                   </button>
                 </>
               )}
@@ -515,7 +526,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {depositMode === "self" && isPending && (
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-semibold text-white font-mono">Depositing {tokenSymbol} to V2 pool...</p>
+                  <p className="text-sm font-semibold text-white font-mono">Shielding {tokenSymbol}...</p>
                   <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Confirm the transaction in your wallet</p>
                 </div>
               )}
@@ -562,7 +573,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   {/* Amount input */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-                      Deposit Amount ({tokenSymbol})
+                      Shield Amount ({tokenSymbol})
                     </label>
                     <input
                       type="text"
@@ -584,7 +595,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                       className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       <WalletIcon size={16} color="#00FF41" />
-                      {parsedAmount ? `Connect & Deposit ${amount} ${tokenSymbol}` : "Enter Amount"}
+                      {parsedAmount ? `Connect & Shield ${amount} ${tokenSymbol}` : "Enter Amount"}
                     </button>
                   )}
 
@@ -643,7 +654,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
               {depositMode === "external" && ext.status === "generating-note" && (
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-semibold text-white font-mono">Generating commitment...</p>
+                  <p className="text-sm font-semibold text-white font-mono">Generating deposit...</p>
                 </div>
               )}
 
@@ -715,7 +726,7 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                       <ShieldCheckIcon size={40} color="#00FF41" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">Deposit Successful</p>
-                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} deposited to V2 privacy pool</p>
+                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} shielded in privacy pool</p>
                   </div>
 
                   {(txHash || ext.txHash) && (
@@ -726,16 +737,16 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                   )}
 
                   <div className="p-3 rounded-sm bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)]">
-                    <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Note Saved Locally</p>
+                    <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Deposit Confirmed</p>
                     <p className="text-[11px] text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
-                      Your UTXO note is stored in this browser&apos;s IndexedDB. Clearing browser data will lose access to this deposit.
+                      Your private balance is stored in this browser. Clearing browser data will lose access to shielded funds.
                     </p>
                   </div>
 
                   <div className="p-3 rounded-sm bg-[rgba(99,102,241,0.06)] border border-[rgba(99,102,241,0.15)]">
                     <p className="text-xs text-indigo-400 font-semibold mb-1 font-mono">1-Hour Cooldown Active</p>
                     <p className="text-[11px] text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
-                      For compliance, private transfers are available after a 1-hour cooldown. During this period, you can only withdraw back to your deposit address.
+                      Transfers over $10,000 are delayed 1 hour for compliance. During this period, you can only withdraw back to your deposit address.
                     </p>
                   </div>
 
@@ -774,12 +785,11 @@ export function V2DepositModal({ isOpen, onClose, keysRef, chainId, hasKeys: has
                           clearError();
                         }
                         ext.reset();
-                        setAmount("");
                         setShowDepositLink(false);
                       }}
                       className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
                     >
-                      Try Again
+                      [ TRY AGAIN ]
                     </button>
                   </div>
                 </div>

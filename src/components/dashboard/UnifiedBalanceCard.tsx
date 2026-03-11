@@ -1,25 +1,34 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { RefreshCwIcon, EyeOffIcon, CheckIcon } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { RefreshCwIcon, EyeOffIcon, CheckIcon, ChevronDownIcon } from "lucide-react";
 import { getChainConfig } from "@/config/chains";
 import { useAuth } from "@/contexts/AuthContext";
-import { TokenIcon } from "@/components/stealth/icons";
+import { TokenIcon, ShieldIcon } from "@/components/stealth/icons";
 
 interface UnifiedBalanceCardProps {
   total: number;
   stealthTotal: number;
   claimTotal: number;
+  shieldedTotal?: number;
   unclaimedCount: number;
   isScanning: boolean;
   isLoading: boolean;
   onRefresh: () => void;
 }
 
+function BalanceSkeleton({ width = "w-24", height = "h-7" }: { width?: string; height?: string }) {
+  return (
+    <div className={`${width} ${height} rounded-sm bg-[rgba(255,255,255,0.06)] animate-pulse`} />
+  );
+}
+
 export function UnifiedBalanceCard({
   total,
   stealthTotal,
   claimTotal,
+  shieldedTotal = 0,
   unclaimedCount,
   isScanning,
   isLoading,
@@ -29,6 +38,7 @@ export function UnifiedBalanceCard({
   const chainConfig = getChainConfig(activeChainId);
   const symbol = chainConfig.nativeCurrency.symbol;
   const loading = isScanning || isLoading;
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <motion.div
@@ -58,33 +68,69 @@ export function UnifiedBalanceCard({
 
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-white font-mono tracking-tight mb-1 flex items-center gap-2">
-          {total.toFixed(4)} <span className="flex items-center gap-1"><TokenIcon symbol={symbol} size={20} />{symbol}</span>
+          {loading ? (
+            <BalanceSkeleton width="w-32" height="h-8" />
+          ) : (
+            <>{total.toFixed(4)} <span className="flex items-center gap-1"><TokenIcon symbol={symbol} size={20} />{symbol}</span></>
+          )}
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]">
-          <div className="flex items-center gap-1.5 mb-1">
-            <EyeOffIcon className="w-3 h-3 text-[rgba(255,255,255,0.4)]" />
-            <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-              Stealth
-            </span>
-          </div>
-          <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
-            {stealthTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /> {symbol}
-          </span>
-        </div>
-        <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]">
-          <div className="flex items-center gap-1.5 mb-1">
-            <CheckIcon className="w-3 h-3 text-[rgba(255,255,255,0.4)]" />
-            <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-              Claimed
-            </span>
-          </div>
-          <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
-            {claimTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /> {symbol}
-          </span>
-        </div>
+      <div className="mb-6">
+        <button
+          onClick={() => setExpanded(prev => !prev)}
+          className="flex items-center gap-1.5 mb-3 text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono hover:text-[rgba(255,255,255,0.7)] transition-colors"
+        >
+          <ChevronDownIcon className={`w-3 h-3 transition-transform ${expanded ? "rotate-0" : "-rotate-90"}`} />
+          Breakdown
+        </button>
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <EyeOffIcon className="w-3 h-3 text-[rgba(255,255,255,0.4)]" />
+                    <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
+                      Stealth
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
+                    {loading ? <BalanceSkeleton width="w-16" height="h-5" /> : <>{stealthTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /></>}
+                  </span>
+                </div>
+                <div className="p-3 rounded-sm border border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <CheckIcon className="w-3 h-3 text-[rgba(255,255,255,0.4)]" />
+                    <span className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
+                      Claimed
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
+                    {loading ? <BalanceSkeleton width="w-16" height="h-5" /> : <>{claimTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /></>}
+                  </span>
+                </div>
+                <div className="p-3 rounded-sm border border-[rgba(0,255,65,0.06)] bg-[rgba(0,255,65,0.02)]">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <ShieldIcon size={12} color="#00FF41" />
+                    <span className="text-[9px] text-[#00FF41] uppercase tracking-wider font-mono">
+                      Shielded
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-white font-mono flex items-center gap-1">
+                    {loading ? <BalanceSkeleton width="w-16" height="h-5" /> : <>{shieldedTotal.toFixed(4)} <TokenIcon symbol={symbol} size={14} /></>}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {unclaimedCount > 0 && (

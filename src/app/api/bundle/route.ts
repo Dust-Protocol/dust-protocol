@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig } from '@/config/chains';
-import { getServerProvider, getServerSponsor, parseChainId } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, parseChainId, getTxGasOverrides } from '@/lib/server-provider';
 import { ENTRY_POINT_ABI, DUST_PAYMASTER_ABI } from '@/lib/stealth/types';
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
@@ -58,16 +58,19 @@ export async function POST(req: Request) {
     const selector = callData.slice(0, 10).toLowerCase();
 
     if (selector === EXECUTE_SELECTOR) {
-      // For execute(), only allow calls targeting the DustPool contract (if available on this chain)
+      // For execute(), only allow calls targeting DustPool or DustPoolV2
       const dustPool = config.contracts.dustPool;
-      if (!dustPool) {
-        return NextResponse.json({ error: 'DustPool not available on this chain' }, { status: 400, headers: NO_STORE });
+      const dustPoolV2 = config.contracts.dustPoolV2;
+      if (!dustPool && !dustPoolV2) {
+        return NextResponse.json({ error: 'No pool available on this chain' }, { status: 400, headers: NO_STORE });
       }
       try {
         const decoded = ethers.utils.defaultAbiCoder.decode(
           ['address', 'uint256', 'bytes'], '0x' + callData.slice(10)
         );
-        if (decoded[0].toLowerCase() !== dustPool.toLowerCase()) {
+        const target = decoded[0].toLowerCase();
+        const allowed = [dustPool, dustPoolV2].filter((a): a is string => !!a).map(a => a.toLowerCase());
+        if (!allowed.includes(target)) {
           return NextResponse.json({ error: 'Execute target not allowed' }, { status: 400, headers: NO_STORE });
         }
       } catch {
@@ -96,11 +99,21 @@ export async function POST(req: Request) {
     };
     const preVerificationGas = body.preVerificationGas || L2_PRE_VERIFICATION[chainId] || '50000';
 
-    // Fee estimation — use RPC feeData; L2s (Arbitrum FIFO sequencer) don't use priority fees
-    const feeData = await provider.getFeeData();
-    const baseFee = feeData.lastBaseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-    const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('0.01', 'gwei');
-    const maxFeePerGas = baseFee.mul(2).add(maxPriorityFeePerGas);
+    // Fee estimation — UserOp maxFeePerGas must be >= outer tx gasPrice (EntryPoint enforces this).
+    // Get the actual gas price that handleOps will use, then set UserOp fields to match.
+    const outerGasOverrides = await getTxGasOverrides(chainId, 21000);
+    let maxFeePerGas: ethers.BigNumber;
+    let maxPriorityFeePerGas: ethers.BigNumber;
+
+    if (outerGasOverrides.gasPrice) {
+      // Legacy chain (Flow): outer tx uses gasPrice — UserOp fields must match
+      const gp = outerGasOverrides.gasPrice as ethers.BigNumber;
+      maxFeePerGas = gp;
+      maxPriorityFeePerGas = gp;
+    } else {
+      maxFeePerGas = outerGasOverrides.maxFeePerGas as ethers.BigNumber;
+      maxPriorityFeePerGas = outerGasOverrides.maxPriorityFeePerGas as ethers.BigNumber;
+    }
 
     // Build partial UserOp (without paymasterAndData and signature)
     const userOp = {

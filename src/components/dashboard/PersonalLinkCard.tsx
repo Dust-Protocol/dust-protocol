@@ -25,9 +25,13 @@ export function PersonalLinkCard({ ownedNames, metaAddress, isNamesSettled = tru
     const textToCopy = payPath
       ? `${window.location.origin}${payPath}`
       : copyText;
-    await navigator.clipboard.writeText(textToCopy);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
 
   return (

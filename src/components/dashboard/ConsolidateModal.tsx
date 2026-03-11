@@ -68,7 +68,7 @@ export function ConsolidateModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">

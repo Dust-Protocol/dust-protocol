@@ -87,15 +87,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Auto-switch wallet to active chain if connected on an unsupported chain
+  // Auto-switch wallet to active chain if connected on an unsupported/invisible chain.
+  // If switch fails (user rejects), isChainMismatch stays true and the banner shows.
   useEffect(() => {
     if (!isConnected || !walletChainId || !switchChain) return;
     if (!isChainVisible(walletChainId)) {
-      try {
-        switchChain({ chainId: activeChainId });
-      } catch {
-        // User rejected the switch — no action needed
-      }
+      switchChain(
+        { chainId: activeChainId },
+        { onError: () => setChainSwitchError('Please switch your wallet to the correct network') },
+      );
     }
   }, [isConnected, walletChainId, activeChainId, switchChain]);
 
@@ -105,13 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.setItem(CHAIN_STORAGE_KEY, chainId.toString());
     }
-    // Also switch the wallet to match
     if (isConnected && switchChain && walletChainId !== chainId) {
-      try {
-        switchChain({ chainId });
-      } catch {
-        // User rejected — wallet stays on old chain, mismatch banner will show
-      }
+      switchChain(
+        { chainId },
+        { onError: () => setChainSwitchError('Please switch your wallet to the correct network') },
+      );
     }
   }, [isConnected, switchChain, walletChainId]);
 

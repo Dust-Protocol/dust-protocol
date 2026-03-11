@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 
-type ToastVariant = "warning" | "error" | "info";
+type ToastVariant = "warning" | "error" | "info" | "success";
 
 interface ToastProps {
   message: string;
@@ -13,6 +13,11 @@ interface ToastProps {
 }
 
 const VARIANT_STYLES: Record<ToastVariant, { bg: string; border: string; text: string }> = {
+  success: {
+    bg: "bg-[rgba(0,255,65,0.1)]",
+    border: "border-[rgba(0,255,65,0.3)]",
+    text: "text-[#00FF41]",
+  },
   warning: {
     bg: "bg-[rgba(255,176,0,0.1)]",
     border: "border-[rgba(255,176,0,0.3)]",

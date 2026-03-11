@@ -23,6 +23,9 @@ import type { V2Keys } from "@/lib/dustpool/v2/types";
 import { errorToUserMessage } from "@/lib/dustpool/v2/errors";
 import { decomposeForToken, formatChunks, suggestRoundedAmounts } from "@/lib/dustpool/v2/denominations";
 
+const ROUND_ETH = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2, 0.3, 0.5, 1, 2, 3, 5, 10, 20, 50, 100];
+const ROUND_USDC = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
+
 interface KnownToken {
   symbol: string;
   decimals: number;
@@ -34,6 +37,7 @@ interface KnownToken {
 interface V2WithdrawModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   keysRef: RefObject<V2Keys | null>;
   chainId?: number;
   balances: Map<bigint, bigint>;
@@ -42,6 +46,7 @@ interface V2WithdrawModalProps {
 export function V2WithdrawModal({
   isOpen,
   onClose,
+  onSuccess,
   keysRef,
   chainId,
   balances,
@@ -252,6 +257,19 @@ export function V2WithdrawModal({
     ? suggestRoundedAmounts(parsedAmount, tokenSymbol, 2)
     : [];
 
+  const isRoundAmount = useCallback((val: number): boolean => {
+    const table = tokenSymbol === "USDC" ? ROUND_USDC : ROUND_ETH;
+    return table.includes(val);
+  }, [tokenSymbol]);
+
+  const suggestions = useMemo(() => {
+    if (!selectedAsset) return [];
+    const maxBal = parseFloat(formatAmount(selectedBalance));
+    if (maxBal <= 0) return [];
+    const table = selectedAsset.symbol === "USDC" ? ROUND_USDC : ROUND_ETH;
+    return table.filter(a => a <= maxBal).slice(-4);
+  }, [selectedBalance, selectedAsset, formatAmount]);
+
   const useSplitFlow = chunks.length > 1;
   const activePending = useSplitFlow ? isSplitPending : isPending;
   const activeStatus = useSplitFlow ? splitStatus : status;
@@ -288,6 +306,13 @@ export function V2WithdrawModal({
   };
 
   const isSuccess = txHash !== null && !activePending && !activeError;
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(() => { onSuccess?.(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, onSuccess]);
+
   const formattedMax = selectedAsset
     ? parseFloat(formatAmount(selectedBalance)).toFixed(selectedAsset.decimals === 6 ? 2 : 4)
     : "0";
@@ -309,13 +334,13 @@ export function V2WithdrawModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
-                  [ WITHDRAW_V2 ]
+                  [ UNSHIELD ]
                 </span>
                 <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)]">
                   <ChainIcon size={14} chainId={chainId} />
@@ -373,7 +398,7 @@ export function V2WithdrawModal({
                       </span>
                     </p>
                     <p className="text-xs text-[rgba(255,255,255,0.4)] font-mono mt-1">
-                      {filteredNotes.length} unspent note{filteredNotes.length !== 1 ? "s" : ""}
+                      {filteredNotes.length} available balance source{filteredNotes.length !== 1 ? "s" : ""}
                     </p>
                   </div>
 
@@ -381,7 +406,7 @@ export function V2WithdrawModal({
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-center">
                       <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-                        Withdraw Amount ({tokenSymbol})
+                        Unshield Amount ({tokenSymbol})
                       </label>
                       <button
                         onClick={handleMaxClick}
@@ -404,6 +429,31 @@ export function V2WithdrawModal({
                     {exceedsBalance && (
                       <p className="text-[11px] text-red-400 font-mono">Amount exceeds shielded balance</p>
                     )}
+                    {suggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        <span className="text-[9px] text-[rgba(255,255,255,0.3)] font-mono mr-1 self-center">
+                          Privacy-optimal:
+                        </span>
+                        {suggestions.map(s => (
+                          <button
+                            key={s}
+                            onClick={() => setAmount(s.toString())}
+                            className={`px-2.5 py-1 rounded-sm text-[10px] font-mono transition-all ${
+                              amount === s.toString()
+                                ? 'bg-[rgba(0,255,65,0.15)] border border-[#00FF41] text-[#00FF41]'
+                                : 'bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(255,255,255,0.2)]'
+                            }`}
+                          >
+                            {s} {tokenSymbol}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {amount && !isRoundAmount(parseFloat(amount)) && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && (
+                      <p className="text-[9px] text-amber-400/60 font-mono mt-1">
+                        Round amounts blend in better with the privacy pool
+                      </p>
+                    )}
                   </div>
 
                   {/* Note consumption preview */}
@@ -413,14 +463,14 @@ export function V2WithdrawModal({
                         Note Selection
                       </p>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Input note</span>
+                        <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Source funds</span>
                         <span className="text-[11px] font-semibold text-white font-mono flex items-center gap-1">
                           {parseFloat(formatAmount(consumedNote.note.amount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
                         </span>
                       </div>
                       {changeAmount !== null && changeAmount > 0n && (
                         <div className="flex justify-between items-center">
-                          <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Change returned</span>
+                          <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Remaining balance</span>
                           <span className="text-[11px] font-semibold text-[#00FF41] font-mono flex items-center gap-1">
                             {parseFloat(formatAmount(changeAmount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
                           </span>
@@ -446,7 +496,7 @@ export function V2WithdrawModal({
                         ))}
                       </div>
                       <p className="text-[10px] text-[rgba(255,255,255,0.35)] font-mono">
-                        Each chunk blends into its denomination anonymity set.
+                        Amounts are split into standard sizes for better privacy.
                       </p>
                       {roundSuggestions.length > 0 && (
                         <div className="mt-2 pt-2 border-t border-[rgba(255,255,255,0.05)]">
@@ -520,7 +570,7 @@ export function V2WithdrawModal({
                   {/* Relayer fee notice */}
                   <div className="p-2.5 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
                     <p className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">
-                      Withdrawal is processed via relayer. A small fee may apply to cover gas.
+                      Processed via relayer. Relayer fee applies to cover gas.
                     </p>
                   </div>
 
@@ -532,9 +582,7 @@ export function V2WithdrawModal({
                     className="w-full py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] hover:shadow-[0_0_15px_rgba(0,255,65,0.15)] transition-all text-sm font-bold text-[#00FF41] font-mono tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {parsedAmount
-                      ? useSplitFlow
-                        ? `Split & Withdraw ${amount} ${tokenSymbol}`
-                        : `Withdraw ${amount} ${tokenSymbol}`
+                      ? `Unshield ${amount} ${tokenSymbol}`
                       : "Enter Amount"}
                   </button>
                 </>
@@ -545,7 +593,7 @@ export function V2WithdrawModal({
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">
-                    {activeStatus || (useSplitFlow ? "Generating denomination split proof..." : "Generating ZK proof...")}
+                    {activeStatus || (useSplitFlow ? "Generating privacy split proof..." : "Generating ZK proof...")}
                   </p>
                   {useSplitFlow ? (
                     <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
@@ -577,15 +625,15 @@ export function V2WithdrawModal({
                       <ShieldCheckIcon size={40} color="#00FF41" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">
-                      {useSplitFlow ? "Denomination Split Successful" : "Withdrawal Successful"}
+                      {useSplitFlow ? "Privacy Split Successful" : "Unshield Successful"}
                     </p>
-                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} withdrawn privately</p>
+                    <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} unshielded privately</p>
                   </div>
 
                   {useSplitFlow && (
                     <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
-                        {chunks.length} denomination notes created
+                        {chunks.length} privacy-optimized amounts created
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {formattedChunkValues.map((val, i) => (
@@ -614,7 +662,7 @@ export function V2WithdrawModal({
 
                   {changeAmount !== null && changeAmount > 0n && (
                     <div className="p-3 rounded-sm bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)]">
-                      <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Change Note Saved</p>
+                      <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Remaining balance saved</p>
                       <p className="text-[11px] text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
                         {parseFloat(formatAmount(changeAmount)).toFixed(6)} {tokenSymbol} returned as a new shielded note.
                       </p>
@@ -638,7 +686,7 @@ export function V2WithdrawModal({
                       <AlertCircleIcon size={40} color="#ef4444" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">
-                      {useSplitFlow ? "Split Failed" : "Withdrawal Failed"}
+                      {useSplitFlow ? "Split Failed" : "Unshield Failed"}
                     </p>
                     <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{errorToUserMessage(activeError)}</p>
                   </div>
@@ -651,10 +699,10 @@ export function V2WithdrawModal({
                       Cancel
                     </button>
                     <button
-                      onClick={() => { activeClearError(); setAmount(""); }}
+                      onClick={() => { activeClearError(); }}
                       className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
                     >
-                      Try Again
+                      [ TRY AGAIN ]
                     </button>
                   </div>
                 </div>

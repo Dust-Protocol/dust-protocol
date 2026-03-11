@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getSupportedChains, DEFAULT_CHAIN_ID } from '@/config/chains';
-import { getServerSponsor, getServerProvider, waitForTx } from '@/lib/server-provider';
+import { getServerSponsor, getServerProvider, waitForTx, getTxGasOverrides } from '@/lib/server-provider';
 
 export const maxDuration = 60;
 
@@ -84,7 +84,8 @@ export async function POST(req: Request) {
             const available = await registry.isNameAvailable(name);
             if (!available) continue; // already registered
 
-            const tx = await registry.registerName(name, metaBytes);
+            const gasOverrides = await getTxGasOverrides(chain.id, 600_000);
+            const tx = await registry.registerName(name, metaBytes, gasOverrides);
             await waitForTx(tx);
             synced++;
             totalSynced++;

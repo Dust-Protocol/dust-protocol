@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, useCallback, ChangeEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAccount, useBalance } from "wagmi";
 import { useStealthSend, useStealthName } from "@/hooks/stealth";
 import { useAuth } from "@/contexts/AuthContext";
 import { isStealthName, NAME_SUFFIX, lookupStealthMetaAddress, getRegistryForChain, SCHEME_ID } from "@/lib/stealth";
@@ -22,8 +23,10 @@ interface SendModalProps {
 export function SendModal({ isOpen, onClose }: SendModalProps) {
   const { activeChainId } = useAuth();
   const chainConfig = getChainConfig(activeChainId);
-  const { generateAddressFor, sendEthToStealth, lastGeneratedAddress, isLoading, error: sendError } = useStealthSend(activeChainId);
+  const { generateAddressFor, sendEthToStealth, getMaxSendable, lastGeneratedAddress, isLoading, error: sendError } = useStealthSend(activeChainId);
   const { resolveName, isConfigured: nameRegistryConfigured } = useStealthName();
+  const { address } = useAccount();
+  const { data: walletBalance } = useBalance({ address });
 
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
@@ -33,6 +36,14 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
   const [isResolving, setIsResolving] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [sendTxHash, setSendTxHash] = useState<string | null>(null);
+  const [isLoadingMax, setIsLoadingMax] = useState(false);
+
+  const handleMax = useCallback(async () => {
+    setIsLoadingMax(true);
+    const max = await getMaxSendable();
+    setIsLoadingMax(false);
+    if (max && max !== "0") setAmount(max);
+  }, [getMaxSendable]);
 
   useEffect(() => {
     const resolve = async () => {
@@ -129,7 +140,7 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header — hidden on success */}
             {sendStep !== "success" && (
@@ -207,9 +218,16 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
 
                 {/* Amount field */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
-                    Amount
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono">
+                      Amount
+                    </label>
+                    {walletBalance && (
+                      <p className="text-[11px] font-mono text-[rgba(255,255,255,0.4)]">
+                        Balance: {parseFloat(walletBalance.formatted).toFixed(4)} {chainConfig.nativeCurrency.symbol}
+                      </p>
+                    )}
+                  </div>
                   <div className="relative">
                     <input
                       type="text"
@@ -220,11 +238,21 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                         const v = e.target.value;
                         if (v === "" || /^\d*\.?\d*$/.test(v)) setAmount(v);
                       }}
-                      className="w-full p-3 pr-16 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-2xl font-bold focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
+                      className="w-full p-3 pr-28 rounded-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white font-mono text-2xl font-bold focus:outline-none focus:border-[#00FF41] focus:bg-[rgba(0,255,65,0.02)] transition-all placeholder-[rgba(255,255,255,0.2)]"
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[rgba(255,255,255,0.5)] font-mono flex items-center gap-1">
-                      <ETHIcon size={14} />
-                      {chainConfig.nativeCurrency.symbol}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleMax}
+                        disabled={isLoadingMax}
+                        className="text-[10px] font-mono font-bold text-[#00FF41] hover:text-[rgba(0,255,65,0.7)] transition-colors px-1.5 py-0.5 border border-[rgba(0,255,65,0.2)] rounded-sm disabled:opacity-40"
+                      >
+                        {isLoadingMax ? "..." : "MAX"}
+                      </button>
+                      <div className="text-xs font-bold text-[rgba(255,255,255,0.5)] font-mono flex items-center gap-1">
+                        <ETHIcon size={14} />
+                        {chainConfig.nativeCurrency.symbol}
+                      </div>
                     </div>
                   </div>
                   <p className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">{chainConfig.name}</p>

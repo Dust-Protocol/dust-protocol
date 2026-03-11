@@ -8,6 +8,11 @@ import {
 import type { OutgoingPayment } from '@/lib/design/types';
 import { getChainConfig, DEFAULT_CHAIN_ID } from '@/config/chains';
 import { getChainProvider } from '@/lib/providers';
+
+// Flow EVM RPC reports ~1.5 gwei but rejects below ~16 gwei
+const MIN_GAS_PRICE: Record<number, ethers.BigNumber> = {
+  545: ethers.utils.parseUnits('100', 'gwei'),
+};
 import { useAuth } from '@/contexts/AuthContext';
 
 import { storageKey, migrateKey } from '@/lib/storageKey';
@@ -70,23 +75,28 @@ async function ensureChain(chainId: number): Promise<void> {
 }
 
 // Estimate gas cost for ETH transfer only (21k gas)
-async function estimateEthTransferGasCost(provider: ethers.providers.Provider): Promise<ethers.BigNumber> {
+async function estimateEthTransferGasCost(provider: ethers.providers.Provider, chainId: number): Promise<ethers.BigNumber> {
+  const config = getChainConfig(chainId);
   const feeData = await provider.getFeeData();
-  const block = await provider.getBlock('latest');
+  const gasLimit = ethers.BigNumber.from(21000);
 
+  if (!config.supportsEIP1559) {
+    const rpcGasPrice = feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+    const minPrice = MIN_GAS_PRICE[chainId];
+    const gasPrice = minPrice && minPrice.gt(rpcGasPrice) ? minPrice : rpcGasPrice;
+    const baseCost = gasLimit.mul(gasPrice);
+    return baseCost.add(baseCost.mul(5).div(100));
+  }
+
+  const block = await provider.getBlock('latest');
   const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
   const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
-
-  // maxFeePerGas = max(2x baseFee, 1.2x (baseFee + priorityFee))
   const twoXBaseFee = baseFee.mul(2);
   const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
   const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
 
-  // Gas for ETH transfer only + 5% buffer for RPC timing differences
-  const gasLimit = ethers.BigNumber.from(21000);
   const baseCost = gasLimit.mul(maxFeePerGas);
-  const buffer = baseCost.mul(5).div(100);
-  return baseCost.add(buffer);
+  return baseCost.add(baseCost.mul(5).div(100));
 }
 
 // Sponsor the announcement via deployer API (sender doesn't pay gas for this)
@@ -109,11 +119,11 @@ async function sponsorAnnounce(
 // Calculate maximum sendable amount (balance - gas for ETH transfer only; announcement is sponsored)
 async function calculateMaxSendable(
   provider: ethers.providers.Provider,
-  address: string
+  address: string,
+  chainId: number,
 ): Promise<{ maxAmount: ethers.BigNumber; gasCost: ethers.BigNumber; balance: ethers.BigNumber }> {
   const balance = await provider.getBalance(address);
-  // Only need gas for ETH transfer — announcement is sponsored by deployer
-  const gasCost = await estimateEthTransferGasCost(provider);
+  const gasCost = await estimateEthTransferGasCost(provider, chainId);
   const maxAmount = balance.sub(gasCost);
   return { maxAmount: maxAmount.gt(0) ? maxAmount : ethers.BigNumber.from(0), gasCost, balance };
 }
@@ -214,7 +224,7 @@ export function useStealthSend(chainId?: number) {
       const address = await provider.getSigner().getAddress();
 
       const rpcProvider = getChainProvider(activeChainId);
-      const { maxAmount } = await calculateMaxSendable(rpcProvider, address);
+      const { maxAmount } = await calculateMaxSendable(rpcProvider, address, activeChainId);
 
       if (maxAmount.lte(0)) return '0';
       return ethers.utils.formatEther(maxAmount);
@@ -243,7 +253,7 @@ export function useStealthSend(chainId?: number) {
       const rpcProvider = getChainProvider(activeChainId);
 
       // Validate balance and gas BEFORE generating address
-      const { balance, gasCost } = await calculateMaxSendable(rpcProvider, signerAddress);
+      const { balance, gasCost } = await calculateMaxSendable(rpcProvider, signerAddress, activeChainId);
       const validation = validateSendAmount(amount, balance, gasCost, config.nativeCurrency.symbol);
       if (!validation.valid) {
         throw new Error(validation.error);
@@ -253,22 +263,29 @@ export function useStealthSend(chainId?: number) {
       const generated = generateAddressFor(metaAddress);
       if (!generated) throw new Error('Failed to generate stealth address');
 
-      // Send ETH with explicit gas parameters
+      // Build gas parameters — legacy (type 0) for chains that reject EIP-1559
       const feeData = await rpcProvider.getFeeData();
-      const block = await rpcProvider.getBlock('latest');
-      const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-      const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1', 'gwei');
-      const twoXBaseFee = baseFee.mul(2);
-      const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
-      const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
+      let txOverrides: ethers.providers.TransactionRequest;
+
+      if (!config.supportsEIP1559) {
+        const rpcGasPrice = feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+        const minPrice = MIN_GAS_PRICE[activeChainId];
+        const gasPrice = minPrice && minPrice.gt(rpcGasPrice) ? minPrice : rpcGasPrice;
+        txOverrides = { gasLimit: 21000, gasPrice, type: 0 };
+      } else {
+        const block = await rpcProvider.getBlock('latest');
+        const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+        const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1', 'gwei');
+        const twoXBaseFee = baseFee.mul(2);
+        const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
+        const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
+        txOverrides = { gasLimit: 21000, maxFeePerGas, maxPriorityFeePerGas: priorityFee, type: 2 };
+      }
 
       const tx = await signer.sendTransaction({
         to: generated.stealthAddress,
         value: ethers.utils.parseEther(amount),
-        gasLimit: 21000,
-        maxFeePerGas,
-        maxPriorityFeePerGas: priorityFee,
-        type: 2,
+        ...txOverrides,
       });
       const receipt = await tx.wait();
       const sendTxHash = receipt.transactionHash;
@@ -323,7 +340,7 @@ export function useStealthSend(chainId?: number) {
 
       const rpcProvider = getChainProvider(activeChainId);
       const ethBalance = await rpcProvider.getBalance(signerAddress);
-      const gasCost = await estimateEthTransferGasCost(rpcProvider);
+      const gasCost = await estimateEthTransferGasCost(rpcProvider, activeChainId);
 
       if (ethBalance.lt(gasCost)) {
         throw new Error(`Insufficient balance for gas. Need ~${ethers.utils.formatEther(gasCost)} ${config.nativeCurrency.symbol}`);

@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { ec as EC } from 'elliptic';
 import { NextResponse } from 'next/server';
 import { getChainConfig, getCanonicalNamingChain, DEFAULT_CHAIN_ID } from '@/config/chains';
-import { getServerProvider, getServerSponsor } from '@/lib/server-provider';
+import { getServerProvider, getServerSponsor, getTxGasOverrides } from '@/lib/server-provider';
 import { checkOrigin } from '@/lib/api-auth';
 
 export const maxDuration = 60;
@@ -197,7 +197,8 @@ export async function GET(req: Request, { params }: { params: { name: string } }
     let announceTx: ethers.ContractTransaction | null = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        announceTx = await announcer.announce(1, stealthAddress, ephPubKeyHex, metadata);
+        const gasOverrides = await getTxGasOverrides(requestedChainId, 200_000);
+        announceTx = await announcer.announce(1, stealthAddress, ephPubKeyHex, metadata, gasOverrides);
         break;
       } catch (e) {
         console.warn(`[Resolve] announce attempt ${attempt + 1}/3 failed:`, e instanceof Error ? e.message : e);

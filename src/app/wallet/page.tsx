@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useStealthScanner, useUnifiedBalance, useDustPool } from "@/hooks/stealth";
+import { useStealthScanner, useUnifiedBalance } from "@/hooks/stealth";
 import { getExplorerBase } from "@/lib/design/tokens";
 import { getChainConfig } from "@/config/chains";
-import { ConsolidateModal } from "@/components/dashboard/ConsolidateModal";
 import {
   WalletIcon, ShieldIcon, KeyIcon, RefreshIcon,
   ExternalLinkIcon,
@@ -38,13 +36,6 @@ export default function WalletPage() {
     claimAddressesInitialized,
   });
 
-  // ─── Privacy Pool (DustPool) ──────────────────────────────────────────────
-  const dustPool = useDustPool(activeChainId);
-
-  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
-
-  const hasPoolBalance = parseFloat(dustPool.poolBalance) > 0;
-
   // ─── Not connected state ──────────────────────────────────────────────────
 
   if (!isConnected) {
@@ -70,36 +61,6 @@ export default function WalletPage() {
         <h1 className="text-[28px] font-bold text-white tracking-tight mb-1">Wallet</h1>
         <p className="text-[13px] text-[rgba(255,255,255,0.5)]">Manage your stealth payments and privacy pool</p>
       </div>
-
-      {/* Privacy Pool balance card */}
-      {hasPoolBalance && (
-        <div className="p-4 rounded-sm border border-[rgba(129,140,248,0.3)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="opacity-70 text-[#00FF41]">
-                <ShieldIcon size={18} />
-              </div>
-              <div>
-                <p className="text-[13px] font-bold text-white">Privacy Pool</p>
-                <p className="text-[11px] text-[rgba(255,255,255,0.4)]">
-                  {dustPool.deposits.filter((d) => !d.withdrawn).length} deposits ready to withdraw
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <p className="text-lg font-extrabold text-white font-mono">
-                {parseFloat(dustPool.poolBalance).toFixed(4)} {nativeSymbol}
-              </p>
-              <button
-                className="px-3 py-1.5 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] transition-all text-xs font-bold text-[#00FF41] font-mono cursor-pointer"
-                onClick={() => setShowConsolidateModal(true)}
-              >
-                Withdraw
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ─── Stealth Payments Section ────────────────────────────────────── */}
       <div className="w-full p-5 rounded-sm border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] backdrop-blur-sm flex flex-col gap-4">
@@ -199,17 +160,6 @@ export default function WalletPage() {
         )}
       </div>
 
-      {/* ─── Consolidate (Withdraw) Modal ────────────────────────────────── */}
-      <ConsolidateModal
-        isOpen={showConsolidateModal}
-        onClose={() => setShowConsolidateModal(false)}
-        deposits={dustPool.deposits}
-        poolBalance={dustPool.poolBalance}
-        progress={dustPool.progress}
-        onConsolidate={dustPool.consolidate}
-        onReset={dustPool.resetProgress}
-        isConsolidating={dustPool.isConsolidating}
-      />
     </div>
   );
 }

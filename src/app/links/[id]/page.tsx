@@ -64,9 +64,13 @@ export default function LinkDetailPage({ params }: { params: { id: string } }) {
   const accentColor = link.emojiBg || "#00FF41";
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(dustName);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(dustName);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
 
   const handleDelete = () => {

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef, useMemo, type ChangeEvent } from "react";
-import { useAccount, useConnect, useChainId, useSwitchChain } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useLogin } from "@privy-io/react-auth";
 import { getExplorerBase } from "@/lib/design/tokens";
 import { useStealthSend, useStealthName } from "@/hooks/stealth";
 import { NAME_SUFFIX } from "@/lib/stealth";
@@ -192,7 +192,7 @@ function PayTokenSelector({
 
 export default function PayPageClient({ name }: { name: string }) {
   const { isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { login: privyLogin } = useLogin();
   const walletChainId = useChainId();
   const { switchChain } = useSwitchChain();
   const { resolveName, formatName, isConfigured } = useStealthName();
@@ -435,7 +435,7 @@ export default function PayPageClient({ name }: { name: string }) {
                             </span>
                           </div>
                           <button
-                            onClick={() => connect({ connector: injected() })}
+                            onClick={() => privyLogin()}
                             className="w-full py-3 rounded-sm border border-[#00FF41]/30 bg-[#00FF41]/[0.05] text-[#00FF41] font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 cursor-pointer hover:border-[#00FF41] hover:bg-[#00FF41]/[0.1] transition-all"
                             style={{ boxShadow: "0 0 12px rgba(0,255,65,0.05)" }}
                           >

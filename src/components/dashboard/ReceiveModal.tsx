@@ -20,9 +20,10 @@ interface ReceiveModalProps {
   onClose: () => void;
   dustName: string | null;
   payPath: string;
+  metaAddress?: string | null;
 }
 
-export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModalProps) {
+export function ReceiveModal({ isOpen, onClose, dustName, payPath, metaAddress }: ReceiveModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [copied, setCopied] = useState(false);
   const [fullUrl, setFullUrl] = useState("");
@@ -43,9 +44,13 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
 
   const handleCopy = async () => {
     if (!fullUrl) return;
-    await navigator.clipboard.writeText(fullUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
 
   const handleShare = async () => {
@@ -81,7 +86,7 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[400px] p-6 rounded-md border border-white/[0.08] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[400px] p-6 rounded-md border border-white/[0.08] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-5">
@@ -171,10 +176,43 @@ export function ReceiveModal({ isOpen, onClose, dustName, payPath }: ReceiveModa
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-4 py-5">
-                <p className="text-lg font-bold text-white text-center">No Username Yet</p>
-                <p className="text-sm text-white/40 font-mono text-center leading-relaxed">
-                  Register a username to get a shareable payment link.
+              <div className="flex flex-col gap-4 py-3">
+                <p className="text-sm font-bold text-white text-center font-mono">No .dust name yet</p>
+                {metaAddress ? (
+                  <>
+                    <p className="text-[11px] text-white/35 font-mono text-center">
+                      Share your stealth address to receive private payments
+                    </p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(metaAddress);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        } catch {
+                          console.warn("Clipboard API unavailable");
+                        }
+                      }}
+                      className="flex items-center gap-2 w-full px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-sm hover:border-[#00FF41]/30 hover:bg-[#00FF41]/[0.03] transition-all group"
+                    >
+                      <span className="flex-1 text-[11px] text-white/40 font-mono truncate text-left group-hover:text-white/60 transition-colors">
+                        {metaAddress.slice(0, 24)}...{metaAddress.slice(-8)}
+                      </span>
+                      <span className="flex-shrink-0 text-white/30 group-hover:text-[#00FF41] transition-colors">
+                        {copied
+                          ? <CheckIcon size={14} color="#00FF41" />
+                          : <CopyIcon size={14} color="currentColor" />
+                        }
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-[11px] text-white/35 font-mono text-center">
+                    Complete onboarding to receive payments
+                  </p>
+                )}
+                <p className="text-[10px] text-white/25 font-mono text-center">
+                  Register a .dust name for a shareable payment link
                 </p>
               </div>
             )}

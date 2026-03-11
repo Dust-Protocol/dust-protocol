@@ -159,9 +159,13 @@ export const PrivateWallet = () => {
   }, [nameInput, nameRegistryConfigured, validateName, checkAvailability]);
 
   const handleCopy = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.warn("Clipboard API unavailable");
+    }
   };
 
   const handleSetup = async () => {

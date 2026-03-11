@@ -5,16 +5,13 @@ import { getExplorerBase } from "@/lib/design/tokens";
 import { getChainConfig } from "@/config/chains";
 import { useAuth } from "@/contexts/AuthContext";
 import type { StealthPayment, ClaimAddress, OutgoingPayment } from "@/lib/design/types";
+import { buildSortedActivities, type ActivityItem } from "@/lib/design/activity-sort";
 import {
   ArrowDownLeftIcon, CheckCircleIcon, AlertCircleIcon,
   RefreshIcon, ZapIcon, ArrowUpRightIcon, FileTextIcon, SendIcon, TokenIcon,
 } from "@/components/stealth/icons";
 
 type Filter = "all" | "incoming" | "outgoing";
-
-type ActivityItem =
-  | { type: "incoming"; payment: StealthPayment; index: number; timestamp: number }
-  | { type: "outgoing"; payment: OutgoingPayment; timestamp: number };
 
 interface ActivityListProps {
   payments: StealthPayment[];
@@ -42,34 +39,7 @@ export function ActivityList({
   const [filter, setFilter] = useState<Filter>("all");
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
 
-  // Build unified activity list sorted by time (newest first)
-  const allActivities: ActivityItem[] = [];
-
-  payments.forEach((p, i) => {
-    allActivities.push({
-      type: "incoming",
-      payment: p,
-      index: i,
-      // Use block number as rough timestamp proxy (higher = newer)
-      timestamp: p.announcement.blockNumber,
-    });
-  });
-
-  (outgoingPayments || []).forEach((p) => {
-    allActivities.push({
-      type: "outgoing",
-      payment: p,
-      timestamp: p.timestamp,
-    });
-  });
-
-  // Sort: outgoing by timestamp (ms), incoming by blockNumber — normalize to comparable values
-  // For display, just interleave with outgoing on top if recent
-  allActivities.sort((a, b) => {
-    const tA = a.type === "outgoing" ? a.timestamp : a.timestamp * 1000000; // block numbers are ~6M range
-    const tB = b.type === "outgoing" ? b.timestamp : b.timestamp * 1000000;
-    return tB - tA;
-  });
+  const allActivities = buildSortedActivities(payments, outgoingPayments || []);
 
   const filtered = allActivities.filter((item) => {
     if (filter === "all") return true;

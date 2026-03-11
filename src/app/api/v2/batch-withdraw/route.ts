@@ -218,7 +218,7 @@ export async function POST(req: Request) {
             txHash: receipt.transactionHash,
             blockNumber: receipt.blockNumber,
             gasUsed: receipt.gasUsed.toString(),
-            fee: receipt.effectiveGasPrice.mul(receipt.gasUsed).toString(),
+            fee: (receipt.effectiveGasPrice ?? ethers.constants.Zero).mul(receipt.gasUsed).toString(),
           })
         } catch (chunkErr) {
           const msg = chunkErr instanceof Error ? chunkErr.message : 'Unknown error'

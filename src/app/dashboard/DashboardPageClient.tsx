@@ -1,39 +1,42 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useStealthScanner, useUnifiedBalance, useDustPool } from "@/hooks/stealth";
-import { getChainConfig } from "@/config/chains";
+import { useStealthScanner, useUnifiedBalance } from "@/hooks/stealth";
 import { UnifiedBalanceCard } from "@/components/dashboard/UnifiedBalanceCard";
-import { AddressBreakdownCard } from "@/components/dashboard/AddressBreakdownCard";
 import { PersonalLinkCard } from "@/components/dashboard/PersonalLinkCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
-import { PrivacyPoolCard } from "@/components/dashboard/PrivacyPoolCard";
 import { V2PoolCard } from "@/components/dustpool/V2PoolCard";
+import { V2KeysProvider, useSharedV2Keys } from "@/contexts/V2KeysContext";
+import { useV2NoteSync } from "@/hooks/dustpool/v2/useV2NoteSync";
 import { SendModal } from "@/components/send/SendModal";
 import { ReceiveModal } from "@/components/dashboard/ReceiveModal";
-import { ConsolidateModal } from "@/components/dashboard/ConsolidateModal";
-import { SendIcon, ArrowDownLeftIcon } from "@/components/stealth/icons";
+import { SendIcon, ArrowDownLeftIcon, ShieldIcon } from "@/components/stealth/icons";
+import { V2DepositModal } from "@/components/dustpool/V2DepositModal";
 import { loadOutgoingPayments } from '@/hooks/stealth/useStealthSend';
-import { storageKey } from '@/lib/storageKey';
 import { RestoringBanner } from '@/components/RestoringBanner';
+import { BackupWarningBanner } from '@/components/dashboard/BackupWarningBanner';
+import { useV2Balance } from '@/hooks/dustpool/v2';
+import { formatEther } from 'viem';
 import type { OutgoingPayment } from '@/lib/design/types';
 
-function claimToPoolKey(address: string, chainId: number): string {
-  return storageKey('claim2pool', address, chainId);
+export default function DashboardPageClient() {
+  return (
+    <V2KeysProvider>
+      <DashboardInner />
+    </V2KeysProvider>
+  );
 }
 
-export default function DashboardPageClient() {
+function DashboardInner() {
   const { stealthKeys, metaAddress, ownedNames, claimAddresses, refreshClaimBalances, claimAddressesInitialized, activeChainId, address, isNamesSettled } = useAuth();
-  const chainConfig = getChainConfig(activeChainId);
-  const [claimToPool, setClaimToPool] = useState(() => {
-    if (typeof window === 'undefined' || !address) return false;
-    return localStorage.getItem(claimToPoolKey(address, activeChainId)) === 'true';
-  });
-  const { payments, scan, scanInBackground, stopBackgroundScan, isScanning, depositToPool } = useStealthScanner(stealthKeys, { claimToPool, chainId: activeChainId });
+  const { keysRef: v2KeysRef, hasKeys, hasPin, isDeriving, error: keyError, deriveKeys } = useSharedV2Keys();
+  useV2NoteSync(activeChainId);
+  const { payments, scan, scanInBackground, stopBackgroundScan, isScanning } = useStealthScanner(stealthKeys, { chainId: activeChainId, v2KeysRef });
+  const { totalEthBalance: v2EthBalance } = useV2Balance(v2KeysRef, activeChainId);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
-  const [showConsolidateModal, setShowConsolidateModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
   const [outgoingPayments, setOutgoingPayments] = useState<OutgoingPayment[]>([]);
   useEffect(() => {
@@ -41,11 +44,6 @@ export default function DashboardPageClient() {
       setOutgoingPayments(loadOutgoingPayments(address, activeChainId));
     }
   }, [address, activeChainId, showSendModal]);
-
-  const dustPool = useDustPool(activeChainId);
-  const [depositingToPool, setDepositingToPool] = useState(false);
-  const [poolDepositProgress, setPoolDepositProgress] = useState({ done: 0, total: 0, message: '' });
-  const depositingRef = useRef(false);
 
   const dustName = ownedNames.length > 0 ? `${ownedNames[0].name}.dust` : null;
   const payPath = ownedNames.length > 0 ? `/pay/${ownedNames[0].name}` : "";
@@ -55,18 +53,13 @@ export default function DashboardPageClient() {
     claimAddresses,
     refreshClaimBalances,
     claimAddressesInitialized,
+    shieldedTotal: parseFloat(formatEther(v2EthBalance)),
   });
 
   const handleRefresh = useCallback(() => {
     scan();
     refreshClaimBalances();
-    dustPool.loadPoolDeposits();
-  }, [scan, refreshClaimBalances, dustPool.loadPoolDeposits]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !address) return;
-    setClaimToPool(localStorage.getItem(claimToPoolKey(address, activeChainId)) === 'true');
-  }, [address, activeChainId]);
+  }, [scan, refreshClaimBalances]);
 
   useEffect(() => {
     if (stealthKeys) {
@@ -74,55 +67,6 @@ export default function DashboardPageClient() {
       return () => stopBackgroundScan();
     }
   }, [stealthKeys, scanInBackground, stopBackgroundScan]);
-
-  useEffect(() => {
-    if (claimToPool && stealthKeys) {
-      scan();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [claimToPool]);
-
-  const hasPoolBalance = parseFloat(dustPool.poolBalance) > 0;
-
-  const poolEligibleCount = payments.filter(p => {
-    if (p.claimed || p.keyMismatch) return false;
-    if (p.walletType !== 'create2' && p.walletType !== 'account' && p.walletType !== 'eip7702') return false;
-    const bal = parseFloat(p.balance || '0');
-    return bal > 0.0001;
-  }).length;
-
-  const handlePoolToggle = () => {
-    const next = !claimToPool;
-    setClaimToPool(next);
-    if (address) localStorage.setItem(claimToPoolKey(address, activeChainId), String(next));
-  };
-
-  const handleDepositAll = async () => {
-    if (depositingRef.current) return;
-    depositingRef.current = true;
-    setDepositingToPool(true);
-    setPoolDepositProgress({ done: 0, total: poolEligibleCount, message: 'Starting pool deposits...' });
-
-    try {
-      stopBackgroundScan();
-      const result = await depositToPool((done, total, message) => {
-        setPoolDepositProgress({ done, total, message });
-      });
-      dustPool.loadPoolDeposits();
-      if (result.deposited > 0) {
-        scan();
-      }
-      await new Promise(r => setTimeout(r, 3000));
-    } catch (err) {
-      console.error('[PoolDeposit] Unexpected error:', err);
-      setPoolDepositProgress({ done: 0, total: 0, message: 'Deposit failed — check console' });
-      await new Promise(r => setTimeout(r, 5000));
-    } finally {
-      setDepositingToPool(false);
-      depositingRef.current = false;
-      scanInBackground();
-    }
-  };
 
   return (
     <div className="px-3.5 py-7 md:px-6 md:py-7 max-w-[640px] mx-auto">
@@ -138,10 +82,13 @@ export default function DashboardPageClient() {
 
         <RestoringBanner isScanning={isScanning && payments.length === 0} />
 
+        {address && <BackupWarningBanner address={address} hasNotes={v2EthBalance > 0n || !!stealthKeys} />}
+
         <UnifiedBalanceCard
           total={unified.total}
           stealthTotal={unified.stealthTotal}
           claimTotal={unified.claimTotal}
+          shieldedTotal={unified.shieldedTotal}
           unclaimedCount={unified.unclaimedCount}
           isScanning={isScanning}
           isLoading={unified.isLoading}
@@ -157,6 +104,14 @@ export default function DashboardPageClient() {
             Send
           </button>
           <button
+            onClick={() => setShowDepositModal(true)}
+            disabled={!v2KeysRef.current}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-sm border border-[rgba(0,255,65,0.3)] bg-[rgba(0,255,65,0.05)] hover:bg-[rgba(0,255,65,0.12)] active:scale-[0.98] transition-all font-mono font-bold text-sm text-[#00FF41] disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ShieldIcon size={17} color="#00FF41" />
+            Shield
+          </button>
+          <button
             onClick={() => setShowReceiveModal(true)}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-sm border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.05)] active:scale-[0.98] transition-all font-mono font-bold text-sm text-white"
           >
@@ -167,39 +122,22 @@ export default function DashboardPageClient() {
 
         <V2PoolCard chainId={activeChainId} />
 
-        <PrivacyPoolCard
-          claimToPool={claimToPool}
-          onToggle={handlePoolToggle}
-          poolBalance={dustPool.poolBalance}
-          depositCount={dustPool.deposits.filter(d => !d.withdrawn).length}
-          poolEligibleCount={poolEligibleCount}
-          isDepositing={depositingToPool}
-          depositProgress={poolDepositProgress}
-          onWithdraw={() => setShowConsolidateModal(true)}
-          onDepositAll={handleDepositAll}
-          symbol={chainConfig.nativeCurrency.symbol}
-        />
-
-        <AddressBreakdownCard
-          claimAddresses={unified.claimAddresses}
-          unclaimedPayments={unified.unclaimedPayments}
-        />
-
         <PersonalLinkCard ownedNames={ownedNames} metaAddress={metaAddress} isNamesSettled={isNamesSettled} />
 
         <RecentActivityCard payments={payments} outgoingPayments={outgoingPayments} />
 
         <SendModal isOpen={showSendModal} onClose={() => { setShowSendModal(false); scan(); }} />
-        <ReceiveModal isOpen={showReceiveModal} onClose={() => setShowReceiveModal(false)} dustName={dustName} payPath={payPath} />
-        <ConsolidateModal
-          isOpen={showConsolidateModal}
-          onClose={() => setShowConsolidateModal(false)}
-          deposits={dustPool.deposits}
-          poolBalance={dustPool.poolBalance}
-          progress={dustPool.progress}
-          onConsolidate={dustPool.consolidate}
-          onReset={dustPool.resetProgress}
-          isConsolidating={dustPool.isConsolidating}
+        <ReceiveModal isOpen={showReceiveModal} onClose={() => setShowReceiveModal(false)} dustName={dustName} payPath={payPath} metaAddress={metaAddress} />
+        <V2DepositModal
+          isOpen={showDepositModal}
+          onClose={() => { setShowDepositModal(false); }}
+          keysRef={v2KeysRef}
+          chainId={activeChainId}
+          hasKeys={hasKeys}
+          hasPin={hasPin}
+          onDeriveKeys={deriveKeys}
+          isDeriving={isDeriving}
+          keyError={keyError}
         />
       </div>
     </div>

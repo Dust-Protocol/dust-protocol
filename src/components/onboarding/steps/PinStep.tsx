@@ -130,6 +130,15 @@ export function PinStep({ onNext }: PinStepProps) {
         </p>
       </div>
 
+      <div className="p-4 rounded-sm border border-[rgba(255,176,0,0.3)] bg-[rgba(255,176,0,0.06)] mb-6">
+        <p className="text-xs font-mono font-bold text-[#FFB000] mb-1 tracking-wide">
+          IMPORTANT
+        </p>
+        <p className="text-[11px] font-mono text-[rgba(255,255,255,0.6)] leading-relaxed">
+          Choose a PIN you can remember. You will receive a recovery code on the next step in case you forget it.
+        </p>
+      </div>
+
       {step === "create" ? (
         <PinInput value={pin} onChange={setPin} />
       ) : (
@@ -168,7 +177,7 @@ export function PinStep({ onNext }: PinStepProps) {
       </div>
 
       <p className="text-[11px] text-[rgba(255,255,255,0.3)] leading-relaxed font-mono">
-        This PIN cannot be recovered. You would need to create a new identity.
+        A recovery code will be provided after confirmation.
       </p>
     </div>
   );

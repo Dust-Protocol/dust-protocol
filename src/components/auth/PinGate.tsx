@@ -9,7 +9,7 @@ interface PinGateProps {
 }
 
 export function PinGate({ onUnlocked }: PinGateProps) {
-  const { verifyPin, deriveKeysFromWallet, isPinVerified, verifiedPin, pinError } = useAuth();
+  const { verifyPin, deriveKeysFromWallet, isPinVerified, verifiedPin, pinError, hasPin } = useAuth();
   const [pin, setPin] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,15 +45,19 @@ export function PinGate({ onUnlocked }: PinGateProps) {
     setIsVerifying(true);
     setError(null);
     try {
-      const ok = await verifyPin(pin);
-      if (ok) {
-        await deriveKeysFromWallet(pin);
-        onUnlocked();
-      } else {
-        setError("Incorrect PIN");
-        setPin("");
-        refs.current[0]?.focus();
+      if (hasPin) {
+        // Normal flow: verify stored PIN then derive
+        const ok = await verifyPin(pin);
+        if (!ok) {
+          setError("Incorrect PIN");
+          setPin("");
+          refs.current[0]?.focus();
+          return;
+        }
       }
+      // Derive keys (works for both verified PIN and re-entry without stored PIN)
+      await deriveKeysFromWallet(pin);
+      onUnlocked();
     } catch {
       setError("Verification failed");
       setPin("");
@@ -61,7 +65,7 @@ export function PinGate({ onUnlocked }: PinGateProps) {
     } finally {
       setIsVerifying(false);
     }
-  }, [pin, isVerifying, verifyPin, deriveKeysFromWallet, onUnlocked]);
+  }, [pin, isVerifying, hasPin, verifyPin, deriveKeysFromWallet, onUnlocked]);
 
   useEffect(() => {
     if (pin.length === 6) handleUnlock();

@@ -162,7 +162,7 @@ export async function POST(req: Request) {
           txHash: receipt.transactionHash,
           blockNumber: receipt.blockNumber,
           gasUsed: receipt.gasUsed.toString(),
-          fee: receipt.effectiveGasPrice.mul(receipt.gasUsed).toString(),
+          fee: (receipt.effectiveGasPrice ?? ethers.constants.Zero).mul(receipt.gasUsed).toString(),
         },
         { headers: NO_STORE },
       )

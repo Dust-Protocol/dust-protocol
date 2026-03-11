@@ -119,6 +119,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Bundle execution reverted on-chain' }, { status: 500, headers: NO_STORE });
     }
 
+    // Check inner UserOp success via UserOperationEvent(userOpHash, sender, paymaster, nonce, success, ...)
+    // handleOps outer tx succeeds even when inner op reverts — must check the event
+    const USER_OP_EVENT_TOPIC = ethers.utils.id('UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)');
+    const userOpEventLog = receipt.logs.find(
+      (log: { topics: string[] }) => log.topics[0] === USER_OP_EVENT_TOPIC
+    );
+    if (userOpEventLog) {
+      const decoded = ethers.utils.defaultAbiCoder.decode(
+        ['uint256', 'bool', 'uint256', 'uint256'],
+        userOpEventLog.data
+      );
+      const innerSuccess = decoded[1] as boolean;
+      if (!innerSuccess) {
+        console.error(`[Bundle/Submit] Inner UserOp reverted for ${userOp.sender} on ${config.name}`);
+        return NextResponse.json(
+          { error: 'UserOperation inner call reverted — funds are safe but operation failed' },
+          { status: 500, headers: NO_STORE }
+        );
+      }
+    } else {
+      console.warn(`[Bundle/Submit] UserOperationEvent not found in receipt for ${userOp.sender} on ${config.name} — cannot verify inner op success`);
+    }
+
     console.log('[Bundle/Submit] Success, tx:', receipt.transactionHash);
 
     return NextResponse.json({ txHash: receipt.transactionHash }, { headers: NO_STORE });

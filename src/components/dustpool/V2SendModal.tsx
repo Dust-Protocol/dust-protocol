@@ -33,6 +33,7 @@ interface KnownToken {
 interface V2SendModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   keysRef: RefObject<V2Keys | null>;
   chainId?: number;
   balances: Map<bigint, bigint>;
@@ -41,6 +42,7 @@ interface V2SendModalProps {
 export function V2SendModal({
   isOpen,
   onClose,
+  onSuccess,
   keysRef,
   chainId,
   balances,
@@ -274,6 +276,13 @@ export function V2SendModal({
   };
 
   const isSuccess = txHash !== null && !activePending && !activeError;
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = setTimeout(() => { onSuccess?.(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, onSuccess]);
+
   const formattedMax = selectedAsset
     ? parseFloat(formatAmount(selectedBalance)).toFixed(selectedAsset.decimals === 6 ? 2 : 4)
     : "0";
@@ -295,13 +304,13 @@ export function V2SendModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-[440px] p-6 rounded-md border border-[rgba(255,255,255,0.1)] bg-[#06080F] shadow-2xl overflow-y-auto max-h-[90dvh]"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-white font-mono tracking-wider">
-                  [ SEND_V2 ]
+                  [ SEND ]
                 </span>
                 <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)]">
                   <ChainIcon size={14} chainId={chainId} />
@@ -359,7 +368,7 @@ export function V2SendModal({
                       </span>
                     </p>
                     <p className="text-xs text-[rgba(255,255,255,0.4)] font-mono mt-1">
-                      {filteredNotes.length} unspent note{filteredNotes.length !== 1 ? "s" : ""}
+                      From {filteredNotes.length} shielded balance entr{filteredNotes.length !== 1 ? "ies" : "y"}
                     </p>
                   </div>
 
@@ -396,10 +405,10 @@ export function V2SendModal({
                   {consumedNote && parsedAmount && (
                     <div className="p-3 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
-                        Note Selection
+                        Balance Selection
                       </p>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Input note</span>
+                        <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Source balance</span>
                         <span className="text-[11px] font-semibold text-white font-mono flex items-center gap-1">
                           {parseFloat(formatAmount(consumedNote.note.amount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
                         </span>
@@ -419,7 +428,7 @@ export function V2SendModal({
                   {parsedAmount && chunks.length > 1 && !exceedsBalance && (
                     <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.03)] border border-[rgba(0,255,65,0.1)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
-                        Privacy Split &mdash; {chunks.length} chunks
+                        Privacy-optimized &mdash; {chunks.length} chunks
                       </p>
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {formattedChunkValues.map((val, i) => (
@@ -432,7 +441,7 @@ export function V2SendModal({
                         ))}
                       </div>
                       <p className="text-[10px] text-[rgba(255,255,255,0.35)] font-mono">
-                        Each chunk blends into its denomination anonymity set.
+                        Each chunk blends into its privacy pool for stronger protection.
                       </p>
                       {roundSuggestions.length > 0 && (
                         <div className="mt-2 pt-2 border-t border-[rgba(255,255,255,0.05)]">
@@ -519,7 +528,7 @@ export function V2SendModal({
                       <div className="flex flex-col gap-1">
                         <p className="text-[11px] text-[rgba(255,255,255,0.5)] font-mono leading-relaxed">
                           Your identity is hidden by a zero-knowledge proof.{" "}
-                          {chunks.length > 1 && ` Amount will be split into ${chunks.length} standard denomination chunks with random timing delays.`}
+                          {chunks.length > 1 && ` Amount will be split into ${chunks.length} privacy-optimized chunks with random timing delays.`}
                           {chunks.length <= 1 && ` The recipient sees funds arrive but cannot trace the sender.`}
                         </p>
                       </div>
@@ -535,7 +544,7 @@ export function V2SendModal({
                   >
                     {parsedAmount
                       ? useSplitFlow
-                        ? `Split & Send ${amount} ${tokenSymbol}`
+                        ? `Send ${amount} ${tokenSymbol}`
                         : `Send ${amount} ${tokenSymbol}`
                       : "Enter Amount"}
                   </button>
@@ -547,7 +556,7 @@ export function V2SendModal({
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">
-                    {activeStatus || (useSplitFlow ? "Generating denomination split proof..." : "Generating private send proof...")}
+                    {activeStatus || (useSplitFlow ? "Generating privacy-optimized send proof..." : "Generating private send proof...")}
                   </p>
                   {useSplitFlow ? (
                     <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
@@ -587,7 +596,7 @@ export function V2SendModal({
                   {useSplitFlow && (
                     <div className="p-3 rounded-sm bg-[rgba(0,255,65,0.04)] border border-[rgba(0,255,65,0.15)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
-                        {chunks.length} denomination notes created
+                        {chunks.length} privacy-optimized transfers completed
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {formattedChunkValues.map((val, i) => (
@@ -616,9 +625,9 @@ export function V2SendModal({
 
                   {changeAmount !== null && changeAmount > 0n && (
                     <div className="p-3 rounded-sm bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)]">
-                      <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Change Note Saved</p>
+                      <p className="text-xs text-amber-400 font-semibold mb-1 font-mono">Remaining balance saved</p>
                       <p className="text-[11px] text-[rgba(255,255,255,0.4)] leading-relaxed font-mono">
-                        {parseFloat(formatAmount(changeAmount)).toFixed(6)} {tokenSymbol} returned as a new shielded note.
+                        {parseFloat(formatAmount(changeAmount)).toFixed(6)} {tokenSymbol} returned to your shielded balance.
                       </p>
                     </div>
                   )}
@@ -653,10 +662,10 @@ export function V2SendModal({
                       Cancel
                     </button>
                     <button
-                      onClick={() => { activeClearError(); setAmount(""); }}
+                      onClick={() => { activeClearError(); }}
                       className="flex-1 py-3 rounded-sm bg-[rgba(0,255,65,0.1)] border border-[rgba(0,255,65,0.2)] hover:bg-[rgba(0,255,65,0.15)] hover:border-[#00FF41] text-sm font-bold text-[#00FF41] font-mono tracking-wider transition-all"
                     >
-                      Try Again
+                      [ TRY AGAIN ]
                     </button>
                   </div>
                 </div>

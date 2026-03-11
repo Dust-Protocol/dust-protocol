@@ -15,7 +15,7 @@ import {
   AlertCircleIcon,
   TokenIcon,
 } from "@/components/stealth/icons";
-import { getChainConfig } from "@/config/chains";
+import { getChainConfig, isSwapSupported } from "@/config/chains";
 
 interface V2SwapCardProps {
   chainId: number;
@@ -82,7 +82,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
             <V2Header />
             <div className="py-8 text-center">
               <p className="text-sm text-[rgba(255,255,255,0.3)] font-mono">
-                Connect wallet to access V2 privacy pool
+                Connect wallet to access the privacy pool
               </p>
             </div>
           </div>
@@ -103,10 +103,10 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                 <AlertCircleIcon size={14} color="#f59e0b" />
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-bold text-amber-400 font-mono">
-                    V2_POOL: NOT_DEPLOYED
+                    POOL: NOT_DEPLOYED
                   </span>
                   <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
-                    DustPool V2 is not yet deployed on this chain. Use the Legacy swap tab for V1 swaps.
+                    The privacy pool is not yet deployed on this chain.
                   </span>
                 </div>
               </div>
@@ -124,6 +124,17 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
           <CornerAccents />
           <div className="p-6 sm:p-8">
             <V2Header isLoading={isLoading} />
+
+            {!isSwapSupported(chainId) && (
+              <div className="mb-5 p-3 rounded-sm bg-[rgba(255,176,0,0.06)] border border-[rgba(255,176,0,0.2)]">
+                <div className="flex items-center gap-2">
+                  <AlertCircleIcon size={14} color="#FFB000" />
+                  <span className="text-[11px] text-[#FFB000] font-mono font-bold">
+                    Private swaps coming soon to {getChainConfig(chainId).name}
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {/* Left Column: Balance & Actions */}
@@ -143,7 +154,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-white font-mono tracking-tight">
-                        {isLoading ? "-.----" : displayBalance}
+                        {isLoading ? <BalanceSkeleton width="w-28" height="h-8" /> : displayBalance}
                       </span>
                       <div className="flex items-center gap-1.5">
                         <TokenIcon symbol={nativeSymbol} size={16} />
@@ -162,7 +173,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                       <div className="flex items-center gap-2">
                         <LockIcon size={12} color="#f59e0b" />
                         <span className="text-[11px] text-amber-400 font-mono">
-                          {hasPin ? "Enter PIN to unlock V2 pool" : "Set up PIN to use V2 pool"}
+                          {hasPin ? "Enter PIN to unlock privacy pool" : "Set up PIN to use privacy pool"}
                         </span>
                       </div>
                     </button>
@@ -211,11 +222,11 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                     <div className="mb-5 flex flex-col gap-2">
                       <div className="flex items-center gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
-                        <span className="text-[10px] text-[#00FF41] font-mono">V2 keys active</span>
+                        <span className="text-[10px] text-[#00FF41] font-mono">Privacy keys active</span>
                       </div>
                       {v2PubKey && (
                         <div className="flex items-center gap-2 p-2 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
-                          <span className="text-[9px] text-[rgba(255,255,255,0.4)] font-mono shrink-0">YOUR V2 KEY</span>
+                          <span className="text-[9px] text-[rgba(255,255,255,0.4)] font-mono shrink-0">YOUR KEY</span>
                           <span className="text-[10px] text-[rgba(255,255,255,0.6)] font-mono truncate">
                             {v2PubKey.slice(0, 10)}...{v2PubKey.slice(-6)}
                           </span>
@@ -224,7 +235,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                               navigator.clipboard.writeText(v2PubKey).then(() => {
                                 setPubKeyCopied(true);
                                 setTimeout(() => setPubKeyCopied(false), 2000);
-                              }).catch(() => { });
+                              }).catch(() => console.warn("Clipboard API unavailable"));
                             }}
                             className="shrink-0 px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold transition-all bg-[rgba(0,255,65,0.08)] border border-[rgba(0,255,65,0.15)] hover:bg-[rgba(0,255,65,0.15)] text-[#00FF41] cursor-pointer"
                           >
@@ -275,7 +286,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                 {/* How it works */}
                 <div className="p-4 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] flex-1 h-full flex flex-col justify-center">
                   <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-3">
-                    How V2 Works
+                    How It Works
                   </p>
                   <div className="flex flex-col gap-3 text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
                     <div className="flex items-start gap-2">
@@ -328,6 +339,12 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
   );
 }
 
+function BalanceSkeleton({ width = "w-24", height = "h-7" }: { width?: string; height?: string }) {
+  return (
+    <div className={`${width} ${height} rounded-sm bg-[rgba(255,255,255,0.06)] animate-pulse`} />
+  );
+}
+
 function V2Header({ isLoading }: { isLoading?: boolean }) {
   return (
     <div className="flex items-center justify-between mb-5">
@@ -335,9 +352,6 @@ function V2Header({ isLoading }: { isLoading?: boolean }) {
         <ShieldIcon size={14} color="#00FF41" />
         <span className="text-xs font-bold font-mono text-white tracking-widest uppercase">
           PRIVACY_POOL
-        </span>
-        <span className="px-1.5 py-0.5 rounded-sm bg-[rgba(0,255,65,0.15)] text-[9px] text-[#00FF41] font-mono font-bold">
-          V2
         </span>
       </div>
       {isLoading && (

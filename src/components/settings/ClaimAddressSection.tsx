@@ -23,7 +23,7 @@ export function ClaimAddressSection({ claimAddresses, claimAddressesInitialized 
           <div className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.03)] flex items-center justify-center flex-shrink-0">
             <WalletIcon size={16} color="rgba(255,255,255,0.5)" />
           </div>
-          <span className="text-[15px] text-white font-semibold">Claim Addresses</span>
+          <span className="text-[15px] text-white font-semibold">Recovery Wallets</span>
         </div>
 
         <div className="flex flex-col">
