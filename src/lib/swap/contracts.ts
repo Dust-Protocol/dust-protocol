@@ -92,6 +92,110 @@ export const DUST_SWAP_ADAPTER_V2_ABI = [
   { inputs: [], name: 'PoolPaused', type: 'error' },
 ] as const
 
+// ─── DustSwapAdapterGeneric ABI (no V4 pool key — uses arbitrary router) ────
+
+export const DUST_SWAP_ADAPTER_GENERIC_ABI = [
+  {
+    inputs: [
+      { name: 'proof', type: 'bytes' },
+      { name: 'merkleRoot', type: 'bytes32' },
+      { name: 'nullifier0', type: 'bytes32' },
+      { name: 'nullifier1', type: 'bytes32' },
+      { name: 'outCommitment0', type: 'bytes32' },
+      { name: 'outCommitment1', type: 'bytes32' },
+      { name: 'publicAmount', type: 'uint256' },
+      { name: 'publicAsset', type: 'uint256' },
+      { name: 'tokenIn', type: 'address' },
+      { name: 'router', type: 'address' },
+      { name: 'swapCalldata', type: 'bytes' },
+      { name: 'minAmountOut', type: 'uint256' },
+      { name: 'outputCommitment', type: 'bytes32' },
+      { name: 'tokenOut', type: 'address' },
+      { name: 'relayer', type: 'address' },
+      { name: 'relayerFeeBps', type: 'uint256' },
+    ],
+    name: 'executeSwap',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'nullifier', type: 'bytes32' },
+      { indexed: true, name: 'outputCommitment', type: 'bytes32' },
+      { indexed: false, name: 'tokenIn', type: 'address' },
+      { indexed: false, name: 'tokenOut', type: 'address' },
+      { indexed: false, name: 'outputAmount', type: 'uint256' },
+      { indexed: false, name: 'relayerFeeBps', type: 'uint256' },
+    ],
+    name: 'PrivateSwapExecuted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'relayer', type: 'address' },
+      { indexed: false, name: 'allowed', type: 'bool' },
+    ],
+    name: 'RelayerUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'router', type: 'address' },
+      { indexed: false, name: 'allowed', type: 'bool' },
+    ],
+    name: 'RouterUpdated',
+    type: 'event',
+  },
+  {
+    inputs: [
+      { name: 'relayer', type: 'address' },
+      { name: 'allowed', type: 'bool' },
+    ],
+    name: 'setRelayer',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'router', type: 'address' },
+      { name: 'allowed', type: 'bool' },
+    ],
+    name: 'setRouter',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ name: '', type: 'address' }],
+    name: 'authorizedRelayers',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ name: '', type: 'address' }],
+    name: 'allowedRouters',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  { inputs: [], name: 'NotRelayer', type: 'error' },
+  { inputs: [], name: 'NotAllowedRouter', type: 'error' },
+  { inputs: [], name: 'RouterIsPool', type: 'error' },
+  { inputs: [], name: 'RouterIsSelf', type: 'error' },
+  { inputs: [], name: 'SlippageExceeded', type: 'error' },
+  { inputs: [], name: 'RelayerFeeTooHigh', type: 'error' },
+  { inputs: [], name: 'ZeroMinAmount', type: 'error' },
+  { inputs: [], name: 'SwapFailed', type: 'error' },
+  { inputs: [], name: 'TransferFailed', type: 'error' },
+  { inputs: [], name: 'PoolPaused', type: 'error' },
+] as const
+
 export function getDustSwapAdapterV2Config(chainId?: number) {
   const config = getChainConfig(chainId ?? DEFAULT_CHAIN_ID)
   const adapterAddress = config.contracts.dustSwapAdapterV2
@@ -101,6 +205,27 @@ export function getDustSwapAdapterV2Config(chainId?: number) {
   return {
     address: adapterAddress as Address,
     abi: DUST_SWAP_ADAPTER_V2_ABI,
+  }
+}
+
+/** Returns true if this chain uses the generic swap adapter (no V4 pool key) */
+export function isGenericSwapAdapter(chainId?: number): boolean {
+  const config = getChainConfig(chainId ?? DEFAULT_CHAIN_ID)
+  return !!(
+    config.contracts.dustSwapAdapterV2 &&
+    !config.contracts.dustSwapVanillaPoolKey
+  )
+}
+
+export function getDustSwapAdapterGenericConfig(chainId?: number) {
+  const config = getChainConfig(chainId ?? DEFAULT_CHAIN_ID)
+  const adapterAddress = config.contracts.dustSwapAdapterV2
+  if (!adapterAddress || !isGenericSwapAdapter(chainId)) {
+    return null
+  }
+  return {
+    address: adapterAddress as Address,
+    abi: DUST_SWAP_ADAPTER_GENERIC_ABI,
   }
 }
 

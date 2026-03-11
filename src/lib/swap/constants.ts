@@ -13,6 +13,7 @@ const USDC_ADDRESSES: Record<number, Address> = {
   11155420: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
   84532: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
   8453: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+  545: '0x5e65b6B04fbA51D95409712978Cb91E99d93aE73',
 }
 
 export function getUSDCAddress(chainId?: number): Address {
@@ -45,10 +46,19 @@ export const SUPPORTED_TOKENS: Record<string, SwapToken> = {
   },
 }
 
-/** Chain-aware token list — resolves USDC to the correct address per chain */
+/** Chain-aware token list — resolves USDC address and native token name per chain */
 export function getSupportedTokens(chainId?: number): Record<string, SwapToken> {
+  const id = chainId ?? DEFAULT_CHAIN_ID
+  const config = getChainConfig(id)
+  const nativeName = config.nativeCurrency?.name ?? 'Ether'
+  const nativeSymbol = config.nativeCurrency?.symbol ?? 'ETH'
+
   return {
-    ETH: SUPPORTED_TOKENS.ETH,
+    ETH: {
+      ...SUPPORTED_TOKENS.ETH,
+      symbol: nativeSymbol,
+      name: nativeName,
+    },
     USDC: {
       ...SUPPORTED_TOKENS.USDC,
       address: getUSDCAddress(chainId),
@@ -87,10 +97,8 @@ export const RPC_LOG_BATCH_SIZE = 50_000n
 export function isSwapSupported(chainId?: number): boolean {
   try {
     const config = getChainConfig(chainId ?? DEFAULT_CHAIN_ID)
-    return !!(
-      config.contracts.dustSwapAdapterV2 &&
-      config.contracts.dustSwapVanillaPoolKey
-    )
+    // V4 adapter (has pool key) or generic adapter (no pool key, uses external router)
+    return !!config.contracts.dustSwapAdapterV2
   } catch {
     return false
   }
