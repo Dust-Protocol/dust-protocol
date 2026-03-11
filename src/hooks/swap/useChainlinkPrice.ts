@@ -113,6 +113,14 @@ export function useChainlinkPrice(chainIdParam?: number): ChainlinkPriceData {
   }, [publicClient, feedAddress])
 
   useEffect(() => {
+    // No Chainlink feed on this chain — return null immediately, no polling
+    if (!feedAddress) {
+      setPrice(null)
+      setIsLoading(false)
+      setError(null)
+      return
+    }
+
     mountedRef.current = true
     setIsLoading(true)
     fetchPrice()
@@ -122,7 +130,7 @@ export function useChainlinkPrice(chainIdParam?: number): ChainlinkPriceData {
       mountedRef.current = false
       clearInterval(interval)
     }
-  }, [fetchPrice])
+  }, [fetchPrice, feedAddress])
 
   return { price, isLoading, error, refetch: fetchPrice }
 }

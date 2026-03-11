@@ -7,6 +7,7 @@ import {
   STATE_VIEW_ABI,
   getVanillaPoolKey,
   computePoolId,
+  isGenericSwapAdapter,
 } from '@/lib/swap/contracts'
 import { getChainConfig } from '@/config/chains'
 import { getUSDCAddress } from '@/lib/swap/constants'
@@ -149,6 +150,96 @@ async function fetchPrivacyPoolStats(
   }
 }
 
+// V2 pair ABI for getReserves (PunchSwap, UniswapV2-style)
+const V2_PAIR_ABI = [
+  {
+    inputs: [],
+    name: 'getReserves',
+    outputs: [
+      { name: 'reserve0', type: 'uint112' },
+      { name: 'reserve1', type: 'uint112' },
+      { name: 'blockTimestampLast', type: 'uint32' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'token0',
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const
+
+const V2_FACTORY_ABI = [
+  {
+    inputs: [
+      { name: 'tokenA', type: 'address' },
+      { name: 'tokenB', type: 'address' },
+    ],
+    name: 'getPair',
+    outputs: [{ name: 'pair', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const
+
+async function fetchV2PairReserves(
+  client: ReturnType<typeof usePublicClient>,
+  chainId: number,
+): Promise<{ ethReserve: number; usdcReserve: number; price: number | null } | null> {
+  if (!client) return null
+
+  const config = getChainConfig(chainId)
+  const factoryAddress = config.contracts.dustSwapFactory as Address | undefined
+  const wethAddress = config.contracts.dustSwapWflow as Address | undefined
+  if (!factoryAddress || !wethAddress) return null
+
+  let usdcAddr: Address
+  try { usdcAddr = getUSDCAddress(chainId) } catch { return null }
+
+  try {
+    const pairAddress = await client.readContract({
+      address: factoryAddress,
+      abi: V2_FACTORY_ABI,
+      functionName: 'getPair',
+      args: [wethAddress, usdcAddr],
+    }) as Address
+
+    if (pairAddress === zeroAddress) return null
+
+    const [reserves, token0] = await Promise.all([
+      client.readContract({
+        address: pairAddress,
+        abi: V2_PAIR_ABI,
+        functionName: 'getReserves',
+      }),
+      client.readContract({
+        address: pairAddress,
+        abi: V2_PAIR_ABI,
+        functionName: 'token0',
+      }),
+    ])
+
+    const [reserve0, reserve1] = reserves as [bigint, bigint, number]
+    const token0Addr = (token0 as Address).toLowerCase()
+    const wethLower = wethAddress.toLowerCase()
+
+    // Determine which reserve is WETH and which is USDC
+    const ethWei = token0Addr === wethLower ? reserve0 : reserve1
+    const usdcUnits = token0Addr === wethLower ? reserve1 : reserve0
+
+    const ethReserve = Number(ethWei) / 1e18
+    const usdcReserve = Number(usdcUnits) / 1e6
+    const price = ethReserve > 0 ? usdcReserve / ethReserve : null
+
+    return { ethReserve, usdcReserve, price }
+  } catch {
+    return null
+  }
+}
+
 async function fetchSwapPoolStats(
   client: ReturnType<typeof usePublicClient>,
   stateViewAddress: Address,
@@ -203,6 +294,9 @@ export function usePoolStats(chainIdParam?: number): PoolStatsData {
   const [shieldedEthWei, setShieldedEthWei] = useState<bigint>(0n)
   const [shieldedUsdcUnits, setShieldedUsdcUnits] = useState<bigint>(0n)
   const [noteCount, setNoteCount] = useState<number>(0)
+  const [v2EthReserve, setV2EthReserve] = useState<number>(0)
+  const [v2UsdcReserve, setV2UsdcReserve] = useState<number>(0)
+  const [v2Price, setV2Price] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -217,22 +311,32 @@ export function usePoolStats(chainIdParam?: number): PoolStatsData {
 
     const config = getChainConfig(chainId)
 
+    // Generic adapter chains (e.g. Flow EVM) have no V4 PoolManager/StateView.
+    // Skip V4 queries entirely — only fetch privacy pool stats.
+    const isGeneric = isGenericSwapAdapter(chainId)
+
     // Fetch DustPoolV2 stats (privacy pool) — independent of swap pool
     const dustPoolAddress = getDustPoolV2Address(chainId)
     const privacyPoolPromise = dustPoolAddress
       ? fetchPrivacyPoolStats(publicClient, dustPoolAddress, chainId)
       : Promise.resolve(null)
 
-    // Fetch swap pool stats (Uniswap V4)
-    const stateViewAddress = config.contracts.uniswapV4StateView as Address | null
+    // Fetch swap pool stats — V4 for standard chains, V2 pair for generic adapter chains
+    const stateViewAddress = isGeneric
+      ? null
+      : (config.contracts.uniswapV4StateView as Address | null)
     const swapPoolPromise = stateViewAddress
       ? fetchSwapPoolStats(publicClient, stateViewAddress, chainId)
       : Promise.resolve(null)
+    const v2PairPromise = isGeneric
+      ? fetchV2PairReserves(publicClient, chainId)
+      : Promise.resolve(null)
 
     try {
-      const [privacyResult, swapResult] = await Promise.all([
+      const [privacyResult, swapResult, v2Result] = await Promise.all([
         privacyPoolPromise,
         swapPoolPromise,
+        v2PairPromise,
       ])
 
       if (!mountedRef.current) return
@@ -241,6 +345,12 @@ export function usePoolStats(chainIdParam?: number): PoolStatsData {
         setSqrtPriceX96(swapResult.sqrtPriceX96)
         setTick(swapResult.tick)
         setLiquidity(swapResult.liquidity)
+      }
+
+      if (v2Result) {
+        setV2EthReserve(v2Result.ethReserve)
+        setV2UsdcReserve(v2Result.usdcReserve)
+        setV2Price(v2Result.price)
       }
 
       if (privacyResult) {
@@ -275,11 +385,16 @@ export function usePoolStats(chainIdParam?: number): PoolStatsData {
     }
   }, [fetchPoolData])
 
-  // Derived values
-  const currentPrice =
-    sqrtPriceX96 > BigInt(0) ? sqrtPriceToHumanPrice(sqrtPriceX96) : null
+  // Derived values — use V2 pair data on generic chains, V4 on standard chains
+  const isGeneric = isGenericSwapAdapter(chainId)
 
-  const { ethReserve, usdcReserve } = estimateReserves(liquidity, sqrtPriceX96)
+  const currentPrice = isGeneric
+    ? v2Price
+    : sqrtPriceX96 > BigInt(0) ? sqrtPriceToHumanPrice(sqrtPriceX96) : null
+
+  const v4Reserves = estimateReserves(liquidity, sqrtPriceX96)
+  const ethReserve = isGeneric ? v2EthReserve : v4Reserves.ethReserve
+  const usdcReserve = isGeneric ? v2UsdcReserve : v4Reserves.usdcReserve
 
   const totalValueLocked =
     currentPrice !== null

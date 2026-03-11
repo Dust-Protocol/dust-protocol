@@ -8,18 +8,31 @@ import {
   QUOTER_ABI,
   getVanillaPoolKey,
   getSwapDirection,
+  isGenericSwapAdapter,
 } from '@/lib/swap/contracts'
 import { SUPPORTED_TOKENS, ETH_ADDRESS } from '@/lib/swap/constants'
 import { getChainConfig } from '@/config/chains'
 
+// V2 router ABI for getAmountsOut (PunchSwap, UniswapV2-style)
+const V2_ROUTER_GET_AMOUNTS_OUT_ABI = [
+  {
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'path', type: 'address[]' },
+    ],
+    name: 'getAmountsOut',
+    outputs: [{ name: 'amounts', type: 'uint256[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const
+
 function getTokenDecimals(tokenAddress: Address): number {
   const addr = tokenAddress.toLowerCase()
   if (addr === ETH_ADDRESS.toLowerCase()) return 18
-  // Any non-ETH token in our supported set is USDC (6 decimals)
   for (const token of Object.values(SUPPORTED_TOKENS)) {
     if (token.address.toLowerCase() === addr) return token.decimals
   }
-  // USDC addresses vary by chain — if it's not ETH, assume 6 decimals
   return 6
 }
 
@@ -64,42 +77,90 @@ export function useSwapQuote({
         return
       }
 
-      const config = getChainConfig(chainId)
-      const quoterAddress = config.contracts.uniswapV4Quoter as Address | null
-      if (!quoterAddress) {
-        setError('Quoter not deployed on this chain')
+      const parsedAmount = parseFloat(amount)
+      if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        setAmountOut(0n)
+        setGasEstimate(0n)
         setIsLoading(false)
         return
       }
 
+      const fromDecimals = getTokenDecimals(fromToken)
+      const exactAmount = parseUnits(amount, fromDecimals)
+
+      if (exactAmount <= 0n) {
+        setAmountOut(0n)
+        setGasEstimate(0n)
+        setIsLoading(false)
+        return
+      }
+
+      if (exactAmount > MAX_UINT128) {
+        setError('Amount exceeds maximum')
+        setIsLoading(false)
+        return
+      }
+
+      const config = getChainConfig(chainId)
+
       try {
+        // Generic adapter chains (Flow, etc.) use V2 router getAmountsOut
+        if (isGenericSwapAdapter(chainId)) {
+          const routerAddress = config.contracts.dustSwapRouter as Address | undefined
+          const wethAddress = config.contracts.dustSwapWflow as Address | undefined
+          if (!routerAddress || !wethAddress) {
+            setError('Swap router not configured')
+            setIsLoading(false)
+            return
+          }
+
+          const isNativeIn = fromToken.toLowerCase() === ETH_ADDRESS.toLowerCase()
+          const isNativeOut = toToken.toLowerCase() === ETH_ADDRESS.toLowerCase()
+          const path: Address[] = isNativeIn
+            ? [wethAddress, toToken]
+            : isNativeOut
+              ? [fromToken, wethAddress]
+              : [fromToken, toToken]
+
+          const result = await publicClient.readContract({
+            address: routerAddress,
+            abi: V2_ROUTER_GET_AMOUNTS_OUT_ABI,
+            functionName: 'getAmountsOut',
+            args: [exactAmount, path],
+          })
+
+          if (callId !== abortRef.current) return
+
+          const amounts = result as readonly bigint[]
+          const quotedAmountOut = amounts[amounts.length - 1]
+
+          if (quotedAmountOut <= 0n) {
+            setAmountOut(0n)
+            setGasEstimate(0n)
+            setError('No liquidity')
+            return
+          }
+
+          setAmountOut(quotedAmountOut)
+          setGasEstimate(500_000n)
+          setError(null)
+          return
+        }
+
+        // V4 Quoter path (Ethereum Sepolia, Base, etc.)
+        const quoterAddress = config.contracts.uniswapV4Quoter as Address | null
+        if (!quoterAddress) {
+          setError('Quoter not deployed on this chain')
+          setIsLoading(false)
+          return
+        }
+
         const poolKey = getVanillaPoolKey(chainId)
         if (!poolKey) {
           setError('Vanilla pool not configured on this chain')
           return
         }
         const { zeroForOne } = getSwapDirection(fromToken, toToken, poolKey)
-
-        const parsedAmount = parseFloat(amount)
-        if (isNaN(parsedAmount) || parsedAmount <= 0) {
-          setAmountOut(0n)
-          setGasEstimate(0n)
-          return
-        }
-
-        const fromDecimals = getTokenDecimals(fromToken)
-        const exactAmount = parseUnits(amount, fromDecimals)
-
-        if (exactAmount <= 0n) {
-          setAmountOut(0n)
-          setGasEstimate(0n)
-          return
-        }
-
-        if (exactAmount > MAX_UINT128) {
-          setError('Amount exceeds maximum')
-          return
-        }
 
         const result = await publicClient.simulateContract({
           address: quoterAddress,
@@ -125,7 +186,6 @@ export function useSwapQuote({
 
         const [quotedAmountOut, quotedGasEstimate] = result.result as [bigint, bigint]
 
-        // Discards quotes returning less than 0.01% of input value
         const toDecimals = getTokenDecimals(toToken)
         const decimalDiff = toDecimals - fromDecimals
         const inputScaled = decimalDiff >= 0
@@ -147,7 +207,6 @@ export function useSwapQuote({
         const message = err instanceof Error ? err.message : 'Quote failed'
         setAmountOut(0n)
         setGasEstimate(0n)
-        // Treat all quoter reverts as no-liquidity (pool may be uninitialized or tick range empty)
         if (
           message.includes('revert') ||
           message.includes('execution reverted')

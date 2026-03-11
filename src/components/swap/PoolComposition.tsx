@@ -1,6 +1,8 @@
 'use client'
 
-import { ETHIcon, USDCIcon } from '@/components/stealth/icons'
+import { TokenIcon, USDCIcon } from '@/components/stealth/icons'
+import { getChainConfig } from '@/config/chains'
+import { isGenericSwapAdapter } from '@/lib/swap/contracts'
 
 interface PoolCompositionProps {
   ethReserve: number
@@ -8,6 +10,7 @@ interface PoolCompositionProps {
   shieldedEth: number
   shieldedUsdc: number
   currentPrice: number | null
+  chainId?: number
 }
 
 export function formatReserve(value: number, isUsdc: boolean): string {
@@ -23,7 +26,12 @@ export function formatReserve(value: number, isUsdc: boolean): string {
   return value.toFixed(2)
 }
 
-export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shieldedUsdc, currentPrice }: PoolCompositionProps) {
+export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shieldedUsdc, currentPrice, chainId }: PoolCompositionProps) {
+  const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol
+
+  const isGeneric = isGenericSwapAdapter(chainId)
+  const poolLabel = isGeneric ? 'PunchSwap Pool' : 'Pool'
+
   const totalEth = Math.max(0, ethReserve) + Math.max(0, shieldedEth)
   const totalUsdc = Math.max(0, usdcReserve) + Math.max(0, shieldedUsdc)
 
@@ -38,7 +46,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
         <div className="flex items-center gap-1.5 mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41] animate-pulse" />
           <span className="text-[10px] text-[rgba(255,255,255,0.45)] uppercase tracking-wider font-mono">
-            Pool
+            {poolLabel}
           </span>
         </div>
 
@@ -72,7 +80,7 @@ export function PoolComposition({ ethReserve, usdcReserve, shieldedEth, shielded
         <div className="flex md:flex-col gap-3 md:gap-2 mt-3 font-mono w-full">
           <div className="flex items-center gap-1.5 w-full">
             <span className="w-3 h-2 rounded-[2px] bg-[#00FF41] opacity-60 shrink-0" />
-            <ETHIcon size={14} />
+            <TokenIcon symbol={nativeSymbol} size={14} />
             <span className="text-[13px] text-white font-bold">
               {formatReserve(totalEth, false)}
             </span>

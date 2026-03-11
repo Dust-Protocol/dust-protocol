@@ -6,11 +6,13 @@ import { PoolComposition } from "@/components/swap/PoolComposition";
 import { usePoolStats } from "@/hooks/swap/usePoolStats";
 import { useChainlinkPrice } from "@/hooks/swap/useChainlinkPrice";
 import { isSwapSupported } from "@/lib/swap/constants";
+import { isGenericSwapAdapter } from "@/lib/swap/contracts";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function SwapPageClient() {
   const { activeChainId } = useAuth();
   const swapSupported = isSwapSupported(activeChainId);
+  const genericAdapter = isGenericSwapAdapter(activeChainId);
 
   const {
     currentPrice: poolPrice,
@@ -41,6 +43,8 @@ export default function SwapPageClient() {
     poolTick: tick !== undefined ? tick : undefined,
     priceSource: chainlinkPrice != null ? 'chainlink' as const : poolPrice != null ? 'pool' as const : undefined,
     liquidity,
+    isGenericAdapter: genericAdapter,
+    chainId: activeChainId,
   };
 
   return (
@@ -71,6 +75,7 @@ export default function SwapPageClient() {
               shieldedEth={shieldedEth}
               shieldedUsdc={shieldedUsdc}
               currentPrice={oraclePrice}
+              chainId={activeChainId}
             />
           </div>
         )}
@@ -86,6 +91,7 @@ export default function SwapPageClient() {
             shieldedEth={shieldedEth}
             shieldedUsdc={shieldedUsdc}
             currentPrice={oraclePrice}
+            chainId={activeChainId}
           />
         </div>
       )}
