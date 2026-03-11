@@ -44,7 +44,12 @@ export interface DenomSwapProgress {
   total: number
 }
 
-export function useV2DenomSwap(keysRef: RefObject<V2Keys | null>, chainIdOverride?: number) {
+export function useV2DenomSwap(
+  keysRef: RefObject<V2Keys | null>,
+  chainIdOverride?: number,
+  backupNote?: (note: StoredNoteV2) => Promise<void>,
+  backupSpent?: (commitment: string) => Promise<void>,
+) {
   const { address, isConnected } = useAccount()
   const wagmiChainId = useChainId()
   const chainId = chainIdOverride ?? wagmiChainId
@@ -210,6 +215,8 @@ export function useV2DenomSwap(keysRef: RefObject<V2Keys | null>, chainIdOverrid
         complianceStatus: 'inherited' as const,
       }))
       await markSpentAndSaveMultiple(db, inputStored.id, outputStored, encKey)
+      backupSpent?.(inputStored.id).catch(() => {})
+      for (const out of outputStored) { backupNote?.(out).catch(() => {}) }
 
       const denomNotes = splitSubmission.splitResult.outputNotes.slice(0, chunks.length)
       const hasChange = splitSubmission.splitResult.outputNotes.length > chunks.length
@@ -366,6 +373,7 @@ export function useV2DenomSwap(keysRef: RefObject<V2Keys | null>, chainIdOverrid
             createdAt: Date.now(),
           }
           await saveNoteV2(db, address, outputStoredNote, encKey)
+          backupNote?.(outputStoredNote).catch(() => {})
         }
       }
 
@@ -373,6 +381,7 @@ export function useV2DenomSwap(keysRef: RefObject<V2Keys | null>, chainIdOverrid
       for (let i = 0; i < denomNotes.length; i++) {
         if (!failedSwapIndices.has(i)) {
           await markNoteSpent(db, bigintToHex(denomNotes[i].commitment))
+          backupSpent?.(bigintToHex(denomNotes[i].commitment)).catch(() => {})
         }
       }
 

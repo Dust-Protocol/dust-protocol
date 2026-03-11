@@ -15,6 +15,7 @@ import { deriveStorageKey } from '@/lib/dustpool/v2/storage-crypto'
 import { extractRelayerError } from '@/lib/dustpool/v2/errors'
 import { ensureComplianceProved } from '@/lib/dustpool/v2/compliance-gate'
 import { getChainConfig } from '@/config/chains'
+import { isGenericSwapAdapter } from '@/lib/swap/contracts'
 import type { V2Keys } from '@/lib/dustpool/v2/types'
 
 const RECEIPT_TIMEOUT_MS = 30_000
@@ -38,7 +39,12 @@ export type SwapStatus =
   | 'done'
   | 'error'
 
-export function useV2Swap(keysRef: RefObject<V2Keys | null>, chainIdOverride?: number) {
+export function useV2Swap(
+  keysRef: RefObject<V2Keys | null>,
+  chainIdOverride?: number,
+  backupNote?: (note: StoredNoteV2) => Promise<void>,
+  backupSpent?: (commitment: string) => Promise<void>,
+) {
   const { address, isConnected } = useAccount()
   const wagmiChainId = useChainId()
   const chainId = chainIdOverride ?? wagmiChainId
@@ -141,20 +147,29 @@ export function useV2Swap(keysRef: RefObject<V2Keys | null>, chainIdOverride?: n
         const ownerPubKey = await computeOwnerPubKey(keys.spendingKey)
         const blinding = generateBlinding()
 
-        const response = await fetch('/api/v2/swap', {
+        const isGeneric = isGenericSwapAdapter(chainId)
+        const swapEndpoint = isGeneric ? '/api/v2/swap-generic' : '/api/v2/swap'
+
+        const requestBody: Record<string, unknown> = {
+          proof: proofCalldata,
+          publicSignals,
+          targetChainId: chainId,
+          tokenIn,
+          tokenOut,
+          ownerPubKey: ownerPubKey.toString(),
+          blinding: blinding.toString(),
+          relayerFeeBps: relayerFeeBps ?? 200,
+          minAmountOut: minAmountOut.toString(),
+        }
+
+        if (isGeneric) {
+          requestBody.router = getChainConfig(chainId).contracts.dustSwapRouter
+        }
+
+        const response = await fetch(swapEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            proof: proofCalldata,
-            publicSignals,
-            targetChainId: chainId,
-            tokenIn,
-            tokenOut,
-            ownerPubKey: ownerPubKey.toString(),
-            blinding: blinding.toString(),
-            relayerFeeBps: relayerFeeBps ?? 200,
-            minAmountOut: minAmountOut.toString(),
-          }),
+          body: JSON.stringify(requestBody),
         })
 
         if (!response.ok) {
@@ -232,6 +247,7 @@ export function useV2Swap(keysRef: RefObject<V2Keys | null>, chainIdOverride?: n
         complianceStatus: 'unverified',
       }
       await saveNoteV2(db, address, outputStored, encKey)
+      backupNote?.(outputStored).catch(() => {})
       setOutputNote(outputStored)
 
       // Mark input note as spent + save change note if applicable
@@ -255,6 +271,8 @@ export function useV2Swap(keysRef: RefObject<V2Keys | null>, chainIdOverride?: n
         }
       }
       await markSpentAndSaveChange(db, inputStored.id, changeStored, encKey)
+      backupSpent?.(inputStored.id).catch(() => {})
+      if (changeStored) backupNote?.(changeStored).catch(() => {})
 
       if (mountedRef.current) setStatus('done')
     } catch (e) {

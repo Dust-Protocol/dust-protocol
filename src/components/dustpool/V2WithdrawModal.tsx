@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseEther, parseUnits, formatEther, formatUnits, isAddress, zeroAddress, type Address } from "viem";
 import { useAccount } from "wagmi";
 import { useV2Withdraw, useV2Notes, useV2Split } from "@/hooks/dustpool/v2";
+import { useV2Backup } from "@/hooks/dustpool/v2/useV2Backup";
 import { useV2Compliance } from "@/hooks/dustpool/v2/useV2Compliance";
 import { useChainlinkPrice } from "@/hooks/swap/useChainlinkPrice";
 import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
@@ -52,8 +53,9 @@ export function V2WithdrawModal({
   balances,
 }: V2WithdrawModalProps) {
   const { address } = useAccount();
-  const { withdraw, isPending, status, txHash, error, clearError } = useV2Withdraw(keysRef, chainId);
-  const { split, isPending: isSplitPending, status: splitStatus, error: splitError, clearError: clearSplitError } = useV2Split(keysRef, chainId);
+  const { backupNote, backupSpent } = useV2Backup(keysRef, chainId ?? 0);
+  const { withdraw, isPending, status, txHash, error, clearError } = useV2Withdraw(keysRef, chainId, backupNote, backupSpent);
+  const { split, isPending: isSplitPending, status: splitStatus, error: splitError, clearError: clearSplitError } = useV2Split(keysRef, chainId, backupNote, backupSpent);
   const { unspentNotes, refreshNotes } = useV2Notes(keysRef, chainId);
   const { checkCooldown, cooldown } = useV2Compliance(chainId);
   const { price: chainlinkPrice } = useChainlinkPrice();

@@ -8,6 +8,7 @@ import { getChainConfig } from "@/config/chains";
 import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { useV2Keys, useV2Balance } from "@/hooks/dustpool/v2";
+import { useV2Backup } from "@/hooks/dustpool/v2/useV2Backup";
 import { useV2Swap, type SwapStatus } from "@/hooks/swap/v2/useV2Swap";
 import { useV2DenomSwap, type DenomSwapStatus } from "@/hooks/swap/v2/useV2DenomSwap";
 import { useSwapQuote } from "@/hooks/swap";
@@ -91,20 +92,27 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
   const { balances, pendingDeposits, isLoading: balanceLoading, refreshBalances } = useV2Balance(keysRef, activeChainId);
 
-  const [fromToken, setFromToken] = useState<SwapToken>(SUPPORTED_TOKENS.ETH);
+  const [fromToken, setFromToken] = useState<SwapToken>(() => {
+    try { return getSupportedTokens(activeChainId).ETH; }
+    catch { return SUPPORTED_TOKENS.ETH; }
+  });
   const [toToken, setToToken] = useState<SwapToken>(() => {
     try { return getSupportedTokens(activeChainId).USDC; }
     catch { return SUPPORTED_TOKENS.USDC; }
   });
   const [amountStr, setAmountStr] = useState("");
 
-  // Update USDC address when chain changes
+  // Update token addresses and native token label when chain changes
   useEffect(() => {
     try {
       const chainTokens = getSupportedTokens(activeChainId);
       setToToken(prev => prev.symbol === 'USDC' ? chainTokens.USDC : prev);
-      setFromToken(prev => prev.symbol === 'USDC' ? chainTokens.USDC : prev);
-    } catch { /* USDC not configured for this chain */ }
+      setFromToken(prev =>
+        prev.address.toLowerCase() === ETH_ADDRESS.toLowerCase()
+          ? chainTokens.ETH
+          : prev.symbol === 'USDC' ? chainTokens.USDC : prev
+      );
+    } catch { /* tokens not configured for this chain */ }
   }, [activeChainId]);
   const [slippageBps, setSlippageBps] = useState(DEFAULT_SLIPPAGE_BPS);
   const [customSlippage, setCustomSlippage] = useState("");
@@ -118,7 +126,8 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
   const [showFromTokenDropdown, setShowFromTokenDropdown] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
 
-  const { swap, isPending, status, txHash, error: swapError, outputNote, clearError } = useV2Swap(keysRef, activeChainId);
+  const { backupNote, backupSpent } = useV2Backup(keysRef, activeChainId);
+  const { swap, isPending, status, txHash, error: swapError, outputNote, clearError } = useV2Swap(keysRef, activeChainId, backupNote, backupSpent);
   const {
     denomSwap,
     isPending: isDenomPending,
@@ -127,7 +136,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
     txHashes: denomTxHashes,
     error: denomError,
     clearError: clearDenomError,
-  } = useV2DenomSwap(keysRef, activeChainId);
+  } = useV2DenomSwap(keysRef, activeChainId, backupNote, backupSpent);
 
   // Denomination swap toggle (default ON for privacy)
   const [useDenomSwap, setUseDenomSwap] = useState(true);
@@ -426,8 +435,8 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
   const activeLabels = shouldUseDenomSwap ? DENOM_STATUS_LABELS : STATUS_LABELS;
 
   return (
-    <div className="w-full max-w-[620px]">
-      <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-sm backdrop-blur-sm relative overflow-hidden">
+    <div className="w-full max-w-[620px] md:min-h-[540px] md:flex md:flex-col">
+      <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-sm backdrop-blur-sm relative overflow-hidden md:flex-1">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[rgba(255,255,255,0.1)]" />
         <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[rgba(255,255,255,0.1)]" />
@@ -612,7 +621,7 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
 
                   {showFromTokenDropdown && (
                     <div className="absolute top-full left-0 mt-1 w-36 bg-[#06080F] border border-[rgba(255,255,255,0.1)] rounded-sm shadow-xl overflow-hidden z-40">
-                      {Object.values(SUPPORTED_TOKENS)
+                      {Object.values(getSupportedTokens(activeChainId))
                         .map((t) => (
                           <button
                             key={t.symbol}

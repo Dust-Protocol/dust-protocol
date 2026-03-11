@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, type RefObject } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseEther, formatEther } from "viem";
 import { useV2Transfer } from "@/hooks/dustpool/v2";
+import { useV2Backup } from "@/hooks/dustpool/v2/useV2Backup";
 import {
   ShieldCheckIcon,
   AlertCircleIcon,
@@ -32,7 +33,8 @@ export function V2TransferModal({
   chainId,
   shieldedBalance,
 }: V2TransferModalProps) {
-  const { transfer, isPending, status, txHash, error, clearError } = useV2Transfer(keysRef, chainId);
+  const { backupNote, backupSpent } = useV2Backup(keysRef, chainId ?? 0);
+  const { transfer, isPending, status, txHash, error, clearError } = useV2Transfer(keysRef, chainId, backupNote, backupSpent);
   const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
 
   const [amount, setAmount] = useState("");

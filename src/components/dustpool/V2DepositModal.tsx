@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback, useMemo, type RefObject } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { parseEther, formatEther, parseUnits, formatUnits, zeroAddress, publicActions, type Address } from "viem";
+import { parseEther, formatEther, parseUnits, formatUnits, zeroAddress, publicActions, formatGwei, type Address } from "viem";
+import { MAX_AMOUNT } from "@/lib/dustpool/v2/constants";
 import { useAccount, useBalance, usePublicClient, useWalletClient } from "wagmi";
 import { QRCodeSVG } from "qrcode.react";
 import { useV2Deposit, useV2Compliance, useExternalDeposit } from "@/hooks/dustpool/v2";
+import { useV2Backup } from "@/hooks/dustpool/v2/useV2Backup";
 import {
   ShieldIcon,
   ShieldCheckIcon,
@@ -71,7 +73,8 @@ export function V2DepositModal({ isOpen, onClose, onSuccess, keysRef, chainId, h
   const { data: walletBalance } = useBalance({ address });
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { deposit, isPending, txHash, error, clearError } = useV2Deposit(keysRef, chainId);
+  const { backupNote } = useV2Backup(keysRef, chainId ?? 0);
+  const { deposit, isPending, txHash, error, clearError, depositProgress } = useV2Deposit(keysRef, chainId, backupNote);
   const { screenAddress, screeningResult, isScreening, clearScreening } = useV2Compliance(chainId);
   const ext = useExternalDeposit(keysRef, chainId);
 
@@ -502,6 +505,15 @@ export function V2DepositModal({ isOpen, onClose, onSuccess, keysRef, chainId, h
                     )}
                   </div>
 
+                  {/* Auto-split notice for large deposits */}
+                  {parsedAmount !== null && parsedAmount > MAX_AMOUNT && (
+                    <div className="p-2.5 rounded-sm bg-[rgba(99,102,241,0.06)] border border-[rgba(99,102,241,0.15)]">
+                      <p className="text-[10px] text-indigo-400 font-mono leading-relaxed">
+                        Auto-splits into {((parsedAmount + MAX_AMOUNT - 1n) / MAX_AMOUNT).toString()} notes (~{parseFloat(formatEther(MAX_AMOUNT)).toFixed(2)} {tokenSymbol} each) in a single transaction.
+                      </p>
+                    </div>
+                  )}
+
                   <button
                     data-testid="deposit-submit"
                     onClick={handleDeposit}
@@ -527,7 +539,21 @@ export function V2DepositModal({ isOpen, onClose, onSuccess, keysRef, chainId, h
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-white font-mono">Shielding {tokenSymbol}...</p>
-                  <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Confirm the transaction in your wallet</p>
+                  {depositProgress && depositProgress.total > 1 ? (
+                    <>
+                      <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">
+                        Chunk {depositProgress.current}/{depositProgress.total} — confirm each transaction in your wallet
+                      </p>
+                      <div className="w-full max-w-[200px] h-1.5 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#00FF41] rounded-full transition-all duration-300"
+                          style={{ width: `${(depositProgress.current / depositProgress.total) * 100}%` }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-xs text-[rgba(255,255,255,0.4)] text-center font-mono">Confirm the transaction in your wallet</p>
+                  )}
                 </div>
               )}
 
