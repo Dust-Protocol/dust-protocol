@@ -484,7 +484,7 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
     dustPoolV2ComplianceVerifier: '0x5779192B220876221Bc2871511FB764941314e04',
     dustSwapAdapterV2: null,
     dustSwapVanillaPoolKey: null,
-    noteAnnouncer: undefined,
+    noteAnnouncer: '0x5aC74e83F2A77073975503Ba5756bB6977fBa879',
   },
   creationCodes: {
     wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
