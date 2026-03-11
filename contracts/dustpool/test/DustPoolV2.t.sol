@@ -619,7 +619,7 @@ contract DustPoolV2Test is Test {
 
     function testDepositTooLarge() public {
         bytes32 commitment = bytes32(uint256(0x777));
-        uint256 tooMuch = (1 << 64); // MAX_DEPOSIT_AMOUNT + 1
+        uint256 tooMuch = (1 << 128); // MAX_DEPOSIT_AMOUNT + 1
 
         vm.deal(alice, tooMuch + 1 ether);
         vm.prank(alice);
@@ -629,7 +629,7 @@ contract DustPoolV2Test is Test {
 
     function testDepositERC20TooLarge() public {
         bytes32 commitment = bytes32(uint256(0x888));
-        uint256 tooMuch = (1 << 64);
+        uint256 tooMuch = (1 << 128);
 
         mockToken.mint(alice, tooMuch);
         vm.prank(alice);

@@ -9,7 +9,7 @@ import type { ProofInputs } from './types'
 import { TREE_DEPTH } from './constants'
 
 const WASM_PATH = '/circuits/v2/DustV2Transaction.wasm'
-const ZKEY_PATH = process.env.NEXT_PUBLIC_V2_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=2'
+const ZKEY_PATH = process.env.NEXT_PUBLIC_V2_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=3'
 const VKEY_PATH = '/circuits/v2/verification_key.json'
 const PROOF_TIMEOUT_MS = 300_000
 

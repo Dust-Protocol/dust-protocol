@@ -43,8 +43,8 @@ contract DustPoolV2 {
     uint256 public constant FIELD_SIZE =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
     uint256 public constant ROOT_HISTORY_SIZE = 100;
-    /// @dev Max deposit per tx: 2^64 - 1 (matches circuit range proof width)
-    uint256 public constant MAX_DEPOSIT_AMOUNT = (1 << 64) - 1;
+    /// @dev Max deposit per tx: 2^128 - 1 (matches circuit range proof width)
+    uint256 public constant MAX_DEPOSIT_AMOUNT = (1 << 128) - 1;
     uint256 public constant MAX_BATCH_SIZE = 8;
     /// @dev Post-deposit standby — depositor can only withdraw to self during cooldown
     uint256 public constant COOLDOWN_PERIOD = 1 hours;

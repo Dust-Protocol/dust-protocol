@@ -7,8 +7,8 @@ export const BN254_FIELD_SIZE =
 /** Poseidon Merkle tree depth (matches on-chain V2 contract) */
 export const TREE_DEPTH = 20
 
-/** Maximum note amount: 2^64 - 1 (enforced by range proof in circuit) */
-export const MAX_AMOUNT = (1n << 64n) - 1n
+/** Maximum note amount: 2^128 - 1 (enforced by range proof in circuit) */
+export const MAX_AMOUNT = (1n << 128n) - 1n
 
 /** Empty leaf value in Merkle tree */
 export const ZERO_VALUE = 0n

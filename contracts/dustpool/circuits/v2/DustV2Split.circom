@@ -121,7 +121,7 @@ template DustV2Split(TREE_DEPTH, N_OUTPUTS) {
         inAmount[i] * (inOwner[i] - ownerPubKey.out) === 0;
 
         // Input amount range check (prevents overflow via field arithmetic)
-        inAmountRange[i] = Num2Bits(64);
+        inAmountRange[i] = Num2Bits(128);
         inAmountRange[i].in <== inAmount[i];
 
         // Asset consistency — non-dummy inputs must match publicAsset
@@ -180,7 +180,7 @@ template DustV2Split(TREE_DEPTH, N_OUTPUTS) {
         outCommitmentHasher[j].inputs[4] <== outBlinding[j];
 
         // Output amount range check (prevents overflow attacks)
-        outAmountRange[j] = Num2Bits(64);
+        outAmountRange[j] = Num2Bits(128);
         outAmountRange[j].in <== outAmount[j];
 
         // Asset consistency — non-dummy outputs must match publicAsset

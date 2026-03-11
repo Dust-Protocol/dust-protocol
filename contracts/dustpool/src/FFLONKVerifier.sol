@@ -21,7 +21,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 contract FflonkVerifier {
-    uint32 constant n     = 32768; // Domain size
+    uint32 constant n     = 65536; // Domain size
 
     // Verification Key data
     uint256 constant k1   = 2;   // Plonk k1 multiplicative factor to force distinct cosets of H
@@ -29,8 +29,8 @@ contract FflonkVerifier {
 
     // OMEGAS
     // Omega, Omega^{1/3}
-    uint256 constant w1   = 20402931748843538985151001264530049874871572933694634836567070693966133783803;
-    uint256 constant wr   = 582840597611563133261541420468690335435231913830130138101700752603649249758;
+    uint256 constant w1   = 421743594562400382753388642386256516545992082196004333756405989743524594615;
+    uint256 constant wr   = 17111025991735422260403402576932280617357619981334346847634041882580842293288;
     // Omega_3, Omega_3^2
     uint256 constant w3   = 21888242871839275217838484774961031246154997185409878258781734729429964517155;
     uint256 constant w3_2 = 4407920970296243842393367215006156084916469457145843978461;
@@ -48,8 +48,8 @@ contract FflonkVerifier {
     uint256 constant w8_7 = 8613538655231327379234925296132678673308827349856085326283699237864372525723;
 
     // Verifier preprocessed input C_0(x)·[1]_1
-    uint256 constant C0x  = 15388230416042757297913456229638165726194942582334504347967980095244473210667;
-    uint256 constant C0y  = 15223776950515993593427814107353681296918003287967251658550823462736656790309;
+    uint256 constant C0x  = 13822693178035248304284833493760000296595826145569739388040006115376750779306;
+    uint256 constant C0y  = 16311055446134595934544197616372482758716063668276204031874642076560590915419;
 
     // Verifier preprocessed input x·[1]_2
     uint256 constant X2x1 = 21831381940315734285607113342023901060522397560371972897001948545212302161822;
@@ -455,14 +455,24 @@ contract FflonkVerifier {
                 }
             }  
             
-            // Validate all the evaluations sent by the prover ∈ F
-            function checkInput() {
-                // Check proof commitments fullfill bn128 curve equation Y^2 = X^3 + 3
+            function checkProofData() {
+                // Check proof commitments belong to the bn128 curve
                 checkPointBelongsToBN128Curve(pC1)
                 checkPointBelongsToBN128Curve(pC2)
                 checkPointBelongsToBN128Curve(pW1)
                 checkPointBelongsToBN128Curve(pW2)
 
+                // Check proof commitments coordinates are in the field
+                checkField(calldataload(pC1))
+                checkField(calldataload(add(pC1, 32)))
+                checkField(calldataload(pC2))
+                checkField(calldataload(add(pC2, 32)))
+                checkField(calldataload(pW1))
+                checkField(calldataload(add(pW1, 32)))
+                checkField(calldataload(pW2))
+                checkField(calldataload(add(pW2, 32)))
+
+                // Check proof evaluations are in the field
                 checkField(calldataload(pEval_ql))
                 checkField(calldataload(pEval_qr))
                 checkField(calldataload(pEval_qm))
@@ -479,8 +489,6 @@ contract FflonkVerifier {
                 checkField(calldataload(pEval_t1w))
                 checkField(calldataload(pEval_t2w))
                 checkField(calldataload(pEval_inv))
-
-                // Points are checked in the point operations precompiled smart contracts
             }
 
             function computeChallenges(pMem, pPublic) {
@@ -553,6 +561,8 @@ contract FflonkVerifier {
                 mstore(add(pMem, pXi), xin)
 
                 // Compute xi^n
+                
+                xin:= mulmod(xin, xin, q)
                 
                 xin:= mulmod(xin, xin, q)
                 
@@ -1362,8 +1372,8 @@ contract FflonkVerifier {
             let pMem := mload(0x40)
             mstore(0x40, add(pMem, lastMem))
 
-            // Validate that all evaluations ∈ F
-            checkInput()
+            // Check proof data is well-formed
+            checkProofData()
 
             // Compute the challenges: beta, gamma, xi, alpha and y ∈ F, h1w4/h2w3/h3w3 roots, xiN and zh(xi)
             computeChallenges(pMem, pubSignals)

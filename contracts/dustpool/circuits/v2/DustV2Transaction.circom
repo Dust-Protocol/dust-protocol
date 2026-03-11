@@ -125,7 +125,7 @@ template DustV2Transaction(TREE_DEPTH) {
         inAmount[i] * (inOwner[i] - ownerPubKey.out) === 0;
 
         // C3 fix: range check input amounts (prevents overflow via field arithmetic)
-        inAmountRange[i] = Num2Bits(64);
+        inAmountRange[i] = Num2Bits(128);
         inAmountRange[i].in <== inAmount[i];
 
         // C2 fix: asset consistency — non-dummy input notes must match publicAsset
@@ -195,8 +195,8 @@ template DustV2Transaction(TREE_DEPTH) {
         outCommitmentHasher[j].inputs[3] <== outChainId[j];
         outCommitmentHasher[j].inputs[4] <== outBlinding[j];
 
-        // 3b. Range proof: outAmount must fit in 64 bits (prevents overflow attacks)
-        outAmountRange[j] = Num2Bits(64);
+        // 3b. Range proof: outAmount must fit in 128 bits (prevents overflow attacks)
+        outAmountRange[j] = Num2Bits(128);
         outAmountRange[j].in <== outAmount[j];
 
         // C2 fix: asset consistency — non-dummy output notes must match publicAsset
