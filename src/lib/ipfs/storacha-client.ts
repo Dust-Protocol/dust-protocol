@@ -2,8 +2,9 @@
  * IPFS pinning utility for PL Genesis Hackathon.
  *
  * Supports multiple providers via IPFS_PROVIDER env var:
- *   - 'pinata'  — Pinata pinning API (requires PINATA_API_KEY + PINATA_SECRET_KEY)
- *   - 'local'   — Mock provider returning deterministic fake CIDs (testing)
+ *   - 'storacha' — Storacha (w3up-client) with UCAN delegations (requires W3_PRIVATE_KEY + W3_PROOF)
+ *   - 'pinata'   — Pinata pinning API (requires PINATA_API_KEY + PINATA_SECRET_KEY)
+ *   - 'local'    — Mock provider returning deterministic fake CIDs (testing)
  *
  * Gateway URL is configurable via IPFS_GATEWAY_URL (defaults to w3s.link).
  */
@@ -12,7 +13,7 @@ import { createHash } from 'crypto'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
-export type IPFSProvider = 'pinata' | 'local'
+export type IPFSProvider = 'storacha' | 'pinata' | 'local'
 
 export interface PinResult {
   cid: string
@@ -22,13 +23,13 @@ export interface PinResult {
 
 // ─── Config ─────────────────────────────────────────────────────────────────────
 
-const DEFAULT_GATEWAY = 'https://gateway.pinata.cloud/ipfs'
+const DEFAULT_GATEWAY = 'https://w3s.link/ipfs'
 const PINATA_PIN_URL = 'https://api.pinata.cloud/pinning/pinFileToIPFS'
 const PINATA_PIN_JSON_URL = 'https://api.pinata.cloud/pinning/pinJSONToIPFS'
 
 function getProvider(): IPFSProvider {
   const val = process.env.IPFS_PROVIDER?.toLowerCase()
-  if (val === 'pinata' || val === 'local') return val
+  if (val === 'storacha' || val === 'pinata' || val === 'local') return val
   return 'local'
 }
 
@@ -56,6 +57,58 @@ export class IPFSPinError extends Error {
     super(message)
     this.name = 'IPFSPinError'
   }
+}
+
+// ─── Storacha Provider ──────────────────────────────────────────────────────────
+
+// Singleton w3up-client — avoids re-initializing on every request.
+// StoreMemory holds agent keypair + proofs in RAM only (serverless-safe).
+let storachaClientPromise: Promise<unknown> | null = null
+
+async function getStorachaClient() {
+  if (storachaClientPromise) return storachaClientPromise
+
+  storachaClientPromise = (async () => {
+    const privateKey = process.env.W3_PRIVATE_KEY
+    const proofStr = process.env.W3_PROOF
+    if (!privateKey || !proofStr) {
+      throw new Error('W3_PRIVATE_KEY and W3_PROOF env vars required for storacha provider')
+    }
+
+    // Dynamic imports — these are large packages, only load when needed
+    const Client = await import('@web3-storage/w3up-client')
+    const { StoreMemory } = await import('@web3-storage/w3up-client/stores/memory')
+    const Proof = await import('@web3-storage/w3up-client/proof')
+    const { Signer } = await import('@web3-storage/w3up-client/principal/ed25519')
+
+    const signer = Signer.parse(privateKey)
+    const store = new StoreMemory()
+    const client = await Client.create({ principal: signer, store })
+
+    const proof = await Proof.parse(proofStr)
+    const space = await client.addSpace(proof)
+    await client.setCurrentSpace(space.did())
+
+    return client
+  })()
+
+  return storachaClientPromise
+}
+
+async function storachaUploadJSON(data: unknown): Promise<string> {
+  const client = await getStorachaClient() as { uploadFile: (file: Blob) => Promise<{ toString: () => string }> }
+  const json = JSON.stringify(data)
+  const blob = new Blob([json], { type: 'application/json' })
+  const cid = await client.uploadFile(blob)
+  return cid.toString()
+}
+
+async function storachaUploadFile(content: Buffer, fileName: string): Promise<string> {
+  const client = await getStorachaClient() as { uploadFile: (file: File) => Promise<{ toString: () => string }> }
+  const blob = new Blob([content])
+  const file = new File([blob], fileName)
+  const cid = await client.uploadFile(file)
+  return cid.toString()
 }
 
 // ─── Pinata Provider ────────────────────────────────────────────────────────────
@@ -117,7 +170,6 @@ async function pinataUploadFile(content: Buffer, fileName: string): Promise<stri
 
 // ─── Local/Mock Provider ────────────────────────────────────────────────────────
 
-// Deterministic fake CID from content hash (useful for testing)
 function localFakeCID(content: Buffer | string): string {
   const hash = createHash('sha256')
     .update(typeof content === 'string' ? content : content)
@@ -128,9 +180,6 @@ function localFakeCID(content: Buffer | string): string {
 
 // ─── Public API ─────────────────────────────────────────────────────────────────
 
-/**
- * Returns a public gateway URL for the given CID.
- */
 export function getIPFSGatewayURL(cid: string): string {
   const base = getGatewayBase().replace(/\/$/, '')
   return `${base}/${cid}`
@@ -143,7 +192,10 @@ export async function pinToIPFS(data: string | Record<string, unknown>): Promise
   const provider = getProvider()
   let cid: string
 
-  if (provider === 'pinata') {
+  if (provider === 'storacha') {
+    const payload = typeof data === 'string' ? JSON.parse(data) : data
+    cid = await storachaUploadJSON(payload)
+  } else if (provider === 'pinata') {
     const payload = typeof data === 'string' ? JSON.parse(data) : data
     cid = await pinataUploadJSON(payload)
   } else {
@@ -164,7 +216,9 @@ export async function pinFileToIPFS(
   const provider = getProvider()
   let cid: string
 
-  if (provider === 'pinata') {
+  if (provider === 'storacha') {
+    cid = await storachaUploadFile(content, fileName)
+  } else if (provider === 'pinata') {
     cid = await pinataUploadFile(content, fileName)
   } else {
     cid = localFakeCID(content)
