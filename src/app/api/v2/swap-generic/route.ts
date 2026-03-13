@@ -10,6 +10,7 @@ import { computeAssetId, poseidonHash } from '@/lib/dustpool/v2/commitment'
 import { acquireNullifier, releaseNullifier } from '@/lib/dustpool/v2/pending-nullifiers'
 import { checkCooldown } from '@/lib/dustpool/v2/persistent-cooldown'
 import { incrementSwap, observeGasUsed, recordProofVerification } from '@/lib/metrics'
+import { isSanctioned } from '@/lib/dustpool/v2/chainalysis-api'
 import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 60
@@ -154,6 +155,20 @@ export async function POST(req: Request) {
         sponsor,
       )
 
+      // Swap recipient is the adapter contract (not a user address), but screen it
+      // for defense-in-depth — catches a sanctioned adapter before wasting gas
+      try {
+        if (await isSanctioned(adapterAddress)) {
+          console.warn(`[V2/swap-generic] Chainalysis: sanctioned adapter=${adapterAddress}`)
+          return NextResponse.json(
+            { error: 'Swap adapter address is sanctioned' },
+            { status: 403, headers: NO_STORE },
+          )
+        }
+      } catch (apiErr) {
+        console.warn('[V2/swap-generic] Chainalysis API error (continuing):', apiErr)
+      }
+
       const merkleRoot = toBytes32Hex(BigInt(publicSignals[0]))
       const nullifier0 = nullifier0Hex
       const nullifier1 = nullifier1Hex
@@ -161,6 +176,12 @@ export async function POST(req: Request) {
       const outCommitment1 = toBytes32Hex(BigInt(publicSignals[4]))
       const publicAmount = BigInt(publicSignals[5])
       const publicAsset = BigInt(publicSignals[6])
+
+      // publicAmount is field-negative for withdrawals: FIELD_SIZE - actualAmount
+      const BN254_FIELD_SIZE = 21888242871839275222246405745257275088548364400416034343698204186575808495617n
+      const actualSwapAmount = publicAmount > BN254_FIELD_SIZE / 2n
+        ? BN254_FIELD_SIZE - publicAmount
+        : publicAmount
 
       // Build V2 router swap calldata
       const isNativeIn = tokenIn.toLowerCase() === '0x0000000000000000000000000000000000000000'
@@ -178,7 +199,7 @@ export async function POST(req: Request) {
         : isNativeOut
           ? [tokenIn, wflowAddress]
           : [tokenIn, tokenOut]
-      const amountsOut: ethers.BigNumber[] = await routerContract.getAmountsOut(publicAmount, swapPath)
+      const amountsOut: ethers.BigNumber[] = await routerContract.getAmountsOut(actualSwapAmount, swapPath)
       const estimatedOutput = amountsOut[amountsOut.length - 1]
       const estimatedFee = estimatedOutput.mul(relayerFeeBps).div(10_000)
       const estimatedUserAmount = estimatedOutput.sub(estimatedFee)
@@ -217,7 +238,7 @@ export async function POST(req: Request) {
         ])
       } else if (isNativeOut) {
         swapCalldata = V2_ROUTER_IFACE.encodeFunctionData('swapExactTokensForETH', [
-          publicAmount,
+          actualSwapAmount,
           estimatedOutput,
           [tokenIn, wflowAddress],
           adapterAddress,
@@ -225,7 +246,7 @@ export async function POST(req: Request) {
         ])
       } else {
         swapCalldata = V2_ROUTER_IFACE.encodeFunctionData('swapExactTokensForTokens', [
-          publicAmount,
+          actualSwapAmount,
           estimatedOutput,
           [tokenIn, tokenOut],
           adapterAddress,

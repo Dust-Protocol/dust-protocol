@@ -127,7 +127,7 @@ export function useV2Deposit(
           let leafIndex = -1
           for (let attempt = 0; attempt < DEPOSIT_POLL_MAX_ATTEMPTS; attempt++) {
             try {
-              const status = await relayer.getDepositStatus(commitmentHex, chainId)
+              const status = await relayer.getDepositStatus(commitmentHex, chainId, address)
               if (status.confirmed) { leafIndex = status.leafIndex; break }
             } catch { /* not indexed yet */ }
             await new Promise(r => setTimeout(r, DEPOSIT_POLL_INTERVAL_MS))
@@ -195,7 +195,7 @@ export function useV2Deposit(
 
         for (let attempt = 0; attempt < DEPOSIT_POLL_MAX_ATTEMPTS; attempt++) {
           try {
-            const status = await relayer.getDepositStatus(commitmentHex, chainId)
+            const status = await relayer.getDepositStatus(commitmentHex, chainId, address)
             if (status.confirmed) { leafIndex = status.leafIndex; break }
           } catch { /* not indexed yet */ }
           await new Promise(r => setTimeout(r, DEPOSIT_POLL_INTERVAL_MS))

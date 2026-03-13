@@ -9,6 +9,7 @@ import { toBytes32Hex } from '@/lib/dustpool/poseidon'
 import { computeAssetId } from '@/lib/dustpool/v2/commitment'
 import { acquireNullifier, releaseNullifier } from '@/lib/dustpool/v2/pending-nullifiers'
 import { checkCooldown } from '@/lib/dustpool/v2/persistent-cooldown'
+import { isSanctioned } from '@/lib/dustpool/v2/chainalysis-api'
 import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 120
@@ -225,9 +226,17 @@ export async function POST(req: Request) {
             '0x' + recipientBigInt.toString(16).padStart(40, '0'),
           )
 
-          // Swap outputs are UTXO commitments re-deposited into DustPoolV2 —
-          // recipient is the adapter contract (validated at line 156), not an end-user.
-          // Screening skipped intentionally (matches single swap route behavior).
+          // Swap recipient is the adapter contract (not a user address), but screen it
+          // for defense-in-depth — catches a sanctioned adapter before wasting gas
+          try {
+            if (await isSanctioned(adapterConfig.address)) {
+              console.warn(`[V2/batch-swap] Chainalysis: sanctioned adapter=${adapterConfig.address}`)
+              errors.push({ index: item.originalIndex, error: 'Swap adapter address is sanctioned' })
+              continue
+            }
+          } catch (apiErr) {
+            console.warn('[V2/batch-swap] Chainalysis API error (continuing):', apiErr)
+          }
 
           const gasOverrides = await getTxGasOverrides(chainId, 1_500_000)
 

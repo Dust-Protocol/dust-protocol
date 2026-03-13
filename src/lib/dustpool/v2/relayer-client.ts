@@ -316,6 +316,68 @@ export function createRelayerClient(config?: Partial<RelayerConfig>) {
     },
 
     /**
+     * Submit multiple swap proofs via the generic (V2 router) endpoint.
+     * Used on chains without Uniswap V4 (e.g. Flow EVM with PunchSwap).
+     * Executes sequentially with client-side jitter for timing privacy.
+     */
+    async submitBatchSwapGeneric(
+      swaps: Array<{
+        proof: string
+        publicSignals: string[]
+        tokenIn: string
+        tokenOut: string
+        ownerPubKey: string
+        blinding: string
+        relayerFeeBps: number
+        minAmountOut: string
+      }>,
+      targetChainId: number
+    ): Promise<BatchSwapResult> {
+      const results: BatchSwapResultItem[] = []
+      const errors: Array<{ index: number; error: string }> = []
+
+      for (let i = 0; i < swaps.length; i++) {
+        // Client-side jitter between swaps (2-8s) for timing privacy
+        if (i > 0) {
+          await new Promise(r => setTimeout(r, 2000 + Math.random() * 6000))
+        }
+
+        try {
+          const data = await relayerFetch<{
+            txHash: string
+            outputCommitment: string | null
+            outputAmount: string | null
+            queueIndex: number | null
+            blockNumber: number
+          }>(resolvedConfig, '/api/v2/swap-generic', {
+            method: 'POST',
+            body: JSON.stringify({
+              ...swaps[i],
+              targetChainId,
+            }),
+          })
+
+          results.push({
+            txHash: data.txHash,
+            blockNumber: data.blockNumber,
+            gasUsed: '0',
+            fee: '0',
+            outputCommitment: data.outputCommitment,
+            outputAmount: data.outputAmount,
+            queueIndex: data.queueIndex,
+          })
+        } catch (err) {
+          errors.push({
+            index: i,
+            error: err instanceof Error ? err.message : 'Unknown error',
+          })
+        }
+      }
+
+      return { results, errors, total: swaps.length, succeeded: results.length }
+    },
+
+    /**
      * Submit a 2-in-8-out split withdrawal proof for the relayer to execute on-chain.
      * Used when withdrawing into multiple denomination chunks for privacy.
      * @param proofCalldata 0x-prefixed hex string (768 bytes) from FFLONK prover
@@ -358,13 +420,16 @@ export function createRelayerClient(config?: Partial<RelayerConfig>) {
     /**
      * Check whether a deposit commitment has been confirmed and its leaf index.
      */
-    async getDepositStatus(commitment: string, chainId?: number): Promise<DepositStatus> {
+    async getDepositStatus(commitment: string, chainId?: number, depositor?: string): Promise<DepositStatus> {
       // Pad to bytes32 — route validates ^0x[0-9a-fA-F]{64}$
       const padded = '0x' + commitment.replace(/^0x/, '').padStart(64, '0')
-      const params = chainId != null ? `?chainId=${chainId}` : ''
+      const qp = new URLSearchParams()
+      if (chainId != null) qp.set('chainId', String(chainId))
+      if (depositor) qp.set('depositor', depositor)
+      const qs = qp.toString()
       const data = await relayerFetch<DepositStatusResponse>(
         resolvedConfig,
-        `/api/v2/deposit/status/${padded}${params}`
+        `/api/v2/deposit/status/${padded}${qs ? `?${qs}` : ''}`
       )
       return {
         confirmed: data.confirmed,

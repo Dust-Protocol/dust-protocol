@@ -18,6 +18,7 @@ import { decomposeForSplit, formatChunks, suggestRoundedAmounts } from "@/lib/du
 import { getExplorerBase } from "@/lib/design/tokens";
 import { AlertCircleIcon, LockIcon, TokenIcon, ShieldIcon } from "@/components/stealth/icons";
 import { V2DepositModal } from "@/components/dustpool/V2DepositModal";
+import { useV2Compliance } from "@/hooks/dustpool/v2/useV2Compliance";
 
 const SLIPPAGE_OPTIONS = [
   { label: "0.1%", bps: 10 },
@@ -91,6 +92,16 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
   const { keysRef, hasKeys, hasPin, isDeriving, error: keyError, deriveKeys } = useV2Keys();
 
   const { balances, pendingDeposits, isLoading: balanceLoading, refreshBalances } = useV2Balance(keysRef, activeChainId);
+
+  const chainConfig = getChainConfig(activeChainId);
+  const complianceAvailable = !!chainConfig.contracts.dustPoolV2ComplianceVerifier;
+  const { screenAddress, screeningResult, isScreening } = useV2Compliance(activeChainId);
+
+  useEffect(() => {
+    if (isConnected && complianceAvailable) {
+      screenAddress();
+    }
+  }, [isConnected, complianceAvailable, screenAddress]);
 
   const [fromToken, setFromToken] = useState<SwapToken>(() => {
     try { return getSupportedTokens(activeChainId).ETH; }
@@ -470,6 +481,46 @@ export function SwapV2Card({ onPoolChange, oraclePrice }: { onPoolChange?: () =>
             </button>
             </div>
           </div>
+
+          {/* Compliance Status */}
+          {complianceAvailable && isConnected && (
+            <div className="mb-4 flex items-center gap-1.5">
+              {isScreening ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="animate-spin text-[rgba(255,200,0,0.7)]">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-xs font-mono text-[rgba(255,200,0,0.7)]">Checking...</span>
+                </>
+              ) : screeningResult?.status === 'clear' || screeningResult?.status === 'no-screening' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,255,100,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                  <span className="text-xs font-mono text-[rgba(0,255,100,0.6)]">Compliant</span>
+                </>
+              ) : screeningResult?.status === 'blocked' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,80,80,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                  </svg>
+                  <span className="text-xs font-mono text-[rgba(255,80,80,0.8)]">
+                    Sanctioned{screeningResult.reason ? ` — ${screeningResult.reason}` : ''}
+                  </span>
+                </>
+              ) : screeningResult?.status === 'error' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <span className="text-xs font-mono text-[rgba(255,255,255,0.3)]">Unavailable</span>
+                </>
+              ) : null}
+            </div>
+          )}
 
           {/* Slippage Settings */}
           {showSlippageSettings && (

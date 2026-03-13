@@ -10,6 +10,7 @@ import { computeAssetId } from '@/lib/dustpool/v2/commitment'
 import { acquireNullifier, releaseNullifier } from '@/lib/dustpool/v2/pending-nullifiers'
 import { checkCooldown } from '@/lib/dustpool/v2/persistent-cooldown'
 import { incrementSwap, observeGasUsed, recordProofVerification } from '@/lib/metrics'
+import { isSanctioned } from '@/lib/dustpool/v2/chainalysis-api'
 import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 60
@@ -157,8 +158,19 @@ export async function POST(req: Request) {
       const publicAmount = BigInt(publicSignals[5])
       const publicAsset = BigInt(publicSignals[6])
 
-      // No compliance screening here: swap outputs are UTXO commitments re-deposited
-      // into DustPoolV2 — there is no recipient address to screen.
+      // Swap recipient is the adapter contract (not a user address), but screen it
+      // for defense-in-depth — catches a sanctioned adapter before wasting gas
+      try {
+        if (await isSanctioned(adapterAddress)) {
+          console.warn(`[V2/swap] Chainalysis: sanctioned adapter=${adapterAddress}`)
+          return NextResponse.json(
+            { error: 'Swap adapter address is sanctioned' },
+            { status: 403, headers: NO_STORE },
+          )
+        }
+      } catch (apiErr) {
+        console.warn('[V2/swap] Chainalysis API error (continuing):', apiErr)
+      }
 
       // Swap direction: true if tokenIn is currency0 (swap 0→1), false if currency1 (swap 1→0)
       const zeroForOne = tokenIn.toLowerCase() === poolKey.currency0.toLowerCase()

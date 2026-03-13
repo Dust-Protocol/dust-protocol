@@ -53,6 +53,9 @@ export interface ChainCreationCodes {
 
 export type ChainIconFamily = 'ethereum' | 'arbitrum' | 'optimism' | 'base' | 'thanos' | 'flow';
 
+// Which on-chain compliance oracle the chain uses for deposit screening
+export type ComplianceType = 'chainalysis-oracle' | 'ofac-registry' | 'testnet-mock' | 'none';
+
 export interface ChainConfig {
   id: number;
   name: string;
@@ -71,6 +74,7 @@ export interface ChainConfig {
   testnet: boolean;
   isL2: boolean;
   iconFamily: ChainIconFamily;
+  complianceType: ComplianceType;
 }
 
 // ─── Thanos Sepolia ────────────────────────────────────────────────────────────
@@ -134,6 +138,7 @@ const THANOS_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
   isL2: false,
   iconFamily: 'thanos',
+  complianceType: 'ofac-registry',
 };
 
 // ─── Ethereum Sepolia ──────────────────────────────────────────────────────────
@@ -214,6 +219,7 @@ const ETHEREUM_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
   isL2: false,
   iconFamily: 'ethereum',
+  complianceType: 'chainalysis-oracle',
 };
 
 // ─── Arbitrum Sepolia ──────────────────────────────────────────────────────────
@@ -274,6 +280,7 @@ const ARBITRUM_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
   isL2: true,
   iconFamily: 'arbitrum',
+  complianceType: 'testnet-mock',
 };
 
 // ─── OP Sepolia ────────────────────────────────────────────────────────────────
@@ -334,6 +341,7 @@ const OP_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
   isL2: true,
   iconFamily: 'optimism',
+  complianceType: 'testnet-mock',
 };
 
 // ─── Base Sepolia ──────────────────────────────────────────────────────────────
@@ -394,6 +402,7 @@ const BASE_SEPOLIA_CONFIG: ChainConfig = {
   testnet: true,
   isL2: true,
   iconFamily: 'base',
+  complianceType: 'testnet-mock',
 };
 
 // ─── Base Mainnet ───────────────────────────────────────────────────────────────
@@ -455,6 +464,7 @@ const BASE_MAINNET_CONFIG: ChainConfig = {
   testnet: false,
   isL2: true,
   iconFamily: 'base',
+  complianceType: 'none',
 };
 
 // ─── Flow EVM Testnet ────────────────────────────────────────────────────────
@@ -494,17 +504,17 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
     uniswapV4PoolManager: null,
     uniswapV4StateView: null,
     uniswapV4Quoter: null,
-    dustPoolV2: '0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94',
-    dustPoolV2Verifier: '0x753D0F47c21093Ba5A09666Ec694c71684998626',
-    dustPoolV2SplitVerifier: '0xB1D73BeA90f2eF2bAaA67740aEf97C6129192b94',
+    dustPoolV2: '0x0deec7879dd4A80f28e2797EE1C14Bd6eEEC87aC',
+    dustPoolV2Verifier: '0x6fF7F670Df8aE9C5DC16d66d6b84Bb49f33258F5',
+    dustPoolV2SplitVerifier: '0x5CDd9F3688CB80d07c849419F555289aA2DB7FFe',
     dustPoolV2ComplianceVerifier: '0x5779192B220876221Bc2871511FB764941314e04',
-    dustSwapAdapterV2: '0x65462968988B191ec43E55E911Ff3D47B885A906',
+    dustSwapAdapterV2: '0x11fE972a76d36195361bAFAFA695352c3E82f2f7',
     dustSwapVanillaPoolKey: null,
     noteAnnouncer: '0x5aC74e83F2A77073975503Ba5756bB6977fBa879',
     dustSwapRouter: '0xeD53235cC3E9d2d464E9c408B95948836648870B',
     dustSwapWflow: '0xd3bF53DAC106A0290B0483EcBC89d40FcC961f3e',
     dustSwapFactory: '0x0f6C2EF40FA42B2F0E0a9f5987b2f3F8Af3C173f',
-    depositSplitter: '0x0Fe67f27ed9Ff208b7C275A68da3a28Ec039F4dD',
+    depositSplitter: '0x9f97dD7A487e64D3693Dc6a67FafBA1605c34448',
   },
   creationCodes: {
     wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
@@ -523,6 +533,8 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
   testnet: true,
   isL2: false,
   iconFamily: 'flow',
+  // Compliance oracle address will be updated after OFACSanctionsRegistry deployment on Flow
+  complianceType: 'ofac-registry',
 };
 
 // ─── Registry ──────────────────────────────────────────────────────────────────

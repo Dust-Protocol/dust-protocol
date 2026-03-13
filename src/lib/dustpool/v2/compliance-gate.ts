@@ -1,6 +1,10 @@
 // Pre-spend compliance gate: ensures all input notes have on-chain compliance
 // proofs before any withdrawal, transfer, split, or swap. Skips gracefully
 // when the compliance verifier is not deployed or is disabled.
+//
+// Two screening layers (checked in order):
+// 1. Chainalysis API — fast off-chain sanctions check (fail-open on API error)
+// 2. On-chain oracle — ZK compliance proof against exclusion SMT
 
 import { type PublicClient } from 'viem'
 import { getChainConfig } from '@/config/chains'
@@ -8,6 +12,7 @@ import { getDustPoolV2Address, DUST_POOL_V2_ABI } from './contracts'
 import { computeNullifier } from './nullifier'
 import { proveCompliance } from './compliance-flow'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
+import { isSanctioned } from './chainalysis-api'
 
 export interface NoteForCompliance {
   commitment: bigint
@@ -16,11 +21,30 @@ export interface NoteForCompliance {
   complianceStatus?: 'unverified' | 'verified' | 'inherited'
 }
 
+export type ScreeningSource = 'chainalysis' | 'on-chain-oracle' | 'none'
+
+export interface ComplianceGateResult {
+  /** Which screening layer was the final authority (or 'none' if skipped) */
+  screeningSource: ScreeningSource
+}
+
+export class SanctionedAddressError extends Error {
+  constructor(
+    public readonly address: string,
+    public readonly screeningSource: ScreeningSource
+  ) {
+    super(`Address ${address} is sanctioned (source: ${screeningSource})`)
+    this.name = 'SanctionedAddressError'
+  }
+}
+
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 /**
  * Ensure all notes have compliance proofs verified on-chain before spending.
  *
+ * - If senderAddress is provided, checks Chainalysis API first (blocks immediately if sanctioned)
+ * - If Chainalysis API errors, falls through to on-chain oracle (fail-open)
  * - Returns immediately if compliance verifier is not configured or set to address(0)
  * - Skips dummy notes (leafIndex < 0)
  * - Skips notes already verified on-chain
@@ -35,25 +59,43 @@ export async function ensureComplianceProved(
   chainId: number,
   publicClient: PublicClient,
   onStatus?: (status: string) => void,
-  onVerified?: OnComplianceVerified
-): Promise<void> {
+  onVerified?: OnComplianceVerified,
+  senderAddress?: string
+): Promise<ComplianceGateResult> {
   const config = getChainConfig(chainId)
-  if (!config.contracts.dustPoolV2ComplianceVerifier) return
+  if (!config.contracts.dustPoolV2ComplianceVerifier) {
+    return { screeningSource: 'none' }
+  }
 
   const poolAddress = getDustPoolV2Address(chainId)
-  if (!poolAddress) return
+  if (!poolAddress) return { screeningSource: 'none' }
 
-  // Verify on-chain that verifier is actually enabled (owner could have zeroed it)
+  // Layer 1: Chainalysis API screening (fail-open on error)
+  if (senderAddress) {
+    onStatus?.('Checking sanctions status...')
+    try {
+      const sanctioned = await isSanctioned(senderAddress)
+      if (sanctioned) {
+        throw new SanctionedAddressError(senderAddress, 'chainalysis')
+      }
+    } catch (err) {
+      if (err instanceof SanctionedAddressError) throw err
+      // API error — fall through to on-chain oracle
+      console.warn('Chainalysis API check failed, falling through to on-chain oracle:', err)
+    }
+  }
+
+  // Layer 2: On-chain oracle screening
   const verifierAddress = await publicClient.readContract({
     address: poolAddress,
     abi: DUST_POOL_V2_ABI,
     functionName: 'complianceVerifier',
   }) as string
 
-  if (verifierAddress === ZERO_ADDRESS) return
+  if (verifierAddress === ZERO_ADDRESS) return { screeningSource: 'none' }
 
   const realNotes = notes.filter(n => n.leafIndex >= 0)
-  if (realNotes.length === 0) return
+  if (realNotes.length === 0) return { screeningSource: 'none' }
 
   for (let i = 0; i < realNotes.length; i++) {
     const note = realNotes[i]
@@ -85,4 +127,6 @@ export async function ensureComplianceProved(
       await onVerified(commitmentHex, result.txHash)
     }
   }
+
+  return { screeningSource: 'on-chain-oracle' }
 }

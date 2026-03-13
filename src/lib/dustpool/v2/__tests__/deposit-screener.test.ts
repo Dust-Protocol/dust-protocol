@@ -32,6 +32,11 @@ vi.mock('../relayer-compliance', () => ({
   screenRecipient: (...args: unknown[]) => mockScreenRecipient(...args),
 }))
 
+const mockCheckSanctions = vi.fn().mockResolvedValue({ address: '0x0', sanctioned: false, identifications: [], checkedAt: Date.now() })
+vi.mock('../chainalysis-api', () => ({
+  checkSanctionsStatus: (...args: unknown[]) => mockCheckSanctions(...args),
+}))
+
 const mockAddFlagged = vi.fn().mockResolvedValue(999n)
 const mockGetRoot = vi.fn().mockResolvedValue(999n)
 vi.mock('../exclusion-tree', () => ({
@@ -61,6 +66,7 @@ describe('deposit-screener', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockScreenRecipient.mockResolvedValue({ blocked: false })
+    mockCheckSanctions.mockResolvedValue({ address: '0x0', sanctioned: false, identifications: [], checkedAt: Date.now() })
     mockAddFlagged.mockResolvedValue(999n)
   })
 
@@ -127,6 +133,70 @@ describe('deposit-screener', () => {
     // #then
     expect(result.eventsProcessed).toBe(3)
     expect(mockScreenRecipient).toHaveBeenCalledTimes(3)
+  })
+
+  it('flags depositor sanctioned by Chainalysis even if oracle says clean', async () => {
+    // #given
+    const contract = getMockContract()
+    contract.queryFilter.mockResolvedValue([
+      { args: { commitment: '0x' + 'ee'.repeat(32) } },
+    ])
+    contract.depositOriginator.mockResolvedValue('0x4444444444444444444444444444444444444444')
+    mockScreenRecipient.mockResolvedValue({ blocked: false })
+    mockCheckSanctions.mockResolvedValue({
+      address: '0x4444444444444444444444444444444444444444',
+      sanctioned: true,
+      identifications: [{ category: 'OFAC', name: 'Test', description: '', url: '' }],
+      checkedAt: Date.now(),
+    })
+
+    // #when
+    const result = await runDepositScreenerCycle(11155111)
+
+    // #then
+    expect(result.newFlagged).toBe(1)
+    expect(mockAddFlagged).toHaveBeenCalledWith(11155111, BigInt('0x' + 'ee'.repeat(32)))
+  })
+
+  it('allows deposit when Chainalysis API errors (fail-open)', async () => {
+    // #given
+    const contract = getMockContract()
+    contract.queryFilter.mockResolvedValue([
+      { args: { commitment: '0x' + 'dd'.repeat(32) } },
+    ])
+    contract.depositOriginator.mockResolvedValue('0x5555555555555555555555555555555555555555')
+    mockScreenRecipient.mockResolvedValue({ blocked: false })
+    mockCheckSanctions.mockRejectedValue(new Error('API timeout'))
+
+    // #when
+    const result = await runDepositScreenerCycle(11155111)
+
+    // #then — not flagged because fail-open + oracle says clean
+    expect(result.newFlagged).toBe(0)
+    expect(mockAddFlagged).not.toHaveBeenCalled()
+  })
+
+  it('flags when both oracle and Chainalysis agree address is sanctioned', async () => {
+    // #given
+    const contract = getMockContract()
+    contract.queryFilter.mockResolvedValue([
+      { args: { commitment: '0x' + 'aa'.repeat(32) } },
+    ])
+    contract.depositOriginator.mockResolvedValue('0x6666666666666666666666666666666666666666')
+    mockScreenRecipient.mockResolvedValue({ blocked: true, reason: 'Sanctioned' })
+    mockCheckSanctions.mockResolvedValue({
+      address: '0x6666666666666666666666666666666666666666',
+      sanctioned: true,
+      identifications: [{ category: 'OFAC', name: 'Test', description: '', url: '' }],
+      checkedAt: Date.now(),
+    })
+
+    // #when
+    const result = await runDepositScreenerCycle(11155111)
+
+    // #then — flagged once (not double-flagged)
+    expect(result.newFlagged).toBe(1)
+    expect(mockAddFlagged).toHaveBeenCalledTimes(1)
   })
 
   it('skips events where originator is zero address', async () => {

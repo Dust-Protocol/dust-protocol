@@ -11,8 +11,10 @@ import { readFile, writeFile } from 'fs/promises'
 import { getServerProvider } from '@/lib/server-provider'
 import { getDustPoolV2Address, DUST_POOL_V2_ABI } from './contracts'
 import { screenRecipient } from './relayer-compliance'
-import { addFlaggedCommitment, getExclusionRoot } from './exclusion-tree'
+import { checkSanctionsStatus } from './chainalysis-api'
+import { addFlaggedCommitment, getExclusionRoot, getFlaggedCount } from './exclusion-tree'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
+import { pinToIPFS } from '@/lib/ipfs/storacha-client'
 
 const BATCH_SIZE = 100
 const MAX_BLOCK_RANGE = 5000
@@ -119,13 +121,36 @@ export async function runDepositScreenerCycle(
 
       if (originator === ethers.constants.AddressZero) continue
 
+      // On-chain oracle check (fail-closed — oracle errors block the depositor)
       const screenResult = await screenRecipient(originator, chainId)
-      if (screenResult.blocked) {
+
+      // Chainalysis API check (fail-open — API errors log but don't block,
+      // the on-chain oracle is the backstop)
+      let chainalysisFlagged = false
+      try {
+        const sanctionsResult = await checkSanctionsStatus(originator)
+        chainalysisFlagged = sanctionsResult.sanctioned
+        if (chainalysisFlagged) {
+          console.log(
+            `[Screener] Chainalysis flagged depositor ${originator}: ${sanctionsResult.identifications.map(i => i.category).join(', ')}`
+          )
+        }
+      } catch (e) {
+        console.error(
+          `[Screener] Chainalysis API error for ${originator} (fail-open):`,
+          e instanceof Error ? e.message : e
+        )
+      }
+
+      if (screenResult.blocked || chainalysisFlagged) {
         const commitmentBigint = BigInt(commitment)
         await addFlaggedCommitment(chainId, commitmentBigint)
         newFlagged++
+        const source = screenResult.blocked && chainalysisFlagged
+          ? 'oracle+chainalysis'
+          : screenResult.blocked ? 'oracle' : 'chainalysis'
         console.log(
-          `[Screener] Flagged commitment ${commitment.slice(0, 18)}... from blocked depositor ${originator}`
+          `[Screener] Flagged commitment ${commitment.slice(0, 18)}... from blocked depositor ${originator} (${source})`
         )
       }
     }
@@ -143,6 +168,26 @@ export async function runDepositScreenerCycle(
       )
       const root = await getExclusionRoot(chainId)
       const rootHex = toBytes32Hex(root)
+      const totalFlaggedCount = await getFlaggedCount(chainId)
+
+      // Pin exclusion tree snapshot to IPFS before posting root on-chain
+      try {
+        const snapshot: Record<string, unknown> = {
+          version: 1,
+          chainId,
+          timestamp: new Date().toISOString(),
+          exclusionRoot: rootHex,
+          newFlaggedCount: newFlagged,
+          totalFlagged: totalFlaggedCount,
+          source: 'deposit-screener',
+          blockRange: { from: fromBlock, to: toBlock },
+        }
+        const { cid } = await pinToIPFS(snapshot)
+        console.log(`[IPFS] Exclusion snapshot pinned: ${cid}`)
+      } catch (e) {
+        console.warn(`[IPFS] Failed to pin exclusion snapshot (continuing): ${e instanceof Error ? e.message : e}`)
+      }
+
       const tx = await poolWriter.updateExclusionRoot(rootHex, { gasLimit: 100_000 })
       await tx.wait()
       console.log(`[Screener] Posted exclusion root: ${rootHex.slice(0, 18)}... (${newFlagged} new flags)`)

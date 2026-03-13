@@ -9,6 +9,7 @@ import { computeAssetId } from '@/lib/dustpool/v2/commitment'
 import { acquireNullifier, releaseNullifier } from '@/lib/dustpool/v2/pending-nullifiers'
 import { checkCooldown } from '@/lib/dustpool/v2/persistent-cooldown'
 import { screenRecipient } from '@/lib/dustpool/v2/relayer-compliance'
+import { isSanctioned } from '@/lib/dustpool/v2/chainalysis-api'
 import { checkOrigin } from '@/lib/api-auth'
 
 export const maxDuration = 120
@@ -180,7 +181,18 @@ export async function POST(req: Request) {
             '0x' + recipientBigInt.toString(16).padStart(40, '0'),
           )
 
-          // Compliance: screen recipient against on-chain oracle
+          // Chainalysis API pre-screen (fail-open — on-chain oracle is backstop)
+          try {
+            if (await isSanctioned(recipient)) {
+              console.warn(`[V2/batch-withdraw] Chainalysis: sanctioned recipient=${recipient}`)
+              errors.push({ index: item.originalIndex, error: 'Recipient address is sanctioned' })
+              continue
+            }
+          } catch (apiErr) {
+            console.warn('[V2/batch-withdraw] Chainalysis API error (continuing):', apiErr)
+          }
+
+          // On-chain oracle screen (fail-closed — last line of defense)
           const screenResult = await screenRecipient(recipient, chainId)
           if (screenResult.blocked) {
             errors.push({ index: item.originalIndex, error: 'Recipient address is sanctioned' })

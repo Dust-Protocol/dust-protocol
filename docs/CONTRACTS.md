@@ -290,7 +290,18 @@ Deployment block: `38350029`
 | FflonkComplianceVerifier | [`0x5779192B220876221Bc2871511FB764941314e04`](https://evm-testnet.flowscan.io/address/0x5779192B220876221Bc2871511FB764941314e04) |
 | TestnetComplianceOracle | [`0xACe425FC23d7594b829935EC4862f654541Bf0d3`](https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3) |
 
-*DustSwap not yet deployed on Flow EVM Testnet.*
+### DustSwap — Generic Adapter (no Uniswap V4, uses PunchSwap V2)
+
+| Contract | Address |
+|----------|---------|
+| DustSwapAdapterGeneric | [`0x3E140c501A39ab9DcA569E76f902E3bd8B11366c`](https://evm-testnet.flowscan.io/address/0x3E140c501A39ab9DcA569E76f902E3bd8B11366c) |
+| NoteAnnouncer | [`0x5aC74e83F2A77073975503Ba5756bB6977fBa879`](https://evm-testnet.flowscan.io/address/0x5aC74e83F2A77073975503Ba5756bB6977fBa879) |
+| PunchSwap V2 Router | `0xeD53235cC3E9d2d464E9c408B95948836648870B` |
+| PunchSwap V2 Factory | `0x0f6C2EF40FA42B2F0E0a9f5987b2f3F8Af3C173f` |
+| WFLOW | `0xd3bF53DAC106A0290B0483EcBC89d40FcC961f3e` |
+| USDCf (testnet mock) | `0x5e65b6B04fbA51D95409712978Cb91E99d93aE73` |
+
+Poseidon libraries not deployed (exceed Flow 24KB code size limit) — commitment computed off-chain by relayer.
 
 ---
 
