@@ -1,5 +1,4 @@
 "use client";
-
 import { SwapV2Card } from "@/components/swap/SwapV2Card";
 import { PoolStats } from "@/components/swap/PoolStats";
 import { PoolComposition } from "@/components/swap/PoolComposition";
@@ -95,6 +94,76 @@ export default function SwapPageClient() {
           />
         </div>
       )}
+
+      {/* Hackathon Info Panel */}
+      <HackathonInfoPanel />
+    </div>
+  );
+}
+
+function HackathonInfoPanel() {
+  return (
+    <div className="fixed bottom-4 right-4 z-50 max-w-xs">
+      <details className="group">
+        <summary className="cursor-pointer list-none flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgba(0,255,100,0.08)] border border-[rgba(0,255,100,0.15)] backdrop-blur-md text-[rgba(255,255,255,0.6)] hover:text-white hover:border-[rgba(0,255,100,0.3)] transition-all text-xs font-mono">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 shrink-0">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4" />
+            <path d="M12 8h.01" />
+          </svg>
+          <span>PL Genesis Hackathon Demo</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto transition-transform group-open:rotate-180">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </summary>
+        <div className="mt-2 p-3 rounded-lg bg-[rgba(10,10,15,0.95)] border border-[rgba(0,255,100,0.12)] backdrop-blur-xl text-[11px] font-mono leading-relaxed space-y-2.5">
+          <div className="text-[rgba(0,255,100,0.7)] font-semibold tracking-wider text-[10px] uppercase">
+            How It Works
+          </div>
+          <div className="text-[rgba(255,255,255,0.5)] space-y-1.5">
+            <p>
+              <span className="text-[rgba(0,255,100,0.6)]">1.</span>{" "}
+              Deposit FLOW into the shielded pool (ZK-UTXO)
+            </p>
+            <p>
+              <span className="text-[rgba(0,255,100,0.6)]">2.</span>{" "}
+              Generate FFLONK proof in-browser (~30s)
+            </p>
+            <p>
+              <span className="text-[rgba(0,255,100,0.6)]">3.</span>{" "}
+              Relayer withdraws + swaps on PunchSwap atomically
+            </p>
+            <p>
+              <span className="text-[rgba(0,255,100,0.6)]">4.</span>{" "}
+              Output USDC deposited back as shielded UTXO
+            </p>
+          </div>
+
+          <div className="border-t border-[rgba(255,255,255,0.06)] pt-2 space-y-1.5">
+            <div className="text-[rgba(0,255,100,0.7)] font-semibold tracking-wider text-[10px] uppercase">
+              Notes
+            </div>
+            <div className="text-[rgba(255,255,255,0.45)] space-y-1">
+              <p>
+                <span className="text-yellow-400/60">Slippage</span> &mdash; Default 0.5%. Increase to 1-2% for large swaps or when using denomination privacy with multiple chunks.
+              </p>
+              <p>
+                <span className="text-yellow-400/60">Denom Privacy</span> &mdash; Splits your swap into common-sized chunks (e.g. 100+100+50). Each chunk swaps separately with random delays. May take 2-5 min.
+              </p>
+              <p>
+                <span className="text-yellow-400/60">Relayer Fee</span> &mdash; 2% covers gas. The relayer submits your tx so your wallet address is never linked to the swap.
+              </p>
+              <p>
+                <span className="text-yellow-400/60">Liquidity</span> &mdash; Swaps route through PunchSwap V2 (FLOW/USDC pool). Your DustPool balance does not need USDC &mdash; the adapter fetches it from PunchSwap atomically.
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t border-[rgba(255,255,255,0.06)] pt-2 text-[rgba(255,255,255,0.3)] text-[10px]">
+            Flow EVM Testnet &middot; Dust Protocol &middot; PL Genesis 2026
+          </div>
+        </div>
+      </details>
     </div>
   );
 }

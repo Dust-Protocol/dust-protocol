@@ -28,6 +28,13 @@ export interface SplitBuildResult {
   outputNotes: SplitOutputNote[]
 }
 
+// ── Constants ────────────────────────────────────────────────────────────────
+
+// Non-zero burn address for internal operations (splits, transfers) where
+// publicAmount = 0 and no ETH leaves the pool. The contract requires a
+// non-zero recipient even when nothing is sent.
+const INTERNAL_RECIPIENT = BigInt('0x000000000000000000000000000000000000dEaD')
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Dummy Merkle proof (all zeros, depth = TREE_DEPTH) */
@@ -161,6 +168,7 @@ export async function buildWithdrawInputs(
   // Negative amount in field arithmetic: FIELD_SIZE - amount represents -amount
   const negativeAmount = BN254_FIELD_SIZE - amount
 
+  // Recompute Merkle root from proof path
   const { poseidonHash } = await import('./commitment')
   let currentHash = inputNote.commitment
   for (let i = 0; i < TREE_DEPTH; i++) {
@@ -284,6 +292,7 @@ export async function buildTransferInputs(
   const outputCommitment0 = await computeNoteCommitment(recipientNote)
   const outputCommitment1 = await computeNoteCommitment(changeNote)
 
+  // Recompute Merkle root from proof path
   const { poseidonHash } = await import('./commitment')
   let currentHash = inputNote.commitment
   for (let i = 0; i < TREE_DEPTH; i++) {
@@ -424,7 +433,7 @@ export async function buildSplitInputs(
     outputCommitments: commitments,
     publicAmount: 0n,
     publicAsset: inputNote.note.asset,
-    recipient: 0n,
+    recipient: INTERNAL_RECIPIENT,
     chainId: BigInt(chainId),
 
     inOwner: [inputNote.note.owner, dummy.owner],

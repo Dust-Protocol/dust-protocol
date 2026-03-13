@@ -20,7 +20,7 @@ const V2_START_BLOCKS: Record<number, number> = {
   421614: 246397522,
   11155420: 40333105,
   84532: 38350239,
-  545: 99040904,       // Flow EVM Testnet (matches deploymentBlock in chains.ts)
+  545: 99365670,       // Flow EVM Testnet — redeployed DustPoolV2 with correct verifiers
 }
 
 // L2s support larger log ranges; drpc.org enforces 10K on Eth Sepolia

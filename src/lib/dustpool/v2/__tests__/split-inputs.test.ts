@@ -153,7 +153,7 @@ describe('buildSplitInputs', () => {
     expect(result.outputNotes[2].owner).toBe(noteCommitment.note.owner)
   })
 
-  it('always sets publicAmount=0 and recipient=0 (internal split only)', async () => {
+  it('always sets publicAmount=0 and non-zero recipient (internal split only)', async () => {
     // #given
     const noteCommitment = await mockNote(parseEther('1.37'))
     const chunks = [
@@ -172,9 +172,9 @@ describe('buildSplitInputs', () => {
       TEST_CHAIN_ID
     )
 
-    // #then — splits are always internal (no value leaves the pool)
+    // #then — splits are internal but contract requires non-zero recipient
     expect(BigInt(result.circuitInputs.publicAmount as string)).toBe(0n)
-    expect(BigInt(result.circuitInputs.recipient as string)).toBe(0n)
+    expect(BigInt(result.circuitInputs.recipient as string)).not.toBe(0n)
   })
 
   it('throws when chunks exceed input note amount', async () => {
@@ -249,8 +249,8 @@ describe('buildSplitInputs — two-step flow invariants', () => {
     }
   })
 
-  it('recipient is always 0 regardless of input', async () => {
-    // Internal split: no external recipient
+  it('recipient is non-zero burn address regardless of input', async () => {
+    // Internal split: no value leaves pool, but contract requires non-zero recipient
     const noteCommitment = await mockNote(parseEther('5.0'))
     const chunks = [parseEther('3.0'), parseEther('1.0')]
 
@@ -261,7 +261,9 @@ describe('buildSplitInputs — two-step flow invariants', () => {
       dummyMerkleProof(),
       TEST_CHAIN_ID
     )
-    expect(BigInt(result.circuitInputs.recipient as string)).toBe(0n)
+    const recipient = BigInt(result.circuitInputs.recipient as string)
+    expect(recipient).not.toBe(0n)
+    expect(recipient).toBe(BigInt('0x000000000000000000000000000000000000dEaD'))
   })
 
   it('balance conservation: sum(input amounts) = sum(output amounts) when publicAmount=0', async () => {

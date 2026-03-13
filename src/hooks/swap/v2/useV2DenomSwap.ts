@@ -308,10 +308,13 @@ export function useV2DenomSwap(
       setStatus('submitting-swaps')
       setProgress({ current: 0, total: totalSteps })
 
-      const batchResult = await relayer.submitBatchSwap(
-        swaps.map(({ denomNoteIndex: _, ...rest }) => rest),
-        chainId
-      )
+      // Chains with Uniswap V4 use batch-swap; others (PunchSwap/V2 router) use swap-generic
+      const chainConfig = getChainConfig(chainId)
+      const hasV4Pool = !!chainConfig.contracts.dustSwapVanillaPoolKey
+      const swapPayloads = swaps.map(({ denomNoteIndex: _, ...rest }) => rest)
+      const batchResult = hasV4Pool
+        ? await relayer.submitBatchSwap(swapPayloads, chainId)
+        : await relayer.submitBatchSwapGeneric(swapPayloads, chainId)
 
       const hashes = batchResult.results.map(r => r.txHash)
       if (mountedRef.current) setTxHashes(hashes)

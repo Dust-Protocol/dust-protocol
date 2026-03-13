@@ -7,7 +7,8 @@
 import { readFile, writeFile } from 'fs/promises'
 
 const COOLDOWN_FILE = '/tmp/dust-v2-cooldowns.json'
-const COOLDOWN_MS = 10_000
+// In development, allow faster retries (2s vs 10s production)
+const COOLDOWN_MS = process.env.NODE_ENV === 'development' ? 2_000 : 10_000
 const MAX_ENTRIES = 1000
 
 let cooldowns: Map<string, number> = new Map()

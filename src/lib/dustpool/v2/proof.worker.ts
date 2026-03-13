@@ -3,7 +3,7 @@
 
 import { fflonk } from 'snarkjs'
 
-const FALLBACK_ZKEY_PATH = 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=2'
+const FALLBACK_ZKEY_PATH = 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=5'
 
 export interface WorkerMessage {
   type: 'generate' | 'verify'

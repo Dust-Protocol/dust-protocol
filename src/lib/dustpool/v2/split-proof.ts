@@ -1,9 +1,9 @@
 import { parseSplitCalldata } from './split-utils'
 import type { RelayerClient } from './relayer-client'
 
-export const SPLIT_CIRCUIT_WASM = '/circuits/v2-split/DustV2Split.wasm'
-export const SPLIT_CIRCUIT_ZKEY = process.env.NEXT_PUBLIC_V2_SPLIT_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2-split/DustV2Split.zkey?v=3'
-export const SPLIT_VKEY_PATH = '/circuits/v2-split/verification_key.json'
+export const SPLIT_CIRCUIT_WASM = '/circuits/v2-split/DustV2Split.wasm?v=5'
+export const SPLIT_CIRCUIT_ZKEY = process.env.NEXT_PUBLIC_V2_SPLIT_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2-split/DustV2Split.zkey?v=5'
+export const SPLIT_VKEY_PATH = '/circuits/v2-split/verification_key.json?v=5'
 export const LEAF_POLL_ATTEMPTS = 15
 export const LEAF_POLL_DELAY_MS = 2_000
 

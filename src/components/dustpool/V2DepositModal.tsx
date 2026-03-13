@@ -147,7 +147,7 @@ export function V2DepositModal({ isOpen, onClose, onSuccess, keysRef, chainId, h
     : false;
 
   const isScreeningBlocked = screeningResult?.status === "blocked";
-  const isScreeningPassed = screeningResult?.status === "clear" || screeningResult?.status === "no-screening";
+  const isScreeningPassed = screeningResult?.status === "clear" || screeningResult?.status === "no-screening" || screeningResult?.status === "error";
   const canSelfDeposit = parsedAmount !== null && !exceedsBalance && !isPending && !isApproving && !isScreening && isScreeningPassed;
 
   const canExternalDeposit = parsedAmount !== null && ext.status === "idle" && ext.hasInjectedWallet;
