@@ -288,7 +288,8 @@ Deployment block: `38350029`
 | FflonkVerifier (9 signals) | [`0x0e4cF377fc18E46BB1184e4274367Bc0dB958573`](https://evm-testnet.flowscan.io/address/0x0e4cF377fc18E46BB1184e4274367Bc0dB958573) |
 | FflonkSplitVerifier (15 signals) | [`0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1`](https://evm-testnet.flowscan.io/address/0x75BD499f7CA8E361b7930e2881b2B3c99Aa1eea1) |
 | FflonkComplianceVerifier | [`0x5779192B220876221Bc2871511FB764941314e04`](https://evm-testnet.flowscan.io/address/0x5779192B220876221Bc2871511FB764941314e04) |
-| TestnetComplianceOracle | [`0xACe425FC23d7594b829935EC4862f654541Bf0d3`](https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3) |
+| TestnetComplianceOracle (deprecated) | [`0xACe425FC23d7594b829935EC4862f654541Bf0d3`](https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3) |
+| OFACSanctionsRegistry | [`0x61C67B3527deE3F5861773fD3A223920953051AA`](https://evm-testnet.flowscan.io/address/0x61C67B3527deE3F5861773fD3A223920953051AA) |
 
 ### DustSwap — Generic Adapter (no Uniswap V4, uses PunchSwap V2)
 
