@@ -41,6 +41,13 @@ function getBaseUrl(): string {
   return DEFAULT_API_URL
 }
 
+function getApiKey(): string | undefined {
+  if (typeof process !== 'undefined') {
+    return process.env?.CHAINALYSIS_API_KEY
+  }
+  return undefined
+}
+
 // ─── Errors ─────────────────────────────────────────────────────────────────────
 
 export class ChainalysisApiError extends Error {
@@ -87,9 +94,11 @@ async function chainalysisFetch<T>(path: string): Promise<T> {
   const url = `${getBaseUrl()}${path}`
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const response = await fetch(url, {
-      headers: { Accept: 'application/json' },
-    })
+    const headers: Record<string, string> = { Accept: 'application/json' }
+    const apiKey = getApiKey()
+    if (apiKey) headers['X-API-Key'] = apiKey
+
+    const response = await fetch(url, { headers })
 
     if (response.ok) {
       return response.json() as Promise<T>
