@@ -7,10 +7,14 @@
 import type { WorkerResponse } from './proof.worker'
 import type { ProofInputs } from './types'
 import { TREE_DEPTH } from './constants'
+import { getZkArtifactWithFallback, getIPFSArtifactURL } from './zk-artifact-fallback'
 
-const WASM_PATH = '/circuits/v2/DustV2Transaction.wasm'
-const ZKEY_PATH = process.env.NEXT_PUBLIC_V2_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=3'
-const VKEY_PATH = '/circuits/v2/verification_key.json'
+// IPFS fallback: once CIDs are populated in zk-artifact-manifest.ts,
+// use getZkArtifactWithFallback('v2-transaction', 'zkey') to resolve
+// env var > R2 CDN > IPFS gateway > local path (in that priority order).
+const WASM_PATH = '/circuits/v2/DustV2Transaction.wasm?v=5'
+const ZKEY_PATH = process.env.NEXT_PUBLIC_V2_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=5'
+const VKEY_PATH = '/circuits/v2/verification_key.json?v=5'
 const PROOF_TIMEOUT_MS = 300_000
 
 export interface V2ProofResult {
@@ -257,6 +261,20 @@ export function prefetchProofAssets(): void {
     link2.href = WASM_PATH
     link2.as = 'fetch'
     document.head.appendChild(link2)
+
+    // IPFS fallback prefetch: warm the gateway cache so fallback is fast if R2 goes down
+    const ipfsUrls = [
+      getIPFSArtifactURL('v2-transaction', 'zkey'),
+      getIPFSArtifactURL('v2-transaction', 'wasm'),
+    ].filter((url): url is string => url !== null)
+    for (const url of ipfsUrls) {
+      const link = document.createElement('link')
+      link.rel = 'prefetch'
+      link.href = url
+      link.as = 'fetch'
+      link.crossOrigin = 'anonymous'
+      document.head.appendChild(link)
+    }
   } catch { /* noop */ }
 }
 
