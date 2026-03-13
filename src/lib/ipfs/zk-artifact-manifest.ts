@@ -32,36 +32,36 @@ const V2_ZKEY_CDN = 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev'
 export const ZK_ARTIFACT_MANIFEST: Record<CircuitName, ArtifactEntry> = {
   'v1-pool': {
     name: 'DustPoolWithdraw (V1 Groth16)',
-    wasmCID: null,
-    zkeyCID: null,
-    vkeyCID: null,
+    wasmCID: 'bafybeidpbi5t5ug7zvmkwakh6y7jv7zbpxhh6q6mazjzl2xyupuk6bqjpu',
+    zkeyCID: null, // zkeys hosted on R2 CDN (too large for free tier)
+    vkeyCID: 'bafybeiatwejovqc3h6rps7lbx6pt4hr2blywkld3buuzyozbr3rr22rntu',
     wasmPath: '/zk/DustPoolWithdraw.wasm',
     zkeyPath: '/zk/DustPoolWithdraw_final.zkey',
     vkeyPath: '/zk/verification_key.json',
   },
   'v2-transaction': {
     name: 'DustV2Transaction (FFLONK)',
-    wasmCID: null,
-    zkeyCID: null,
-    vkeyCID: null,
+    wasmCID: 'bafybeihzuoiaojj26o6zkyd2rxwns2ddxlddv2mpor2hvkgckv7wrjqp3m',
+    zkeyCID: null, // 223MB — hosted on R2 CDN
+    vkeyCID: 'bafybeie3iggjiloyayshsva7r6b642zjupscltbgbz222z7ukpboogchdq',
     wasmPath: '/circuits/v2/DustV2Transaction.wasm',
     zkeyPath: `${V2_ZKEY_CDN}/v2/DustV2Transaction.zkey`,
     vkeyPath: '/circuits/v2/verification_key.json',
   },
   'v2-split': {
     name: 'DustV2Split (FFLONK 2-in-8-out)',
-    wasmCID: null,
-    zkeyCID: null,
-    vkeyCID: null,
+    wasmCID: 'bafybeiel27v34zkati6wvgyiqb5a53w2twdhu6kohlyavtzkial2bkqor4',
+    zkeyCID: null, // 283MB — hosted on R2 CDN
+    vkeyCID: 'bafybeifkkxmg3qo5uk2wjopqh7d35kufxz7bnyyv66u4wpt4izfoeiipeq',
     wasmPath: '/circuits/v2-split/DustV2Split.wasm',
     zkeyPath: `${V2_ZKEY_CDN}/v2-split/DustV2Split.zkey`,
     vkeyPath: '/circuits/v2-split/verification_key.json',
   },
   'v2-compliance': {
     name: 'DustV2Compliance (FFLONK)',
-    wasmCID: null,
-    zkeyCID: null,
-    vkeyCID: null,
+    wasmCID: 'bafybeiflhu2pn4fel5niixx2chpwc4q2q5uwccuqtwrquj6wlsx5auuoxu',
+    zkeyCID: null, // 76MB — hosted on R2 CDN
+    vkeyCID: 'bafybeiaacfhin2bpcjoiveortblde4hb4bcbqnmplmbhcjclddmtmgzefm',
     wasmPath: '/circuits/v2-compliance/DustV2Compliance.wasm',
     zkeyPath: '/circuits/v2-compliance/DustV2Compliance.zkey',
     vkeyPath: '/circuits/v2-compliance/verification_key.json',

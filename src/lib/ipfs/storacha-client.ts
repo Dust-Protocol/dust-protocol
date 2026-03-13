@@ -2,7 +2,7 @@
  * IPFS pinning utility for PL Genesis Hackathon.
  *
  * Supports multiple providers via IPFS_PROVIDER env var:
- *   - 'storacha' — Storacha (w3up-client) with UCAN delegations (requires W3_PRIVATE_KEY + W3_PROOF)
+ *   - 'storacha' — Storacha via `w3` CLI (uses pre-authenticated CLI session)
  *   - 'pinata'   — Pinata pinning API (requires PINATA_API_KEY + PINATA_SECRET_KEY)
  *   - 'local'    — Mock provider returning deterministic fake CIDs (testing)
  *
@@ -10,6 +10,10 @@
  */
 
 import { createHash } from 'crypto'
+import { execFile } from 'child_process'
+import { writeFile, unlink } from 'fs/promises'
+import { tmpdir } from 'os'
+import { join } from 'path'
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -59,56 +63,53 @@ export class IPFSPinError extends Error {
   }
 }
 
-// ─── Storacha Provider ──────────────────────────────────────────────────────────
+// ─── Storacha Provider (via w3 CLI) ─────────────────────────────────────────────
 
-// Singleton w3up-client — avoids re-initializing on every request.
-// StoreMemory holds agent keypair + proofs in RAM only (serverless-safe).
-let storachaClientPromise: Promise<unknown> | null = null
-
-async function getStorachaClient() {
-  if (storachaClientPromise) return storachaClientPromise
-
-  storachaClientPromise = (async () => {
-    const privateKey = process.env.W3_PRIVATE_KEY
-    const proofStr = process.env.W3_PROOF
-    if (!privateKey || !proofStr) {
-      throw new Error('W3_PRIVATE_KEY and W3_PROOF env vars required for storacha provider')
-    }
-
-    // Dynamic imports — these are large packages, only load when needed
-    const Client = await import('@web3-storage/w3up-client')
-    const { StoreMemory } = await import('@web3-storage/w3up-client/stores/memory')
-    const Proof = await import('@web3-storage/w3up-client/proof')
-    const { Signer } = await import('@web3-storage/w3up-client/principal/ed25519')
-
-    const signer = Signer.parse(privateKey)
-    const store = new StoreMemory()
-    const client = await Client.create({ principal: signer, store })
-
-    const proof = await Proof.parse(proofStr)
-    const space = await client.addSpace(proof)
-    await client.setCurrentSpace(space.did())
-
-    return client
-  })()
-
-  return storachaClientPromise
+// Uses the pre-authenticated `w3` CLI session. The CLI handles UCAN delegations
+// internally. Avoids @storacha/client SDK dependency conflicts with multiformats.
+function w3Upload(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile('npx', ['@web3-storage/w3cli', 'up', '--json', filePath], {
+      timeout: 120_000,
+    }, (error, stdout, stderr) => {
+      if (error) {
+        reject(new IPFSPinError(
+          `Storacha upload failed: ${error.message}`,
+          undefined,
+          stderr
+        ))
+        return
+      }
+      try {
+        const result = JSON.parse(stdout.trim())
+        const cid = result.root?.['/'] ?? result.root
+        if (!cid) throw new Error(`Unexpected w3 output: ${stdout}`)
+        resolve(cid)
+      } catch (e) {
+        reject(new IPFSPinError(`Failed to parse w3 output: ${stdout}`, undefined, stderr))
+      }
+    })
+  })
 }
 
 async function storachaUploadJSON(data: unknown): Promise<string> {
-  const client = await getStorachaClient() as { uploadFile: (file: Blob) => Promise<{ toString: () => string }> }
-  const json = JSON.stringify(data)
-  const blob = new Blob([json], { type: 'application/json' })
-  const cid = await client.uploadFile(blob)
-  return cid.toString()
+  const tmpPath = join(tmpdir(), `storacha-${Date.now()}.json`)
+  try {
+    await writeFile(tmpPath, JSON.stringify(data))
+    return await w3Upload(tmpPath)
+  } finally {
+    await unlink(tmpPath).catch(() => {})
+  }
 }
 
 async function storachaUploadFile(content: Buffer, fileName: string): Promise<string> {
-  const client = await getStorachaClient() as { uploadFile: (file: File) => Promise<{ toString: () => string }> }
-  const blob = new Blob([content])
-  const file = new File([blob], fileName)
-  const cid = await client.uploadFile(file)
-  return cid.toString()
+  const tmpPath = join(tmpdir(), `storacha-${Date.now()}-${fileName}`)
+  try {
+    await writeFile(tmpPath, content)
+    return await w3Upload(tmpPath)
+  } finally {
+    await unlink(tmpPath).catch(() => {})
+  }
 }
 
 // ─── Pinata Provider ────────────────────────────────────────────────────────────
