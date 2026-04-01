@@ -78,3 +78,27 @@ public/circuits/v2-split/DustV2Split.zkey
 public/circuits/v2-compliance/DustV2Compliance.zkey
 .wrangler/
 .worktrees/
+
+# Demo video assets (too large for git)
+public/demo-recording.mp4
+public/vo/
+
+# Remotion build artifacts
+remotion-output/
+
+# Hackathon strategy docs (internal)
+PL_Genesis_Hackathon_Strategy.md
+business/
+reports/
+task_plan.md
+
+# Playwright MCP
+.playwright-mcp/
+
+# FHE compliance experiments
+contracts/fhe-compliance/
+
+# Cache directories
+cache/
+contracts/cache/
+contracts/naming/cache/
