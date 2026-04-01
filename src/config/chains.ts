@@ -37,6 +37,12 @@ export interface ChainContracts {
     tickSpacing: number;
     hooks: string;
   } | null;
+  // FHE (Fully Homomorphic Encryption) contracts — all on Sepolia (Zama coprocessor)
+  fheComplianceOracle: string | null;
+  fheComplianceBridge: string | null;
+  fhePoolStats: string | null;
+  // ConfidentialDustPool — FHE-native privacy pool with encrypted balances (euint64)
+  confidentialDustPool: string | null;
   noteAnnouncer?: string;
   dustSwapRouter?: string;
   dustSwapWflow?: string;
@@ -75,6 +81,7 @@ export interface ChainConfig {
   isL2: boolean;
   iconFamily: ChainIconFamily;
   complianceType: ComplianceType;
+  fheEnabled: boolean;
 }
 
 // ─── Thanos Sepolia ────────────────────────────────────────────────────────────
@@ -123,6 +130,10 @@ const THANOS_SEPOLIA_CONFIG: ChainConfig = {
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
+    fheComplianceOracle: null,
+    fheComplianceBridge: null,
+    fhePoolStats: null,
+    confidentialDustPool: null,
   },
   creationCodes: {
     wallet: '0x60a060405234801561000f575f80fd5b5060405161088e38038061088e83398101604081905261002e9161003f565b6001600160a01b031660805261006c565b5f6020828403121561004f575f80fd5b81516001600160a01b0381168114610065575f80fd5b9392505050565b6080516107fd6100915f395f8181607e015281816101d901526103d301526107fd5ff3fe608060405260043610610041575f3560e01c80635cd5972c1461004c5780638da5cb5b1461006d578063affed0e0146100bd578063da0980c7146100df575f80fd5b3661004857005b5f80fd5b348015610057575f80fd5b5061006b610066366004610647565b6100fe565b005b348015610078575f80fd5b506100a07f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b3480156100c8575f80fd5b506100d15f5481565b6040519081526020016100b4565b3480156100ea575f80fd5b5061006b6100f9366004610696565b6102c9565b60015460ff1615610122576040516345f5ce8b60e11b815260040160405180910390fd5b6001805460ff1916811790555f80546040516bffffffffffffffffffffffff1930606090811b8216602084015287901b16603482015260488101919091524660688201526088016040516020818303038152906040528051906020012090505f816040516020016101bf91907f19457468657265756d205369676e6564204d6573736167653a0a3332000000008152601c810191909152603c0190565b6040516020818303038152906040528051906020012090507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031661020c8286866104d1565b6001600160a01b031614610232576040516282b42960e81b815260040160405180910390fd5b5f80544791806102418361072e565b91905055505f866001600160a01b0316826040515f6040518083038185875af1925050503d805f811461028f576040519150601f19603f3d011682016040523d82523d5f602084013e610294565b606091505b50509050806102b6576040516312171d8360e31b815260040160405180910390fd5b50506001805460ff191690555050505050565b60015460ff16156102ed576040516345f5ce8b60e11b815260040160405180910390fd5b6001805460ff1916811790556040515f903090889088906103119089908990610746565b6040519081900381205f546bffffffffffffffffffffffff19606096871b811660208501529490951b90931660348201526048810191909152606881019190915260888101919091524660a882015260c8016040516020818303038152906040528051906020012090505f816040516020016103b991907f19457468657265756d205369676e6564204d6573736167653a0a3332000000008152601c810191909152603c0190565b6040516020818303038152906040528051906020012090507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166104068286866104d1565b6001600160a01b03161461042c576040516282b42960e81b815260040160405180910390fd5b5f8054908061043a8361072e565b91905055505f886001600160a01b031688888860405161045b929190610746565b5f6040518083038185875af1925050503d805f8114610495576040519150601f19603f3d011682016040523d82523d5f602084013e61049a565b606091505b50509050806104bc576040516312171d8360e31b815260040160405180910390fd5b50506001805460ff1916905550505050505050565b5f604182146104e157505f6105e0565b5f6104ef6020828587610755565b6104f89161077c565b90505f610509604060208688610755565b6105129161077c565b90505f858560408181106105285761052861079a565b919091013560f81c9150507f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0821115610566575f93505050506105e0565b601b8160ff1610156105805761057d601b826107ae565b90505b604080515f81526020810180835289905260ff831691810191909152606081018490526080810183905260019060a0016020604051602081039080840390855afa1580156105d0573d5f803e3d5ffd5b5050506020604051035193505050505b9392505050565b80356001600160a01b03811681146105fd575f80fd5b919050565b5f8083601f840112610612575f80fd5b50813567ffffffffffffffff811115610629575f80fd5b602083019150836020828501011115610640575f80fd5b9250929050565b5f805f60408486031215610659575f80fd5b610662846105e7565b9250602084013567ffffffffffffffff81111561067d575f80fd5b61068986828701610602565b9497909650939450505050565b5f805f805f80608087890312156106ab575f80fd5b6106b4876105e7565b955060208701359450604087013567ffffffffffffffff808211156106d7575f80fd5b6106e38a838b01610602565b909650945060608901359150808211156106fb575f80fd5b5061070889828a01610602565b979a9699509497509295939492505050565b634e487b7160e01b5f52601160045260245ffd5b5f6001820161073f5761073f61071a565b5060010190565b818382375f9101908152919050565b5f8085851115610763575f80fd5b8386111561076f575f80fd5b5050820193919092039150565b80356020831015610794575f19602084900360031b1b165b92915050565b634e487b7160e01b5f52603260045260245ffd5b60ff81811683821601908111156107945761079461071a56fea2646970667358221220ae2c2a49601177ccafd839b230577565f89fa02daf76c67848d6f00fcc35f8cc64736f6c63430008140033',
@@ -139,6 +150,7 @@ const THANOS_SEPOLIA_CONFIG: ChainConfig = {
   isL2: false,
   iconFamily: 'thanos',
   complianceType: 'ofac-registry',
+  fheEnabled: false,
 };
 
 // ─── Ethereum Sepolia ──────────────────────────────────────────────────────────
@@ -200,6 +212,10 @@ const ETHEREUM_SEPOLIA_CONFIG: ChainConfig = {
       tickSpacing: 10,
       hooks: '0x0000000000000000000000000000000000000000',
     },
+    fheComplianceOracle: '0x20f25781a041c577b80601DeE602993353018719',
+    fheComplianceBridge: null,
+    fhePoolStats: '0xA47289B496f343d2CC394e798e66390992A18a18',
+    confidentialDustPool: '0x8769Cc9A6AA0d7b7F1f29eDbAD2e9634F9102d4e',
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
@@ -220,6 +236,7 @@ const ETHEREUM_SEPOLIA_CONFIG: ChainConfig = {
   isL2: false,
   iconFamily: 'ethereum',
   complianceType: 'chainalysis-oracle',
+  fheEnabled: false,
 };
 
 // ─── Arbitrum Sepolia ──────────────────────────────────────────────────────────
@@ -262,6 +279,10 @@ const ARBITRUM_SEPOLIA_CONFIG: ChainConfig = {
     dustPoolV2ComplianceVerifier: '0xe6236145fddbC50439934Afb404a607Afaa14f51',
     dustSwapAdapterV2: '0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94',
     dustSwapVanillaPoolKey: null,
+    fheComplianceOracle: null,
+    fheComplianceBridge: null,
+    fhePoolStats: null,
+    confidentialDustPool: null,
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
@@ -281,6 +302,7 @@ const ARBITRUM_SEPOLIA_CONFIG: ChainConfig = {
   isL2: true,
   iconFamily: 'arbitrum',
   complianceType: 'testnet-mock',
+  fheEnabled: false,
 };
 
 // ─── OP Sepolia ────────────────────────────────────────────────────────────────
@@ -323,6 +345,10 @@ const OP_SEPOLIA_CONFIG: ChainConfig = {
     dustPoolV2ComplianceVerifier: '0x769810c0A461aC0f457747324b7f2fedD65963A7',
     dustSwapAdapterV2: null,
     dustSwapVanillaPoolKey: null,
+    fheComplianceOracle: null,
+    fheComplianceBridge: null,
+    fhePoolStats: null,
+    confidentialDustPool: null,
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
@@ -342,6 +368,7 @@ const OP_SEPOLIA_CONFIG: ChainConfig = {
   isL2: true,
   iconFamily: 'optimism',
   complianceType: 'testnet-mock',
+  fheEnabled: false,
 };
 
 // ─── Base Sepolia ──────────────────────────────────────────────────────────────
@@ -384,6 +411,10 @@ const BASE_SEPOLIA_CONFIG: ChainConfig = {
     dustPoolV2ComplianceVerifier: '0x33b72e6d7b39a32B88715b658f2248897Af2e650',
     dustSwapAdapterV2: '0x844d11bD48D85411eE8cD1a7cB0aC00672B1d516',
     dustSwapVanillaPoolKey: null,
+    fheComplianceOracle: null,
+    fheComplianceBridge: null,
+    fhePoolStats: null,
+    confidentialDustPool: null,
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
@@ -403,6 +434,7 @@ const BASE_SEPOLIA_CONFIG: ChainConfig = {
   isL2: true,
   iconFamily: 'base',
   complianceType: 'testnet-mock',
+  fheEnabled: false,
 };
 
 // ─── Base Mainnet ───────────────────────────────────────────────────────────────
@@ -446,6 +478,10 @@ const BASE_MAINNET_CONFIG: ChainConfig = {
     dustPoolV2ComplianceVerifier: null,
     dustSwapAdapterV2: null,
     dustSwapVanillaPoolKey: null,
+    fheComplianceOracle: null,
+    fheComplianceBridge: null,
+    fhePoolStats: null,
+    confidentialDustPool: null,
     noteAnnouncer: undefined,
     dustSwapRouter: undefined,
     dustSwapWflow: undefined,
@@ -465,6 +501,7 @@ const BASE_MAINNET_CONFIG: ChainConfig = {
   isL2: true,
   iconFamily: 'base',
   complianceType: 'none',
+  fheEnabled: false,
 };
 
 // ─── Flow EVM Testnet ────────────────────────────────────────────────────────
@@ -515,6 +552,10 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
     dustSwapWflow: '0xd3bF53DAC106A0290B0483EcBC89d40FcC961f3e',
     dustSwapFactory: '0x0f6C2EF40FA42B2F0E0a9f5987b2f3F8Af3C173f',
     depositSplitter: '0x9f97dD7A487e64D3693Dc6a67FafBA1605c34448',
+    fheComplianceOracle: null, // Deployed on fhEVM chain, not Flow
+    fheComplianceBridge: '0x4A646be6E51cF9Ecc849b7fcB5a6aCFc28321378',
+    fhePoolStats: null, // Deployed on fhEVM chain, not Flow
+    confidentialDustPool: null, // Deployed on fhEVM chain, not Flow
   },
   creationCodes: {
     wallet: THANOS_SEPOLIA_CONFIG.creationCodes.wallet,
@@ -524,8 +565,8 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
     // Pre-fix payments used Thanos creation code — funds at these addresses are unrecoverable (wrong factory bytecode)
     legacyAccount: THANOS_SEPOLIA_CONFIG.creationCodes.account,
   },
-  deploymentBlock: 99040904,
-  dustPoolDeploymentBlock: 99040904,
+  deploymentBlock: 102850000,
+  dustPoolDeploymentBlock: 102850000,
   supportsEIP7702: false,
   // Flow EVM reports baseFeePerGas but rejects type-2 txs — use legacy (type 0)
   supportsEIP1559: false,
@@ -535,6 +576,7 @@ const FLOW_EVM_TESTNET_CONFIG: ChainConfig = {
   iconFamily: 'flow',
   // Compliance oracle address will be updated after OFACSanctionsRegistry deployment on Flow
   complianceType: 'ofac-registry',
+  fheEnabled: false,
 };
 
 // ─── Registry ──────────────────────────────────────────────────────────────────
@@ -553,8 +595,8 @@ const CHAIN_CONFIGS: Record<number, ChainConfig> = {
 export const DEFAULT_CHAIN_ID = 545;
 
 export function getVisibleChains(): ChainConfig[] {
-  // Hackathon: only show Flow in the UI
-  return Object.values(CHAIN_CONFIGS).filter(c => c.id === 545);
+  // Hackathon: Flow + Eth Sepolia (for Zama FHE confidential pool)
+  return Object.values(CHAIN_CONFIGS).filter(c => c.id === 545 || c.id === 11155111);
 }
 
 export function getChainConfig(chainId?: number): ChainConfig {
