@@ -50,7 +50,7 @@ export const ProcessingSteps: React.FC<ProcessingStepsProps> = ({ steps, title }
               style={{
                 fontSize: 13,
                 fontWeight: step.status === 'active' ? 700 : 400,
-                color: step.status === 'completed' ? COLORS.successGreen : step.status === 'active' ? COLORS.white : COLORS.white30 || COLORS.white20,
+                color: step.status === 'completed' ? COLORS.successGreen : step.status === 'active' ? COLORS.white : COLORS.white20,
                 fontFamily: 'JetBrains Mono, monospace',
               }}
             >
