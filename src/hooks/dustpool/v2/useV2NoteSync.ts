@@ -30,8 +30,8 @@ export function useV2NoteSync(chainId: number) {
         for (const note of pending) {
           if (cancelled) return
           try {
-            // Notes pending too long are considered failed — mark spent to stop polling
-            if (note.createdAt && now - note.createdAt > PENDING_TIMEOUT_MS) {
+            // Notes pending too long or restored without timestamp are considered failed
+            if (!note.createdAt || (now - note.createdAt > PENDING_TIMEOUT_MS)) {
               await markNoteSpent(db, note.id).catch(() => {})
               continue
             }
