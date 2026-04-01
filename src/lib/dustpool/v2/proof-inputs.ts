@@ -339,6 +339,97 @@ export async function buildTransferInputs(
   }
 }
 
+// ── Merge ────────────────────────────────────────────────────────────────
+
+/**
+ * Build circuit inputs for merging two notes into one.
+ *
+ * Uses the standard 2-in-2-out circuit with both input slots populated by
+ * real notes. Output 0 is the merged note (sum of amounts); output 1 is dummy.
+ * publicAmount = 0, recipient = INTERNAL_RECIPIENT (no value leaves the pool).
+ *
+ * Both input notes must share the same asset and chainId.
+ * Both must have confirmed leafIndex >= 0.
+ */
+export async function buildMergeInputs(
+  inputNote0: NoteCommitmentV2,
+  inputNote1: NoteCommitmentV2,
+  keys: V2Keys,
+  merkleProof0: { pathElements: bigint[]; pathIndices: number[] },
+  merkleProof1: { pathElements: bigint[]; pathIndices: number[] },
+  chainId: number,
+  mergedNote?: NoteV2
+): Promise<ProofInputs> {
+  if (inputNote0.note.asset !== inputNote1.note.asset) {
+    throw new Error('Cannot merge notes with different assets')
+  }
+
+  const mergedAmount = inputNote0.note.amount + inputNote1.note.amount
+  const resolvedMerged = mergedNote ?? createNote(
+    inputNote0.note.owner,
+    mergedAmount,
+    inputNote0.note.asset,
+    inputNote0.note.chainId
+  )
+
+  const dummy = createDummyNote()
+
+  const nullifier0 = await computeNullifier(
+    keys.nullifierKey,
+    inputNote0.commitment,
+    inputNote0.leafIndex
+  )
+  const nullifier1 = await computeNullifier(
+    keys.nullifierKey,
+    inputNote1.commitment,
+    inputNote1.leafIndex
+  )
+
+  const outputCommitment0 = await computeNoteCommitment(resolvedMerged)
+  const dummyOutputCommitment = await computeNoteCommitment(dummy)
+
+  // Both Merkle proofs must resolve to the same root
+  const { poseidonHash } = await import('./commitment')
+  let root0 = inputNote0.commitment
+  for (let i = 0; i < TREE_DEPTH; i++) {
+    if (merkleProof0.pathIndices[i] === 0) {
+      root0 = await poseidonHash([root0, merkleProof0.pathElements[i]])
+    } else {
+      root0 = await poseidonHash([merkleProof0.pathElements[i], root0])
+    }
+  }
+
+  return {
+    merkleRoot: root0,
+    nullifier0,
+    nullifier1,
+    outputCommitment0,
+    outputCommitment1: dummyOutputCommitment,
+    publicAmount: 0n,
+    publicAsset: inputNote0.note.asset,
+    recipient: INTERNAL_RECIPIENT,
+    chainId: BigInt(chainId),
+
+    inOwner: [inputNote0.note.owner, inputNote1.note.owner],
+    inAmount: [inputNote0.note.amount, inputNote1.note.amount],
+    inAsset: [inputNote0.note.asset, inputNote1.note.asset],
+    inChainId: [BigInt(inputNote0.note.chainId), BigInt(inputNote1.note.chainId)],
+    inBlinding: [inputNote0.note.blinding, inputNote1.note.blinding],
+    pathElements: [merkleProof0.pathElements, merkleProof1.pathElements],
+    pathIndices: [merkleProof0.pathIndices, merkleProof1.pathIndices],
+    leafIndex: [BigInt(inputNote0.leafIndex), BigInt(inputNote1.leafIndex)],
+
+    outOwner: [resolvedMerged.owner, dummy.owner],
+    outAmount: [resolvedMerged.amount, dummy.amount],
+    outAsset: [resolvedMerged.asset, dummy.asset],
+    outChainId: [BigInt(resolvedMerged.chainId), BigInt(dummy.chainId)],
+    outBlinding: [resolvedMerged.blinding, dummy.blinding],
+
+    spendingKey: keys.spendingKey,
+    nullifierKey: keys.nullifierKey,
+  }
+}
+
 // ── Split ────────────────────────────────────────────────────────────────────
 
 const N_SPLIT_OUTPUTS = 8

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getRelayerTreeRoot } from '@/lib/dustpool/v2/relayer-tree'
+import { getRelayerTreeRoot, getTreeLeafCount } from '@/lib/dustpool/v2/relayer-tree'
 import { getDustPoolV2Address } from '@/lib/dustpool/v2/contracts'
 import { DEFAULT_CHAIN_ID } from '@/config/chains'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
@@ -23,10 +23,11 @@ export async function GET(req: Request) {
 
     const startTime = performance.now()
     const root = await getRelayerTreeRoot(chainId)
+    const leafCount = await getTreeLeafCount(chainId)
     observeTreeSync(String(chainId), (performance.now() - startTime) / 1000)
 
     return NextResponse.json(
-      { root: toBytes32Hex(root) },
+      { root: toBytes32Hex(root), leafCount },
       { headers: NO_STORE },
     )
   } catch (e) {

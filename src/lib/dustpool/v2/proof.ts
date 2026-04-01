@@ -15,7 +15,7 @@ import { getZkArtifactWithFallback, getIPFSArtifactURL } from './zk-artifact-fal
 const WASM_PATH = '/circuits/v2/DustV2Transaction.wasm?v=5'
 const ZKEY_PATH = process.env.NEXT_PUBLIC_V2_ZKEY_URL || 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=5'
 const VKEY_PATH = '/circuits/v2/verification_key.json?v=5'
-const PROOF_TIMEOUT_MS = 300_000
+const PROOF_TIMEOUT_MS = 600_000
 
 export interface V2ProofResult {
   proof: unknown

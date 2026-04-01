@@ -38,7 +38,7 @@ const nextConfig = {
       {
         source: "/circuits/:path*",
         headers: [
-          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Cache-Control", value: "public, max-age=604800, immutable" },
         ],
       },
       {

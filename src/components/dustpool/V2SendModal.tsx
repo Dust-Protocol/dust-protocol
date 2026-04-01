@@ -10,6 +10,7 @@ import { useChainlinkPrice } from "@/hooks/swap/useChainlinkPrice";
 import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
 import { computeAssetId } from "@/lib/dustpool/v2/commitment";
 import { getChainConfig, DEFAULT_CHAIN_ID } from "@/config/chains";
+import { getUSDCAddress } from "@/lib/swap/constants";
 import {
   ShieldCheckIcon,
   AlertCircleIcon,
@@ -63,8 +64,8 @@ export function V2SendModal({
 
   const usdcTokenAddress = useMemo((): Address | null => {
     try {
-      const addr = getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1;
-      return addr ? (addr as Address) : null;
+      return (getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1
+        ?? getUSDCAddress(chainId)) as Address;
     } catch {
       return null;
     }

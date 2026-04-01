@@ -8,6 +8,7 @@ import { useV2Balance } from "@/hooks/dustpool/v2";
 import { useSharedV2Keys } from "@/contexts/V2KeysContext";
 import { computeAssetId } from "@/lib/dustpool/v2/commitment";
 import { getChainConfig } from "@/config/chains";
+import { getUSDCAddress } from "@/lib/swap/constants";
 import { ShieldIcon, LockIcon, TokenIcon, USDCIcon } from "@/components/stealth/icons";
 import { computePrivacyScore } from "@/lib/dustpool/v2/privacy-score";
 import { V2DepositModal } from "./V2DepositModal";
@@ -48,7 +49,9 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
   const [usdcAssetId, setUsdcAssetId] = useState<bigint | null>(null);
   const usdcAddress = useMemo(() => {
     try {
-      return getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1 ?? null;
+      // V4 pool key has currency1; fall back to global USDC registry for V2-only chains (e.g. Flow)
+      return getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1
+        ?? getUSDCAddress(chainId);
     } catch {
       return null;
     }
@@ -64,6 +67,7 @@ export function V2PoolCard({ chainId: chainIdOverride }: V2PoolCardProps) {
   const nativeSymbol = getChainConfig(chainId).nativeCurrency.symbol;
   const usdcBalance = usdcAssetId !== null ? (balances.get(usdcAssetId) ?? 0n) : 0n;
   const hasAnyBalance = balances.size > 0 && Array.from(balances.values()).some(v => v > 0n);
+
 
   const privacyScore = useMemo(() => computePrivacyScore(notes), [notes]);
   const unspentCount = notes.filter(n => !n.spent).length;

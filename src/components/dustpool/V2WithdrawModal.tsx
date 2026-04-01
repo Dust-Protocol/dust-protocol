@@ -4,13 +4,15 @@ import { useState, useEffect, useCallback, useMemo, useRef, type RefObject, type
 import { AnimatePresence, motion } from "framer-motion";
 import { parseEther, parseUnits, formatEther, formatUnits, isAddress, zeroAddress, type Address } from "viem";
 import { useAccount } from "wagmi";
-import { useV2Withdraw, useV2Notes, useV2Split } from "@/hooks/dustpool/v2";
+import { useV2Notes } from "@/hooks/dustpool/v2";
 import { useV2Backup } from "@/hooks/dustpool/v2/useV2Backup";
 import { useV2Compliance } from "@/hooks/dustpool/v2/useV2Compliance";
+import { useV2SmartWithdraw } from "@/hooks/dustpool/v2/useV2SmartWithdraw";
 import { useChainlinkPrice } from "@/hooks/swap/useChainlinkPrice";
 import { COMPLIANCE_COOLDOWN_THRESHOLD_USD } from "@/lib/dustpool/v2/constants";
 import { computeAssetId } from "@/lib/dustpool/v2/commitment";
 import { getChainConfig, DEFAULT_CHAIN_ID } from "@/config/chains";
+import { getUSDCAddress } from "@/lib/swap/constants";
 import {
   ShieldCheckIcon,
   AlertCircleIcon,
@@ -54,8 +56,7 @@ export function V2WithdrawModal({
 }: V2WithdrawModalProps) {
   const { address } = useAccount();
   const { backupNote, backupSpent } = useV2Backup(keysRef, chainId ?? 0);
-  const { withdraw, isPending, status, txHash, error, clearError } = useV2Withdraw(keysRef, chainId, backupNote, backupSpent);
-  const { split, isPending: isSplitPending, status: splitStatus, error: splitError, clearError: clearSplitError } = useV2Split(keysRef, chainId, backupNote, backupSpent);
+  const { smartWithdraw, isPending, status, statusMessage, txHash, error, strategy, clearError } = useV2SmartWithdraw(keysRef, chainId, backupNote, backupSpent);
   const { unspentNotes, refreshNotes } = useV2Notes(keysRef, chainId);
   const { checkCooldown, cooldown } = useV2Compliance(chainId);
   const { price: chainlinkPrice } = useChainlinkPrice();
@@ -73,8 +74,8 @@ export function V2WithdrawModal({
   // Resolve known token assetIds for this chain
   const usdcTokenAddress = useMemo((): Address | null => {
     try {
-      const addr = getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1;
-      return addr ? (addr as Address) : null;
+      return (getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1
+        ?? getUSDCAddress(chainId)) as Address;
     } catch {
       return null;
     }
@@ -176,22 +177,42 @@ export function V2WithdrawModal({
     return unspentNotes.filter(n => n.note.asset === selectedAsset.assetId);
   }, [unspentNotes, selectedAsset]);
 
-  // Find note that will be consumed (smallest note >= amount)
-  const consumedNote = useMemo(() => {
+  // Note selection strategy preview (mirrors useV2SmartWithdraw logic)
+  const noteStrategy = useMemo(() => {
     if (!parsedAmount) return null;
-    const eligible = filteredNotes
-      .filter(n => n.leafIndex >= 0 && n.note.amount >= parsedAmount)
+    const confirmed = filteredNotes
+      .filter(n => n.leafIndex >= 0)
       .sort((a, b) => {
         const diff = a.note.amount - b.note.amount;
         if (diff < 0n) return -1;
         if (diff > 0n) return 1;
         return 0;
       });
-    return eligible[0] ?? null;
+
+    // Single note sufficient?
+    const single = confirmed.find(n => n.note.amount >= parsedAmount);
+    if (single) {
+      return { type: 'single' as const, notes: [single], total: single.note.amount };
+    }
+
+    // Best 2-note merge?
+    let best: { notes: typeof confirmed; total: bigint } | null = null;
+    for (let i = 0; i < confirmed.length; i++) {
+      for (let j = i + 1; j < confirmed.length; j++) {
+        const total = confirmed[i].note.amount + confirmed[j].note.amount;
+        if (total >= parsedAmount && (!best || total < best.total)) {
+          best = { notes: [confirmed[i], confirmed[j]], total };
+        }
+      }
+    }
+    if (best) return { type: 'merge' as const, ...best };
+
+    return null;
   }, [parsedAmount, filteredNotes]);
 
-  const changeAmount = consumedNote && parsedAmount
-    ? consumedNote.note.amount - parsedAmount
+  const consumedNote = noteStrategy?.notes[0] ?? null;
+  const changeAmount = noteStrategy && parsedAmount
+    ? noteStrategy.total - parsedAmount
     : null;
 
   // Check cooldown on consumed note
@@ -250,7 +271,7 @@ export function V2WithdrawModal({
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const canWithdraw = parsedAmount !== null && !exceedsBalance && isValidRecipient && !isPending && !isSplitPending && !cooldownBlocksSubmit;
+  const canWithdraw = parsedAmount !== null && !exceedsBalance && isValidRecipient && !isPending && !cooldownBlocksSubmit && noteStrategy !== null;
 
   const tokenSymbol = selectedAsset?.symbol ?? nativeSymbol;
   const chunks = parsedAmount ? decomposeForToken(parsedAmount, tokenSymbol) : [];
@@ -273,19 +294,14 @@ export function V2WithdrawModal({
   }, [selectedBalance, selectedAsset, formatAmount]);
 
   const useSplitFlow = chunks.length > 1;
-  const activePending = useSplitFlow ? isSplitPending : isPending;
-  const activeStatus = useSplitFlow ? splitStatus : status;
-  const activeError = useSplitFlow ? splitError : error;
-  const activeClearError = useSplitFlow ? clearSplitError : clearError;
+  const activePending = isPending;
+  const activeStatus = statusMessage;
+  const activeError = error;
+  const activeClearError = clearError;
 
   const handleWithdraw = async () => {
     if (!parsedAmount || !isValidRecipient || !selectedAsset) return;
-    const assetAddr = selectedAsset.address;
-    if (useSplitFlow) {
-      await split(parsedAmount, recipient as Address, assetAddr);
-    } else {
-      await withdraw(parsedAmount, recipient as Address, assetAddr);
-    }
+    await smartWithdraw(parsedAmount, recipient as Address, selectedAsset.address);
   };
 
   const handleClose = useCallback(() => {
@@ -459,17 +475,29 @@ export function V2WithdrawModal({
                   </div>
 
                   {/* Note consumption preview */}
-                  {consumedNote && parsedAmount && (
+                  {noteStrategy && parsedAmount && (
                     <div className="p-3 rounded-sm bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)]">
                       <p className="text-[9px] text-[rgba(255,255,255,0.5)] uppercase tracking-wider font-mono mb-2">
-                        Note Selection
+                        {noteStrategy.type === 'merge' ? 'Auto-Merge (2 notes)' : 'Note Selection'}
                       </p>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Source funds</span>
-                        <span className="text-[11px] font-semibold text-white font-mono flex items-center gap-1">
-                          {parseFloat(formatAmount(consumedNote.note.amount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
-                        </span>
-                      </div>
+                      {noteStrategy.notes.map((note, i) => (
+                        <div key={i} className="flex justify-between items-center mb-1">
+                          <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">
+                            {noteStrategy.type === 'merge' ? `Note ${i + 1}` : 'Source funds'}
+                          </span>
+                          <span className="text-[11px] font-semibold text-white font-mono flex items-center gap-1">
+                            {parseFloat(formatAmount(note.note.amount)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
+                          </span>
+                        </div>
+                      ))}
+                      {noteStrategy.type === 'merge' && (
+                        <div className="flex justify-between items-center mb-1 pt-1 border-t border-[rgba(255,255,255,0.05)]">
+                          <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Merged total</span>
+                          <span className="text-[11px] font-semibold text-white font-mono flex items-center gap-1">
+                            {parseFloat(formatAmount(noteStrategy.total)).toFixed(6)} <TokenIcon symbol={tokenSymbol} size={12} /> {tokenSymbol}
+                          </span>
+                        </div>
+                      )}
                       {changeAmount !== null && changeAmount > 0n && (
                         <div className="flex justify-between items-center">
                           <span className="text-[11px] text-[rgba(255,255,255,0.4)] font-mono">Remaining balance</span>
@@ -594,28 +622,26 @@ export function V2WithdrawModal({
               {activePending && (
                 <div className="flex flex-col items-center gap-4 py-6">
                   <div className="w-8 h-8 border-2 border-[#00FF41] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-semibold text-white font-mono">
-                    {activeStatus || (useSplitFlow ? "Generating privacy split proof..." : "Generating ZK proof...")}
+                  <p className="text-sm font-semibold text-white font-mono text-center">
+                    {activeStatus || "Processing..."}
                   </p>
-                  {useSplitFlow ? (
-                    <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
-                      <span className="text-[#00FF41]">proof</span>
-                      <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Verifying") ? "text-[#00FF41]" : ""}>verify</span>
-                      <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Submitting") ? "text-[#00FF41]" : ""}>submit</span>
-                      <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>confirm</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
-                      <span className="text-[#00FF41]">proof</span>
-                      <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Submitting") || activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>submit</span>
-                      <span>&rarr;</span>
-                      <span className={activeStatus?.includes("Confirming") ? "text-[#00FF41]" : ""}>confirm</span>
-                    </div>
-                  )}
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 text-[10px] text-[rgba(255,255,255,0.3)] font-mono">
+                    {strategy?.startsWith('merge') && (
+                      <>
+                        <span className={status === 'merging' || status === 'waiting-merge-confirm' ? "text-[#00FF41]" : status === 'splitting' || status === 'withdrawing' || status === 'confirming' || status === 'done' ? "text-[rgba(255,255,255,0.5)]" : ""}>merge</span>
+                        <span>&rarr;</span>
+                      </>
+                    )}
+                    {(strategy === 'split' || strategy === 'merge-split') && (
+                      <>
+                        <span className={status === 'splitting' || status === 'waiting-split-confirm' ? "text-[#00FF41]" : status === 'withdrawing' || status === 'confirming' || status === 'done' ? "text-[rgba(255,255,255,0.5)]" : ""}>split</span>
+                        <span>&rarr;</span>
+                      </>
+                    )}
+                    <span className={status === 'withdrawing' ? "text-[#00FF41]" : status === 'confirming' || status === 'done' ? "text-[rgba(255,255,255,0.5)]" : ""}>withdraw</span>
+                    <span>&rarr;</span>
+                    <span className={status === 'confirming' ? "text-[#00FF41]" : status === 'done' ? "text-[rgba(255,255,255,0.5)]" : ""}>confirm</span>
+                  </div>
                 </div>
               )}
 
@@ -627,7 +653,7 @@ export function V2WithdrawModal({
                       <ShieldCheckIcon size={40} color="#00FF41" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">
-                      {useSplitFlow ? "Privacy Split Successful" : "Unshield Successful"}
+                      Unshield Successful
                     </p>
                     <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{amount} {tokenSymbol} unshielded privately</p>
                   </div>
@@ -688,7 +714,7 @@ export function V2WithdrawModal({
                       <AlertCircleIcon size={40} color="#ef4444" />
                     </div>
                     <p className="text-base font-bold text-white mb-1 font-mono">
-                      {useSplitFlow ? "Split Failed" : "Unshield Failed"}
+                      Unshield Failed
                     </p>
                     <p className="text-[13px] text-[rgba(255,255,255,0.5)] font-mono">{errorToUserMessage(activeError)}</p>
                   </div>

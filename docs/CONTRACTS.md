@@ -290,6 +290,7 @@ Deployment block: `38350029`
 | FflonkComplianceVerifier | [`0x5779192B220876221Bc2871511FB764941314e04`](https://evm-testnet.flowscan.io/address/0x5779192B220876221Bc2871511FB764941314e04) |
 | TestnetComplianceOracle (deprecated) | [`0xACe425FC23d7594b829935EC4862f654541Bf0d3`](https://evm-testnet.flowscan.io/address/0xACe425FC23d7594b829935EC4862f654541Bf0d3) |
 | OFACSanctionsRegistry | [`0x61C67B3527deE3F5861773fD3A223920953051AA`](https://evm-testnet.flowscan.io/address/0x61C67B3527deE3F5861773fD3A223920953051AA) |
+| FHEComplianceBridge | [`0x4A646be6E51cF9Ecc849b7fcB5a6aCFc28321378`](https://evm-testnet.flowscan.io/address/0x4A646be6E51cF9Ecc849b7fcB5a6aCFc28321378) |
 
 ### DustSwap — Generic Adapter (no Uniswap V4, uses PunchSwap V2)
 

@@ -217,17 +217,27 @@ export function useV2Swap(
       if (!mountedRef.current) return
       setStatus('saving-note')
 
-      // Verify relayer's output commitment before trusting it for storage
+      // Sanity-check: recompute commitment client-side and warn on mismatch.
+      // Save regardless — the on-chain event is authoritative and throwing
+      // would permanently lose the user's funds.
       const outputAssetId = await computeAssetId(chainId, tokenOut)
-      const expectedCommitment = await poseidonHash([
-        submission.ownerPubKey,
-        BigInt(submission.result.outputAmount),
-        outputAssetId,
-        BigInt(chainId),
-        submission.blinding,
-      ])
-      if (expectedCommitment !== BigInt(submission.result.outputCommitment)) {
-        throw new Error('Output commitment mismatch — relayer response is inconsistent')
+      try {
+        const expectedCommitment = await poseidonHash([
+          submission.ownerPubKey,
+          BigInt(submission.result.outputAmount),
+          outputAssetId,
+          BigInt(chainId),
+          submission.blinding,
+        ])
+        if (expectedCommitment !== BigInt(submission.result.outputCommitment)) {
+          console.warn(
+            `[V2/swap] Output commitment mismatch:`,
+            `expected=${expectedCommitment}, got=${BigInt(submission.result.outputCommitment)}`,
+            `— saving anyway (on-chain event is authoritative)`
+          )
+        }
+      } catch (verifyErr) {
+        console.warn('[V2/swap] Commitment verification failed:', verifyErr)
       }
 
       // Save the output note (new token received from the swap)

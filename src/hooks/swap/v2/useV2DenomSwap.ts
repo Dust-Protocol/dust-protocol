@@ -270,7 +270,7 @@ export function useV2DenomSwap(
       }> = []
 
       for (let i = 0; i < denomNotes.length; i++) {
-        setProgress({ current: i, total: totalSteps })
+        setProgress({ current: i + 1, total: totalSteps })
 
         const noteCommitment = splitOutputToNoteCommitment(
           denomNotes[i], denomLeafIndices[i], chainId
@@ -306,7 +306,6 @@ export function useV2DenomSwap(
 
       // ── Step 6: Submit batch swap ─────────────────────────────────────
       setStatus('submitting-swaps')
-      setProgress({ current: 0, total: totalSteps })
 
       // Chains with Uniswap V4 use batch-swap; others (PunchSwap/V2 router) use swap-generic
       const chainConfig = getChainConfig(chainId)
@@ -343,21 +342,28 @@ export function useV2DenomSwap(
         setProgress({ current: i + 1, total: totalSteps })
 
         if (result.outputCommitment && result.outputAmount) {
-          // Verify commitment matches expected Poseidon hash
           const swapBlinding = BigInt(swaps[i].blinding)
-          const expectedCommitment = await poseidonHash([
-            ownerPubKey,
-            BigInt(result.outputAmount),
-            outputAssetId,
-            BigInt(chainId),
-            swapBlinding,
-          ])
 
-          if (expectedCommitment !== BigInt(result.outputCommitment)) {
-            console.error(
-              `[V2/denom-swap] Output commitment mismatch for chunk ${i + 1} — skipping save`
-            )
-            continue
+          // Sanity-check: recompute commitment client-side and warn on mismatch.
+          // Save regardless — the on-chain event is authoritative and skipping
+          // would permanently lose the user's funds.
+          try {
+            const expectedCommitment = await poseidonHash([
+              ownerPubKey,
+              BigInt(result.outputAmount),
+              outputAssetId,
+              BigInt(chainId),
+              swapBlinding,
+            ])
+            if (expectedCommitment !== BigInt(result.outputCommitment)) {
+              console.warn(
+                `[V2/denom-swap] Output commitment mismatch for chunk ${i + 1}:`,
+                `expected=${expectedCommitment}, got=${BigInt(result.outputCommitment)}`,
+                `— saving anyway (on-chain event is authoritative)`
+              )
+            }
+          } catch (verifyErr) {
+            console.warn(`[V2/denom-swap] Commitment verification failed for chunk ${i + 1}:`, verifyErr)
           }
 
           const outputCommitmentHex = bigintToHex(BigInt(result.outputCommitment))

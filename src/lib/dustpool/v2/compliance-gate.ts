@@ -12,7 +12,6 @@ import { getDustPoolV2Address, DUST_POOL_V2_ABI } from './contracts'
 import { computeNullifier } from './nullifier'
 import { proveCompliance } from './compliance-flow'
 import { toBytes32Hex } from '@/lib/dustpool/poseidon'
-import { isSanctioned } from './chainalysis-api'
 
 export interface NoteForCompliance {
   commitment: bigint
@@ -70,20 +69,9 @@ export async function ensureComplianceProved(
   const poolAddress = getDustPoolV2Address(chainId)
   if (!poolAddress) return { screeningSource: 'none' }
 
-  // Layer 1: Chainalysis API screening (fail-open on error)
-  if (senderAddress) {
-    onStatus?.('Checking sanctions status...')
-    try {
-      const sanctioned = await isSanctioned(senderAddress)
-      if (sanctioned) {
-        throw new SanctionedAddressError(senderAddress, 'chainalysis')
-      }
-    } catch (err) {
-      if (err instanceof SanctionedAddressError) throw err
-      // API error — fall through to on-chain oracle
-      console.warn('Chainalysis API check failed, falling through to on-chain oracle:', err)
-    }
-  }
+  // Layer 1: Chainalysis API screening (server-side relayer routes only)
+  // Skipped client-side — the API is CORS-restricted. Relayer routes handle this layer.
+  // On-chain oracle (Layer 2) provides contract-enforced screening for deposits.
 
   // Layer 2: On-chain oracle screening
   const verifierAddress = await publicClient.readContract({

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, type RefObject } from 'react'
 import { useAccount, useChainId } from 'wagmi'
 import {
   openV2Database, storedToNoteCommitment, getPendingNotes, updateNoteLeafIndex,
+  pruneStaleNotes,
 } from '@/lib/dustpool/v2/storage'
 import type { StoredNoteV2 } from '@/lib/dustpool/v2/storage'
 import { createRelayerClient } from '@/lib/dustpool/v2/relayer-client'
@@ -90,12 +91,22 @@ export function useV2Notes(keysRef?: RefObject<V2Keys | null>, chainIdOverride?:
 
     try {
       const db = await openV2Database()
-      const pending = await getPendingNotes(db, address, chainId)
-      if (pending.length === 0) return
-
       const relayer = createRelayerClient()
       let didUpdate = false
 
+      // Prune notes from old contract deployments by checking tree leaf count
+      try {
+        const { leafCount } = await relayer.getTreeInfo(chainId)
+        const pruned = await pruneStaleNotes(db, address, chainId, leafCount)
+        if (pruned > 0) {
+          console.warn(`[DustPoolV2] Pruned ${pruned} stale notes (leafIndex >= ${leafCount}) on chain ${chainId}`)
+          didUpdate = true
+        }
+      } catch {
+        // Relayer may be down — skip pruning this cycle
+      }
+
+      const pending = await getPendingNotes(db, address, chainId)
       for (const note of pending) {
         try {
           const status = await relayer.getDepositStatus(note.commitment, chainId)

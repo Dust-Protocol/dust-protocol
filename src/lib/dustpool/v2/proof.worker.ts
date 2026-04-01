@@ -4,6 +4,7 @@
 import { fflonk } from 'snarkjs'
 
 const FALLBACK_ZKEY_PATH = 'https://pub-79a49cd9d00544bdbf2c2dd393b47a1f.r2.dev/v2/DustV2Transaction.zkey?v=5'
+const CACHE_NAME = 'dust-zk-artifacts-v5'
 
 export interface WorkerMessage {
   type: 'generate' | 'verify'
@@ -27,6 +28,28 @@ export interface WorkerResponse {
   progress?: number
 }
 
+// Cache API: fetch-with-cache for large zkey/wasm files
+async function cachedFetch(url: string): Promise<Response> {
+  try {
+    const cache = await caches.open(CACHE_NAME)
+    const cached = await cache.match(url)
+    if (cached) return cached
+    const response = await fetch(url)
+    if (response.ok) {
+      await cache.put(url, response.clone())
+    }
+    return response
+  } catch {
+    return fetch(url)
+  }
+}
+
+// snarkjs reads URLs via fetch() internally, so we warm the Cache API
+// before calling fullProve — snarkjs will then hit the cached response.
+async function warmCache(url: string): Promise<void> {
+  await cachedFetch(url)
+}
+
 self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   const { type, id, data } = event.data
 
@@ -42,10 +65,16 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
       if (!circuitInputs) throw new Error('Missing circuitInputs')
       if (!wasmPath) throw new Error('Missing wasmPath — main thread must supply absolute URL')
 
-      sendProgress('Loading circuit files', 0.2)
+      const resolvedZkey = zkeyPath || FALLBACK_ZKEY_PATH
+
+      sendProgress('Downloading circuit files', 0.15)
+
+      // Pre-cache zkey + wasm so snarkjs fetch() hits Cache API
+      await Promise.all([warmCache(resolvedZkey), warmCache(wasmPath)])
+
       sendProgress('Generating witness + proof', 0.3)
 
-      const result = await fflonk.fullProve(circuitInputs, wasmPath, zkeyPath || FALLBACK_ZKEY_PATH)
+      const result = await fflonk.fullProve(circuitInputs, wasmPath, resolvedZkey)
 
       sendProgress('Formatting calldata', 0.8)
 

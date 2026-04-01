@@ -420,6 +420,52 @@ export async function markSpentAndSaveMultiple(
 }
 
 /**
+ * Atomically mark two input notes as spent and save one output note.
+ * Used by merge operations that consume 2 notes and produce 1 merged note.
+ * All operations share a single IndexedDB transaction for atomicity.
+ */
+export async function markTwoSpentAndSaveOne(
+  db: IDBDatabase,
+  inputHex0: string,
+  inputHex1: string,
+  outputNote: StoredNoteV2,
+  encKey?: CryptoKey
+): Promise<void> {
+  const normalized = { ...outputNote, walletAddress: outputNote.walletAddress.toLowerCase() }
+  const toStore = encKey ? await encryptForStorage(normalized, encKey) : normalized
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([STORE_NAME], 'readwrite')
+
+    tx.oncomplete = () => resolve()
+    tx.onerror = () => reject(tx.error)
+    tx.onabort = () => reject(tx.error ?? new Error('Transaction aborted'))
+
+    const store = tx.objectStore(STORE_NAME)
+
+    const get0 = store.get(inputHex0)
+    get0.onsuccess = () => {
+      const note0 = get0.result as StoredNoteV2 | undefined
+      if (!note0) { tx.abort(); return }
+      note0.spent = true
+      store.put(note0)
+
+      const get1 = store.get(inputHex1)
+      get1.onsuccess = () => {
+        const note1 = get1.result as StoredNoteV2 | undefined
+        if (!note1) { tx.abort(); return }
+        note1.spent = true
+        store.put(note1)
+
+        store.put(toStore)
+      }
+      get1.onerror = () => tx.abort()
+    }
+    get0.onerror = () => tx.abort()
+  })
+}
+
+/**
  * Update a stored note's leafIndex. Used by background sync to resolve
  * pending notes (leafIndex === -1) after the relayer confirms them.
  */
@@ -511,6 +557,48 @@ export function updateNoteComplianceStatus(
     }
 
     getRequest.onerror = () => reject(getRequest.error)
+  })
+}
+
+/**
+ * Mark notes with leafIndex >= treeLeafCount as spent.
+ * These notes belong to a previous contract deployment and are irrecoverable
+ * from the current contract. Returns the number of pruned notes.
+ */
+export async function pruneStaleNotes(
+  db: IDBDatabase,
+  walletAddress: string,
+  chainId: number,
+  treeLeafCount: number,
+): Promise<number> {
+  const addr = walletAddress.toLowerCase()
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['notes'], 'readwrite')
+    const store = tx.objectStore('notes')
+    const index = store.index('walletAddress')
+    const request = index.getAll(addr)
+    let pruned = 0
+
+    request.onsuccess = () => {
+      const notes = request.result as StoredNoteV2[]
+      for (const note of notes) {
+        if (
+          note.chainId === chainId &&
+          !note.spent &&
+          note.leafIndex >= 0 &&
+          note.leafIndex >= treeLeafCount
+        ) {
+          note.spent = true
+          store.put(note)
+          pruned++
+        }
+      }
+    }
+
+    request.onerror = () => reject(request.error)
+    tx.oncomplete = () => resolve(pruned)
+    tx.onerror = () => reject(tx.error)
   })
 }
 

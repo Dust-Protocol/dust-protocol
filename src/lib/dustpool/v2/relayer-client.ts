@@ -215,6 +215,17 @@ export function createRelayerClient(config?: Partial<RelayerConfig>) {
     },
 
     /**
+     * Fetch tree root and leaf count. Used to detect stale notes from old deployments.
+     */
+    async getTreeInfo(chainId?: number): Promise<{ root: bigint; leafCount: number }> {
+      const params = chainId != null ? `?chainId=${chainId}` : ''
+      const data = await relayerFetch<TreeRootResponse & { leafCount: number }>(
+        resolvedConfig, `/api/v2/tree/root${params}`
+      )
+      return { root: BigInt(data.root), leafCount: data.leafCount }
+    },
+
+    /**
      * Get a Merkle proof for a leaf at the given index.
      */
     async getMerkleProof(leafIndex: number, chainId?: number): Promise<MerkleProof> {

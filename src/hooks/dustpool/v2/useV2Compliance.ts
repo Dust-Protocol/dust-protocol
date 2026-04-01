@@ -8,7 +8,6 @@ import {
   type CooldownStatus,
 } from '@/lib/dustpool/v2/compliance'
 import {
-  checkSanctionsStatus,
   clearSanctionsCache,
 } from '@/lib/dustpool/v2/chainalysis-api'
 
@@ -43,16 +42,8 @@ export function useV2Compliance(chainIdOverride?: number) {
     setComplianceStatus('checking')
 
     try {
-      // Layer 1: Chainalysis off-chain screening
-      const sanctionsResult = await checkSanctionsStatus(target)
-      if (sanctionsResult.sanctioned) {
-        setScreeningResult({ status: 'blocked', reason: 'Address flagged by Chainalysis sanctions screening' })
-        setScreeningSource('chainalysis')
-        setComplianceStatus('sanctioned')
-        return
-      }
-
-      // Layer 2: On-chain compliance oracle
+      // Chainalysis API is server-side only (CORS-restricted) — relayer routes handle it.
+      // Client-side screening uses the on-chain compliance oracle directly.
       const result = await checkDepositorCompliance(publicClient, target, chainId)
       setScreeningResult(result)
 

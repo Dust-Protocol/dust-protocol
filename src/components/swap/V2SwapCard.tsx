@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { formatEther } from "viem";
+import { useState, useEffect, useMemo } from "react";
+import { formatEther, formatUnits, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { useV2Balance, useV2Keys } from "@/hooks/dustpool/v2";
 import { getDustPoolV2Config } from "@/lib/dustpool/v2/contracts";
-import { computeOwnerPubKey } from "@/lib/dustpool/v2/commitment";
+import { computeOwnerPubKey, computeAssetId } from "@/lib/dustpool/v2/commitment";
+import { getUSDCAddress } from "@/lib/swap/constants";
 import { V2DepositModal } from "@/components/dustpool/V2DepositModal";
 import { V2WithdrawModal } from "@/components/dustpool/V2WithdrawModal";
 import { V2TransferModal } from "@/components/dustpool/V2TransferModal";
@@ -14,6 +15,7 @@ import {
   LockIcon,
   AlertCircleIcon,
   TokenIcon,
+  USDCIcon,
 } from "@/components/stealth/icons";
 import { getChainConfig, isSwapSupported } from "@/config/chains";
 
@@ -52,6 +54,24 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
   const unspentCount = notes.filter(n => !n.spent).length;
   const formattedBalance = formatEther(totalEthBalance);
   const displayBalance = parseFloat(formattedBalance).toFixed(4);
+
+  const usdcAddress = useMemo(() => {
+    try {
+      return getChainConfig(chainId).contracts.dustSwapVanillaPoolKey?.currency1
+        ?? getUSDCAddress(chainId);
+    } catch { return null; }
+  }, [chainId]);
+
+  const [usdcAssetId, setUsdcAssetId] = useState<bigint | null>(null);
+  useEffect(() => {
+    if (!usdcAddress) { setUsdcAssetId(null); return; }
+    let cancelled = false;
+    computeAssetId(chainId, usdcAddress).then(id => { if (!cancelled) setUsdcAssetId(id); });
+    return () => { cancelled = true; };
+  }, [chainId, usdcAddress]);
+
+  const usdcBalance = usdcAssetId !== null ? (balances.get(usdcAssetId) ?? 0n) : 0n;
+  const displayUsdcBalance = parseFloat(formatUnits(usdcBalance, 6)).toFixed(2);
 
   const handleModalClose = () => {
     setActiveModal(null);
@@ -161,6 +181,17 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                         <span className="text-sm text-[rgba(255,255,255,0.4)] font-mono">{nativeSymbol}</span>
                       </div>
                     </div>
+                    {usdcAddress && (
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-lg font-bold text-white font-mono tracking-tight">
+                          {isLoading ? <BalanceSkeleton width="w-20" height="h-5" /> : displayUsdcBalance}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <USDCIcon size={14} />
+                          <span className="text-xs text-[rgba(255,255,255,0.4)] font-mono">USDC</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* PIN verification */}
@@ -291,7 +322,7 @@ export function V2SwapCard({ chainId }: V2SwapCardProps) {
                   <div className="flex flex-col gap-3 text-[11px] text-[rgba(255,255,255,0.4)] font-mono leading-relaxed">
                     <div className="flex items-start gap-2">
                       <span className="text-[#00FF41] font-bold">1</span>
-                      <p>Deposit any amount of {nativeSymbol} into the shielded pool quietly</p>
+                      <p>Deposit any amount of {nativeSymbol} or USDC into the shielded pool quietly</p>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-[#00FF41] font-bold">2</span>

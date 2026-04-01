@@ -235,7 +235,8 @@ async function fetchV2PairReserves(
     const price = ethReserve > 0 ? usdcReserve / ethReserve : null
 
     return { ethReserve, usdcReserve, price }
-  } catch {
+  } catch (err) {
+    console.error('[usePoolStats] V2 pair fetch failed:', err instanceof Error ? err.message : err)
     return null
   }
 }
