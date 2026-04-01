@@ -121,7 +121,7 @@ export default function OverviewPage() {
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
             Thanos Sepolia
-            <span className="text-[rgba(255,255,255,0.25)] ml-1">Tokamak Network</span>
+            <span className="text-[rgba(255,255,255,0.25)] ml-1">Thanos Chain</span>
           </span>
         </div>
         <DocsCallout type="warning" title="Testnet Only">

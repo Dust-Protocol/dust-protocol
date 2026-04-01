@@ -279,7 +279,7 @@ export default function ContractsPage() {
         <div className="flex items-center gap-3 mb-5">
           <h2 className="text-sm font-mono font-semibold text-white tracking-wider uppercase">Thanos Sepolia</h2>
           <span className="text-[10px] font-mono text-[rgba(255,255,255,0.3)]">Chain ID: 111551119090</span>
-          <DocsBadge variant="muted">Tokamak Network</DocsBadge>
+          <DocsBadge variant="muted">Thanos Chain</DocsBadge>
         </div>
         <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
           Thanos Sepolia has core stealth transfer, V1 pool, and V2 ZK-UTXO pool contracts. DustSwapAdapterV2 (privacy swaps via DustPoolV2 + Uniswap V4) is

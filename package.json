@@ -1,7 +1,7 @@
 {
   "name": "dust-protocol",
   "version": "1.1.0",
-  "description": "Stealth payment infrastructure for Tokamak Network - payments that dissolve into the blockchain",
+  "description": "Stealth payment infrastructure - payments that dissolve into the blockchain",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -39,6 +39,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@remotion/bundler": "^4.0.438",
+    "@remotion/cli": "^4.0.438",
+    "@remotion/renderer": "^4.0.438",
     "@types/bn.js": "^5.1.6",
     "@types/elliptic": "^6.4.18",
     "@types/node": "^22.10.5",
@@ -51,6 +54,7 @@
     "fake-indexeddb": "^6.2.5",
     "nodemon": "^3.0.2",
     "postcss": "^8.5.6",
+    "remotion": "^4.0.438",
     "solc": "^0.8.33",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.7.2",
@@ -68,8 +72,8 @@
     "privacy",
     "ethereum",
     "thanos-network",
-    "tokamak"
+    "dust-protocol"
   ],
-  "author": "Tokamak Network",
+  "author": "Dust Protocol",
   "license": "SEE LICENSE IN LICENSE"
 }

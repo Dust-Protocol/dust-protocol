@@ -15,7 +15,7 @@ export interface DerivedClaimAddress {
 export const CLAIM_ADDRESS_DERIVATION_MESSAGE =
   'Sign this message to derive your stealth claim addresses.\n\n' +
   'This creates fresh addresses that cannot be linked to your main wallet.\n\n' +
-  'Domain: Tokamak Stealth\n' +
+  'Domain: Dust Protocol\n' +
   'Purpose: Claim Address Derivation\n' +
   'Version: 1';
 

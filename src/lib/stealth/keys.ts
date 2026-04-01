@@ -14,7 +14,7 @@ const secp256k1 = new EC('secp256k1');
 export const STEALTH_KEY_DERIVATION_MESSAGE =
   'Sign to activate your Private Wallet.\n\n' +
   'This creates your private receiving address and claim wallets.\n\n' +
-  'Domain: Tokamak Network\n' +
+  'Domain: Dust Protocol\n' +
   'Purpose: Private Wallet Setup';
 
 export function generateStealthKeyPair(): StealthKeyPair {
