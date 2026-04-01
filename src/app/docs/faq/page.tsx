@@ -41,8 +41,8 @@ const faqs = [
     a: "Yes. The app is fully responsive. ZK proof generation works on mobile browsers (Chrome/Safari on iOS and Android). Proof generation may take 3–5 seconds on lower-end devices due to the WASM computation.",
   },
   {
-    q: "Why are privacy swaps only available on Ethereum Sepolia?",
-    a: "DustSwap requires Uniswap V4, which is currently only deployed on Ethereum Sepolia in our configuration. Thanos Sepolia has stealth transfers and the Privacy Pool. DustSwap support for Thanos will be added when a V4 deployment is available.",
+    q: "Which chains support privacy swaps?",
+    a: "Privacy swaps are available on Ethereum Sepolia, Arbitrum Sepolia, Base Sepolia (all via Uniswap V4), and Flow EVM Testnet (via PunchSwap V2). Thanos Sepolia and OP Sepolia support pool operations (deposits, withdrawals, transfers) but not swaps.",
   },
   {
     q: "What is ERC-5564?",

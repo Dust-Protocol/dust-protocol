@@ -113,9 +113,10 @@ export default function SwapsAppGuidePage() {
         </p>
       </section>
 
-      <DocsCallout type="warning" title="CHAIN AVAILABILITY">
-        Swaps are only available on Ethereum Sepolia. Other chains support pool operations (deposits,
-        withdrawals, transfers) but not swaps.
+      <DocsCallout type="info" title="CHAIN AVAILABILITY">
+        Swaps are available on Ethereum Sepolia, Arbitrum Sepolia, Base Sepolia (Uniswap V4), and
+        Flow EVM Testnet (PunchSwap V2). Thanos Sepolia and OP Sepolia support pool operations
+        (deposits, withdrawals, transfers) but not swaps.
       </DocsCallout>
 
       <DocsCallout type="tip" title="FEWER CHUNKS = FASTER">

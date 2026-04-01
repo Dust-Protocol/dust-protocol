@@ -10,7 +10,7 @@ import { techArticleJsonLd } from "@/lib/seo/jsonLd";
  * XSS-safe: all values below are hardcoded string literals defined in this file.
  * safeJsonLd() in jsonLd.ts escapes '<' as \u003c. No user input flows into this data.
  */
-const articleLd = techArticleJsonLd("Overview — Privacy Protocol for Ethereum", "Dust Protocol provides stealth addresses (ERC-5564), ZK-UTXO privacy pools with FFLONK proofs, private token swaps, compliance screening, and gasless claims. Non-custodial privacy for Ethereum.", "/docs/overview");
+const articleLd = techArticleJsonLd("Overview — Privacy Protocol for EVM Chains", "Dust Protocol provides stealth addresses (ERC-5564), ZK-UTXO privacy pools with FFLONK proofs, private token swaps, OFAC and FHE compliance, denomination privacy, and IPFS backup. Non-custodial privacy across Flow EVM, Ethereum, Arbitrum, Optimism, and Base.", "/docs/overview");
 
 const features = [
   {
@@ -23,22 +23,36 @@ const features = [
   {
     badge: "ZK-UTXO / FFLONK",
     title: "Privacy Pool",
-    desc: "Deposit arbitrary amounts into a global UTXO pool. Withdraw with a FFLONK zero-knowledge proof — no fixed denominations, no on-chain link between deposit and withdrawal. Split withdrawals break amount fingerprinting.",
+    desc: "Deposit arbitrary amounts into a global UTXO pool. Withdraw with a FFLONK zero-knowledge proof — no fixed denominations, no on-chain link between deposit and withdrawal.",
     href: "/docs/privacy-pool",
     color: "green",
   },
   {
-    badge: "Uniswap V4",
-    title: "Privacy Swaps",
-    desc: "Swap tokens without revealing which deposit you're spending. ZK proof is passed as hookData to a Uniswap V4 hook — verification and swap are atomic.",
+    badge: "Uniswap V4 / PunchSwap",
+    title: "Private Swaps",
+    desc: "Swap tokens without revealing which deposit you're spending. On chains with Uniswap V4, the ZK proof is passed as hookData for atomic verification. On Flow EVM, swaps route through PunchSwap V2 via a generic adapter.",
     href: "/docs/privacy-swaps",
     color: "green",
   },
   {
-    badge: "Chainalysis / View Keys",
-    title: "Compliance & Disclosure",
-    desc: "Built-in deposit screening via Chainalysis oracle, 1-hour cooldown periods, and voluntary view keys for selective disclosure. Privacy with accountability.",
+    badge: "OFAC + Zama FHE",
+    title: "Compliance",
+    desc: "OFAC deposit screening via Chainalysis oracle and on-chain sanctions registry. On Ethereum Sepolia, Zama fhEVM enables confidential compliance — encrypted pool statistics and compliance checks that run entirely on-chain without exposing user data.",
     href: "/docs/compliance",
+    color: "amber",
+  },
+  {
+    badge: "2-in-8-out Split",
+    title: "Denomination Privacy",
+    desc: "Split withdrawals break amount fingerprinting by decomposing outputs into common denomination chunks. The 2-in-8-out split circuit produces up to 8 output UTXOs in a single proof, with batch processing and jittered timing.",
+    href: "/docs/privacy-pool",
+    color: "amber",
+  },
+  {
+    badge: "Storacha / Filecoin",
+    title: "IPFS Backup",
+    desc: "ZK circuit artifacts and compliance tree snapshots are pinned to IPFS via Storacha with Filecoin persistence. Proof generation works offline using content-addressed fallbacks — no single point of failure for critical protocol data.",
+    href: "/docs/privacy-pool",
     color: "amber",
   },
   {
@@ -46,7 +60,7 @@ const features = [
     title: "Gasless Claims",
     desc: "Stealth wallets are claimed gas-free. Your stealth key signs a user operation locally; a sponsored paymaster covers the fee so you never expose the key.",
     href: "/docs/stealth-transfers",
-    color: "amber",
+    color: "muted",
   },
   {
     badge: ".dust names",
@@ -64,7 +78,7 @@ const features = [
   },
 ] as const;
 
-export const metadata = docsMetadata("Overview — Privacy Protocol for Ethereum", "Dust Protocol provides stealth addresses (ERC-5564), ZK-UTXO privacy pools with FFLONK proofs, private token swaps, compliance screening, and gasless claims. Non-custodial privacy for Ethereum.", "/docs/overview");
+export const metadata = docsMetadata("Overview — Privacy Protocol for EVM Chains", "Dust Protocol provides stealth addresses (ERC-5564), ZK-UTXO privacy pools with FFLONK proofs, private token swaps, OFAC and FHE compliance, denomination privacy, and IPFS backup. Non-custodial privacy across Flow EVM, Ethereum, Arbitrum, Optimism, and Base.", "/docs/overview");
 
 export default function OverviewPage() {
   /* articleLd contains only hardcoded string literals from this file, escaped by safeJsonLd */
@@ -74,16 +88,17 @@ export default function OverviewPage() {
     <DocsPage
       currentHref="/docs/overview"
       title="Dust Protocol"
-      subtitle="Private payments and private swaps for EVM chains. Funds dissolve into the blockchain — no on-chain link between sender and recipient."
+      subtitle="Private payments and private swaps across Flow EVM, Ethereum, Arbitrum, Optimism, and Base. Funds dissolve into the blockchain — no on-chain link between sender and recipient."
       badge="OVERVIEW"
     >
       {/* What it is */}
       <section className="mb-10">
         <h2 className="text-sm font-mono font-semibold text-white tracking-wider mb-3 uppercase">What is Dust?</h2>
         <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed mb-6">
-          Dust Protocol is an on-chain privacy layer built on top of standard EVM infrastructure. It lets users send,
-          receive, and swap tokens without creating a public ledger trail — the fundamental privacy problem that
-          affects every public blockchain today.
+          Dust Protocol is a multi-chain privacy layer deployed across Flow EVM, Ethereum Sepolia, Arbitrum Sepolia,
+          OP Sepolia, and Base Sepolia. It lets users send, receive, and swap tokens without creating a public ledger
+          trail — the fundamental privacy problem that affects every public blockchain today. Flow EVM serves as the
+          primary chain, with full stealth, privacy pool, swap, and compliance infrastructure.
         </p>
 
         <div className="mb-8">
@@ -104,8 +119,11 @@ export default function OverviewPage() {
         </p>
         <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed mt-4">
           <strong className="text-white">Dust V2</strong> introduces a ZK-UTXO model with arbitrary-amount deposits,
-          FFLONK proofs (no trusted setup), split withdrawals for denomination privacy, and built-in compliance
-          screening — making it possible to prove legitimacy without sacrificing privacy.
+          FFLONK proofs (no trusted setup), split withdrawals for denomination privacy, and a layered compliance
+          stack — OFAC sanctions screening via Chainalysis oracle, and confidential compliance via{" "}
+          <strong className="text-white">Zama fhEVM</strong> on Ethereum Sepolia where encrypted pool statistics
+          and compliance checks run entirely on-chain without exposing user data. ZK circuit artifacts are pinned
+          to IPFS via Storacha with Filecoin persistence for censorship-resistant availability.
         </p>
       </section>
 
@@ -113,20 +131,35 @@ export default function OverviewPage() {
       <section className="mb-10">
         <h2 className="text-sm font-mono font-semibold text-white tracking-wider mb-3 uppercase">Supported Networks</h2>
         <div className="flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(0,255,65,0.2)] rounded-sm text-[rgba(255,255,255,0.5)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
+            Flow EVM Testnet
+            <span className="text-[rgba(255,255,255,0.25)] ml-1">primary</span>
+          </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FFB000]" />
             Ethereum Sepolia
+            <span className="text-[rgba(255,255,255,0.25)] ml-1">+ Zama FHE</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#627EEA]" />
+            Arbitrum Sepolia
             <span className="text-[rgba(255,255,255,0.25)] ml-1">testnet</span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]" />
-            Thanos Sepolia
-            <span className="text-[rgba(255,255,255,0.25)] ml-1">Thanos Chain</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF0420]" />
+            OP Sepolia
+            <span className="text-[rgba(255,255,255,0.25)] ml-1">testnet</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono border border-[rgba(255,255,255,0.08)] rounded-sm text-[rgba(255,255,255,0.5)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0052FF]" />
+            Base Sepolia
+            <span className="text-[rgba(255,255,255,0.25)] ml-1">testnet</span>
           </span>
         </div>
         <DocsCallout type="warning" title="Testnet Only">
-          Dust Protocol is currently deployed on testnets. Do not send mainnet funds. Contract addresses may change
-          during the testing phase.
+          Dust Protocol is currently deployed on testnets across all five chains. Do not send mainnet funds.
+          Contract addresses may change during the testing phase.
         </DocsCallout>
       </section>
 

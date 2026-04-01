@@ -213,9 +213,223 @@ const flowContracts = [
     address: "0x72f0bd8d014cdB045efD33311028A3013769d69F",
     explorer: "https://evm-testnet.flowscan.io/address/0x72f0bd8d014cdB045efD33311028A3013769d69F",
   },
+  {
+    name: "OFACSanctionsRegistry",
+    address: "0x61C67B3527deE3F5861773fD3A223920953051AA",
+    explorer: "https://evm-testnet.flowscan.io/address/0x61C67B3527deE3F5861773fD3A223920953051AA",
+  },
+  {
+    name: "FHEComplianceBridge",
+    address: "0x4A646be6E51cF9Ecc849b7fcB5a6aCFc28321378",
+    explorer: "https://evm-testnet.flowscan.io/address/0x4A646be6E51cF9Ecc849b7fcB5a6aCFc28321378",
+  },
+  {
+    name: "DustSwapAdapterGeneric",
+    address: "0x3E140c501A39ab9DcA569E76f902E3bd8B11366c",
+    explorer: "https://evm-testnet.flowscan.io/address/0x3E140c501A39ab9DcA569E76f902E3bd8B11366c",
+  },
+  {
+    name: "NoteAnnouncer",
+    address: "0x5aC74e83F2A77073975503Ba5756bB6977fBa879",
+    explorer: "https://evm-testnet.flowscan.io/address/0x5aC74e83F2A77073975503Ba5756bB6977fBa879",
+  },
 ];
 
-export const metadata = docsMetadata("Smart Contracts — Deployed Addresses & Standards", "All Dust Protocol smart contract addresses on Ethereum Sepolia, Thanos Sepolia, and Flow EVM Testnet. Includes ERC-5564 Announcer, ERC-6538 Registry, DustPool, and DustPaymaster.", "/docs/contracts");
+const arbitrumContracts = [
+  {
+    name: "ERC5564Announcer",
+    address: "0x66254f9EdBaAe71B1d81A7cb7b40748A67D6AE42",
+    explorer: "https://sepolia.arbiscan.io/address/0x66254f9EdBaAe71B1d81A7cb7b40748A67D6AE42",
+  },
+  {
+    name: "ERC6538Registry",
+    address: "0xbF9cB629aEB33d7D3934c93aB2b467c366895Cf2",
+    explorer: "https://sepolia.arbiscan.io/address/0xbF9cB629aEB33d7D3934c93aB2b467c366895Cf2",
+  },
+  {
+    name: "EntryPoint v0.6",
+    address: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    explorer: "https://sepolia.arbiscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+  },
+  {
+    name: "StealthAccountFactory",
+    address: "0x85C0b4B3f8d594E3d72B781A915852409E3327fd",
+    explorer: "https://sepolia.arbiscan.io/address/0x85C0b4B3f8d594E3d72B781A915852409E3327fd",
+  },
+  {
+    name: "StealthWalletFactory",
+    address: "0xba3772E8a0D78f1909339aCfeb5420bD0C7c5D95",
+    explorer: "https://sepolia.arbiscan.io/address/0xba3772E8a0D78f1909339aCfeb5420bD0C7c5D95",
+  },
+  {
+    name: "DustPaymaster",
+    address: "0x3E140c501A39ab9DcA569E76f902E3bd8B11366c",
+    explorer: "https://sepolia.arbiscan.io/address/0x3E140c501A39ab9DcA569E76f902E3bd8B11366c",
+  },
+  {
+    name: "DustPoolV2",
+    address: "0x07E961c0d881c1439be55e5157a3d92a3efE305d",
+    explorer: "https://sepolia.arbiscan.io/address/0x07E961c0d881c1439be55e5157a3d92a3efE305d",
+  },
+  {
+    name: "FflonkVerifier (9 signals)",
+    address: "0x8359c6d73c92D8D63fF0f650f0F0061ed65B1128",
+    explorer: "https://sepolia.arbiscan.io/address/0x8359c6d73c92D8D63fF0f650f0F0061ed65B1128",
+  },
+  {
+    name: "FflonkSplitVerifier (15 signals)",
+    address: "0x7E726D2F8eE60B4Dede7A92461c2Fd15Bf38bb3A",
+    explorer: "https://sepolia.arbiscan.io/address/0x7E726D2F8eE60B4Dede7A92461c2Fd15Bf38bb3A",
+  },
+  {
+    name: "ComplianceVerifier",
+    address: "0xe6236145fddbC50439934Afb404a607Afaa14f51",
+    explorer: "https://sepolia.arbiscan.io/address/0xe6236145fddbC50439934Afb404a607Afaa14f51",
+  },
+  {
+    name: "NameVerifier",
+    address: "0x068C9591409CCa14c891DB2bfc061923CF1EfbaB",
+    explorer: "https://sepolia.arbiscan.io/address/0x068C9591409CCa14c891DB2bfc061923CF1EfbaB",
+  },
+  {
+    name: "DustSwapAdapterV2",
+    address: "0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94",
+    explorer: "https://sepolia.arbiscan.io/address/0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94",
+  },
+  {
+    name: "Uniswap V4 PoolManager",
+    address: "0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317",
+    explorer: "https://sepolia.arbiscan.io/address/0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317",
+  },
+];
+
+const opSepoliaContracts = [
+  {
+    name: "ERC5564Announcer",
+    address: "0x6CcA05728116B486dB2ee2E43344888708fFceb6",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x6CcA05728116B486dB2ee2E43344888708fFceb6",
+  },
+  {
+    name: "ERC6538Registry",
+    address: "0x0Fe67f27ed9Ff208b7C275A68da3a28Ec039F4dD",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x0Fe67f27ed9Ff208b7C275A68da3a28Ec039F4dD",
+  },
+  {
+    name: "EntryPoint v0.6",
+    address: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+  },
+  {
+    name: "StealthAccountFactory",
+    address: "0xB1D73BeA90f2eF2bAaA67740aEf97C6129192b94",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0xB1D73BeA90f2eF2bAaA67740aEf97C6129192b94",
+  },
+  {
+    name: "StealthWalletFactory",
+    address: "0x753D0F47c21093Ba5A09666Ec694c71684998626",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x753D0F47c21093Ba5A09666Ec694c71684998626",
+  },
+  {
+    name: "DustPaymaster",
+    address: "0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0xe1Ca871aE6905eAe7B442d0AF7c5612CAE0a9B94",
+  },
+  {
+    name: "DustPoolV2",
+    address: "0x068C9591409CCa14c891DB2bfc061923CF1EfbaB",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x068C9591409CCa14c891DB2bfc061923CF1EfbaB",
+  },
+  {
+    name: "FflonkVerifier (9 signals)",
+    address: "0xe13075B576D879F3Da58dA6E768B3Ce87bED54cA",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0xe13075B576D879F3Da58dA6E768B3Ce87bED54cA",
+  },
+  {
+    name: "FflonkSplitVerifier (15 signals)",
+    address: "0x65462968988B191ec43E55E911Ff3D47B885A906",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x65462968988B191ec43E55E911Ff3D47B885A906",
+  },
+  {
+    name: "ComplianceVerifier",
+    address: "0x769810c0A461aC0f457747324b7f2fedD65963A7",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x769810c0A461aC0f457747324b7f2fedD65963A7",
+  },
+  {
+    name: "NameVerifier",
+    address: "0x9E63A1d2505BC630C1bf0DEE1660050dF21D8c84",
+    explorer: "https://sepolia-optimism.etherscan.io/address/0x9E63A1d2505BC630C1bf0DEE1660050dF21D8c84",
+  },
+];
+
+const baseSepoliaContracts = [
+  {
+    name: "ERC5564Announcer",
+    address: "0x26640Ae565CB324b9253b41101E415f983E85DEf",
+    explorer: "https://sepolia.basescan.org/address/0x26640Ae565CB324b9253b41101E415f983E85DEf",
+  },
+  {
+    name: "ERC6538Registry",
+    address: "0xF1c5F2bF2E21287C49779c6893728A2B954478d1",
+    explorer: "https://sepolia.basescan.org/address/0xF1c5F2bF2E21287C49779c6893728A2B954478d1",
+  },
+  {
+    name: "EntryPoint v0.6",
+    address: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+    explorer: "https://sepolia.basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+  },
+  {
+    name: "StealthAccountFactory",
+    address: "0xd539DA238B7407aE06886458dBdD8e4068c29A3e",
+    explorer: "https://sepolia.basescan.org/address/0xd539DA238B7407aE06886458dBdD8e4068c29A3e",
+  },
+  {
+    name: "StealthWalletFactory",
+    address: "0xF201ad71388aA1624B8005E3d9c4f02B6FC2D547",
+    explorer: "https://sepolia.basescan.org/address/0xF201ad71388aA1624B8005E3d9c4f02B6FC2D547",
+  },
+  {
+    name: "DustPaymaster",
+    address: "0xA2ec6653f6F56bb1215071D4cD8daE7A5A87ddB2",
+    explorer: "https://sepolia.basescan.org/address/0xA2ec6653f6F56bb1215071D4cD8daE7A5A87ddB2",
+  },
+  {
+    name: "DustPoolV2",
+    address: "0x17f52f01ffcB6d3C376b2b789314808981cebb16",
+    explorer: "https://sepolia.basescan.org/address/0x17f52f01ffcB6d3C376b2b789314808981cebb16",
+  },
+  {
+    name: "FflonkVerifier (9 signals)",
+    address: "0xe51ebD6B1F1ad7d7E4874Bb7D4E53a0504cCf652",
+    explorer: "https://sepolia.basescan.org/address/0xe51ebD6B1F1ad7d7E4874Bb7D4E53a0504cCf652",
+  },
+  {
+    name: "FflonkSplitVerifier (15 signals)",
+    address: "0x503e68AdccFbAc5A2F991FC285735a119bF364F7",
+    explorer: "https://sepolia.basescan.org/address/0x503e68AdccFbAc5A2F991FC285735a119bF364F7",
+  },
+  {
+    name: "ComplianceVerifier",
+    address: "0x33b72e6d7b39a32B88715b658f2248897Af2e650",
+    explorer: "https://sepolia.basescan.org/address/0x33b72e6d7b39a32B88715b658f2248897Af2e650",
+  },
+  {
+    name: "NameVerifier",
+    address: "0x416D52f0566081b6881eA887baD3FB1a54fa94aF",
+    explorer: "https://sepolia.basescan.org/address/0x416D52f0566081b6881eA887baD3FB1a54fa94aF",
+  },
+  {
+    name: "DustSwapAdapterV2",
+    address: "0x844d11bD48D85411eE8cD1a7cB0aC00672B1d516",
+    explorer: "https://sepolia.basescan.org/address/0x844d11bD48D85411eE8cD1a7cB0aC00672B1d516",
+  },
+  {
+    name: "Uniswap V4 PoolManager",
+    address: "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408",
+    explorer: "https://sepolia.basescan.org/address/0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408",
+  },
+];
+
+export const metadata = docsMetadata("Smart Contracts — Deployed Addresses & Standards", "All Dust Protocol smart contract addresses across Ethereum Sepolia, Thanos Sepolia, Arbitrum Sepolia, OP Sepolia, Base Sepolia, and Flow EVM Testnet. Includes ERC-5564 Announcer, ERC-6538 Registry, DustPool, DustPoolV2, DustSwap, and DustPaymaster.", "/docs/contracts");
 
 export default function ContractsPage() {
   return (
@@ -316,11 +530,110 @@ export default function ContractsPage() {
           <DocsBadge variant="muted">Flow Network</DocsBadge>
         </div>
         <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
-          Flow EVM Testnet has core stealth transfer, V2 ZK-UTXO pool, and compliance contracts. DustSwap not yet deployed.
+          Full privacy stack including stealth transfers, V2 ZK-UTXO pool, compliance (OFAC + FHE bridge), and private swaps via DustSwapAdapterGeneric (PunchSwap V2).
         </p>
 
         <div className="space-y-2">
           {flowContracts.map((c) => (
+            <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
+              <div className="px-4 py-3 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
+                </div>
+                <a
+                  href={c.explorer}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
+                >
+                  Explorer ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Arbitrum Sepolia */}
+      <section className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-sm font-mono font-semibold text-white tracking-wider uppercase">Arbitrum Sepolia</h2>
+          <span className="text-[10px] font-mono text-[rgba(255,255,255,0.3)]">Chain ID: 421614</span>
+          <DocsBadge variant="muted">Arbitrum L2</DocsBadge>
+        </div>
+        <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
+          Full privacy stack including stealth transfers, V2 ZK-UTXO pool, compliance, and private swaps via DustSwapAdapterV2 (Uniswap V4).
+        </p>
+
+        <div className="space-y-2">
+          {arbitrumContracts.map((c) => (
+            <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
+              <div className="px-4 py-3 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
+                </div>
+                <a
+                  href={c.explorer}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
+                >
+                  Explorer ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* OP Sepolia */}
+      <section className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-sm font-mono font-semibold text-white tracking-wider uppercase">OP Sepolia</h2>
+          <span className="text-[10px] font-mono text-[rgba(255,255,255,0.3)]">Chain ID: 11155420</span>
+          <DocsBadge variant="muted">OP Stack L2</DocsBadge>
+        </div>
+        <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
+          Stealth transfers, V2 ZK-UTXO pool, and compliance contracts. DustSwap intentionally not deployed — no Uniswap V4 PoolManager available on this chain.
+        </p>
+
+        <div className="space-y-2">
+          {opSepoliaContracts.map((c) => (
+            <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
+              <div className="px-4 py-3 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-mono font-semibold text-white mb-1.5">{c.name}</p>
+                  <code className="text-[10px] font-mono text-[rgba(0,255,65,0.6)] break-all">{c.address}</code>
+                </div>
+                <a
+                  href={c.explorer}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-[10px] font-mono text-[rgba(255,255,255,0.3)] hover:text-[#00FF41] transition-colors pt-1"
+                >
+                  Explorer ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Base Sepolia */}
+      <section className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-sm font-mono font-semibold text-white tracking-wider uppercase">Base Sepolia</h2>
+          <span className="text-[10px] font-mono text-[rgba(255,255,255,0.3)]">Chain ID: 84532</span>
+          <DocsBadge variant="muted">Base L2</DocsBadge>
+        </div>
+        <p className="text-xs text-[rgba(255,255,255,0.4)] leading-relaxed mb-4">
+          Full privacy stack including stealth transfers, V2 ZK-UTXO pool, compliance, and private swaps via DustSwapAdapterV2 (Uniswap V4).
+        </p>
+
+        <div className="space-y-2">
+          {baseSepoliaContracts.map((c) => (
             <div key={c.address} className="border border-[rgba(255,255,255,0.06)] rounded-sm overflow-hidden">
               <div className="px-4 py-3 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">

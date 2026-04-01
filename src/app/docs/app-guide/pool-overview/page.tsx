@@ -140,10 +140,17 @@ export default function PoolOverviewAppGuidePage() {
           withdrawals, transfers), Uniswap V4 swap pool, DustSwapAdapterV2, and Chainlink oracle.
           This is the primary testnet.
         </p>
-        <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed">
-          <span className="text-white">Thanos Sepolia</span> — Pool operations only (deposits,
-          withdrawals, transfers). No swap pool or oracle. Shown as a dimmed entry in the networks
-          list. Additional L2 deployments are planned.
+        <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed mb-3">
+          <span className="text-white">Arbitrum Sepolia</span> / <span className="text-white">Base Sepolia</span> — Pool
+          operations and privacy swaps via Uniswap V4.
+        </p>
+        <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed mb-3">
+          <span className="text-white">Flow EVM Testnet</span> — Pool operations and privacy swaps
+          via PunchSwap V2.
+        </p>
+        <p className="text-sm text-[rgba(255,255,255,0.6)] leading-relaxed mb-3">
+          <span className="text-white">Thanos Sepolia</span> / <span className="text-white">OP Sepolia</span> — Pool
+          operations only (deposits, withdrawals, transfers). No swap pool or oracle.
         </p>
         <PoolNetworksSnippet />
       </section>
